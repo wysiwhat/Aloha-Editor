@@ -226,36 +226,7 @@ define( [
 			} );
 		}
 
-		Wikidocs.bindElementsChanged(
-			{ withName: [ "table", "td", "tr", "caption" ] },
-			function ( inserted, deleted, editable ) {
-				unregisterTables( editable );
-
-				// Although unregisterTables() will deactivate tables,
-				// we may still have some UI elements floating around if
-				// a table object itself was removed since the
-				// deactivation code can't re-find the UI elements if
-				// for example the table element itself was
-				// deleted.
-				// TODO: Optimizable with something like a
-				// before-document-changes event so that we could remove
-				// the ui code before the changes are actually applied.
-				var remove
-					= "." + TablePlugin.get( "classSelectionColumn" )
-					+ ", ." + TablePlugin.get( "classSelectionRow" )
-				editable.obj.find( remove ).each(function(){
-					jQuery( this ).remove();
-				});
-				var unwrapChildren
-					= "." + TablePlugin.get( "classTableWrapper" )
-					+ ", .aloha-editable-caption"
-					+ ", .aloha-table-cell-editable";
-				editable.obj.find( unwrapChildren  ).each(function(){
-					jQuery( this ).replaceWith( jQuery( this ).contents() );
-				});
-
-				registerNewTables( editable );
-			});
+		initWikidocs();
 	};
 
 	//namespace prefix for this plugin
@@ -1449,6 +1420,73 @@ define( [
 				registry.splice( numEntries, 1 );
 			}
 		}
+	}
+
+	/**
+	 * Called during table-plugin initialization to perform wikidocs-plugin specific initialization.
+	 */
+	function initWikidocs() {
+		// Wait until Aloha is ready which ensures all plugins that are to be loaded have been loaded
+		Aloha.ready(function(){
+			// Specialy initialization only needs to be done if the wikidocs-plugin actually is loaded
+			if (Aloha.isPluginLoaded("wikidocs")) {
+				Aloha.require([ 'wikidocs/wikidocs-plugin' ], initWithWikidocs);
+			}
+		});
+	}
+
+	/**
+	 * When Aloha is ready and the wikidocs-plugin was loaded, will be invoked with the wikidocs-plugin.
+	 *
+	 * @param Wikidocs
+	 *        The wikdiocs plugin that was loaded by Aloha.
+	 */
+	function initWithWikidocs(Wikidocs) {
+		// Should the table structure be modified, we'll have
+		// to update the internal state to reflect the new structure.
+		// Optimally, there should be no internal state.
+		Wikidocs.bindRemoteChanges(
+			{ withName: [ "table", "th", "td", "tr", "caption" ] },
+			function ( inserted, deleted, editable ) {
+				// We update the internal state by just resetting
+				// everything, although that's not optimal.
+				unregisterTables( editable );
+
+				// Although unregisterTables() will deactivate tables,
+				// we may still have some UI elements floating around if
+				// a table object itself was removed, since the
+				// deactivation code can't re-find the UI elements if
+				// for example the table element itself was
+				// deleted.
+				// TODO: Optimizable with something like a
+				// before-document-changes event so that we could remove
+				// the ui code before the changes are actually applied.
+				removeUiElements( editable );
+
+				registerNewTables( editable );
+			});
+	}
+
+	/**
+	 * Removes table-plugin UI elements from the given editable.
+	 *
+	 * @param editable
+	 *        Only descendants of the given editable will be affected.
+	 */
+	function removeUiElements( editable ) {
+		var remove
+			=   "." + TablePlugin.get( "classSelectionColumn" )
+			+ ", ." + TablePlugin.get( "classSelectionRow" )
+		editable.obj.find( remove ).each(function(){
+			jQuery( this ).remove();
+		});
+		var unwrapChildren
+			= "." + TablePlugin.get( "classTableWrapper" )
+			+ ", .aloha-editable-caption"
+			+ ", .aloha-table-cell-editable";
+		editable.obj.find( unwrapChildren  ).each(function(){
+			jQuery( this ).replaceWith( jQuery( this ).contents() );
+		});
 	}
 
 	return TablePlugin;
