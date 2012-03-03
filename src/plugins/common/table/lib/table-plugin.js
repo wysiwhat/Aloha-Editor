@@ -1436,7 +1436,8 @@ define( [
 	}
 
 	/**
-	 * When Aloha is ready and the wikidocs-plugin was loaded, will be invoked with the wikidocs-plugin.
+	 * When Aloha is ready and if (and only if) the wikidocs-plugin was
+	 * loaded, will be invoked with the wikidocs-plugin.
 	 *
 	 * @param Wikidocs
 	 *        The wikdiocs plugin that was loaded by Aloha.
