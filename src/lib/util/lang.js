@@ -7,7 +7,55 @@
 GENTICS = window.GENTICS || {};
 GENTICS.Utils = GENTICS.Utils || {};
 
-define( 'util/lang', [], function(){} );
+define( "util/lang", [], function(){
+
+	return {
+		/**
+		 * Implements unique() using the browser's sort().
+		 *
+		 * @param array
+		 *        The array to sort and strip of duplicate values.
+		 * @param compFunc
+		 *        A custom comparison function that accepts two values
+		 *        a and b from the given array and returns -1, 0, 1
+		 *        depending on whether a < b, a == b, a > b respectively.
+		 *        If no compFunc is provided, the algorithm will the
+		 *        browsers default sort behaviour and a loosely
+		 *        comparison to detect duplicates.
+		 * @return
+		 *        A sorted array containing all values from the given array
+		 *        excluding duplicates.
+		 */
+		"sortUnique": function( array, compFunc ){
+			if ( 0 === array.length ) {
+				return [];
+			}
+
+			var sorted = array.slice();
+			if ( compFunc ) {
+				sorted.sort( compFunc );
+			} else {
+				sorted.sort();
+			}
+
+			var result = new Array( sorted.length );
+			var lastValue = sorted[ 0 ]; // array.length >= 1 checked above
+			result[ 0 ] = lastValue;
+
+			var j = 1;
+			var len = sorted.length;
+			for ( var i = 1; i < len; i++ ) {
+				var value = sorted[ i ];
+				// Use loosely typed comparsion if no compFunc is given
+				// to avoid sortUnique( [6, "6", 6] ) => [6, "6", 6]
+				if ( compFunc ? 0 !== compFunc( lastValue, value ) : lastValue != value ) {
+					lastValue = result[ j++ ] = value;
+				}
+			}
+			return result.slice(0, j);
+		}
+	};
+} );
 
 // Start Closure
 (function(window, undefined) {
