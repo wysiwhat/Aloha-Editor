@@ -38,21 +38,17 @@ define( "util/lang", [], function(){
 				sorted.sort();
 			}
 
-			var result = new Array( sorted.length );
-			var lastValue = sorted[ 0 ]; // array.length >= 1 checked above
-			result[ 0 ] = lastValue;
-
-			var j = 1;
+			var j = 0;
 			var len = sorted.length;
 			for ( var i = 1; i < len; i++ ) {
 				var value = sorted[ i ];
 				// Use loosely typed comparsion if no compFunc is given
 				// to avoid sortUnique( [6, "6", 6] ) => [6, "6", 6]
-				if ( compFunc ? 0 !== compFunc( lastValue, value ) : lastValue != value ) {
-					lastValue = result[ j++ ] = value;
+				if ( compFunc ? 0 !== compFunc( sorted[ j ], value ) : sorted[ j ] != value ) {
+					sorted[ ++j ] = value;
 				}
 			}
-			return result.slice(0, j);
+			return sorted.slice(0, j + 1);
 		}
 	};
 } );
