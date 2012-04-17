@@ -23,7 +23,6 @@ define([
 	"./format",
 	"./horizontalRule",
 	"./justify",
-	"./languageAnnotation",
 	"./link",
 	"./list",
 	"./metaview",
