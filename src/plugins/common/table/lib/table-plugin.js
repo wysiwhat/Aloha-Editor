@@ -11,6 +11,7 @@ define( [
 	'aloha/plugin',
 	'aloha/pluginmanager',
 	'aloha/floatingmenu',
+	'aloha/ui-classifier',
 	'i18n!table/nls/i18n',
 	'i18n!aloha/nls/i18n',
 	'table/table-create-layer',
@@ -22,6 +23,7 @@ define( [
 	         Plugin,
 	         PluginManager,
 	         FloatingMenu,
+			 UiClassifier,
 	         i18n,
 	         i18nCore,
 	         CreateLayer,
@@ -56,7 +58,7 @@ define( [
 	 * An Array which holds all newly created tables contains DOM-Nodes of
 	 * table-objects
 	 */
-	TablePlugin.TableRegistry = new Array();
+	TablePlugin.TableRegistry = [];
 
 	/**
 	 * Holds the active table-object
@@ -126,6 +128,11 @@ define( [
 
 		var that = this;
 
+		UiClassifier.registerUiClasses([
+			this.get('className'),
+			this.get('classCellSelected'),
+		]);
+
 		// subscribe for the 'editableActivated' event to activate all tables in the editable
 		Aloha.bind( 'aloha-editable-created', function ( event, editable ) {
 
@@ -134,18 +141,7 @@ define( [
 				TablePlugin.setFocusedTable( undefined );
 			} );
 
-			editable.obj.find( 'table' ).each( function () {
-				// only convert tables which are editable
-				if ( that.isEditableTable( this ) &&
-						!TablePlugin.isWithinTable( this ) ) {
-					var table = new Table( this, TablePlugin );
-					table.parentEditable = editable;
-					// table.activate();
-					TablePlugin.TableRegistry.push( table );
-				}
-				
-				TablePlugin.checkForNestedTables( editable.obj );
-			} );
+			registerNewTables( editable );
 		} );
 
 		// initialize the table buttons
@@ -200,30 +196,7 @@ define( [
 
 		// subscribe for the 'editableActivated' event to activate all tables in the editable
 		Aloha.bind( 'aloha-editable-activated', function (event, props) {
-			props.editable.obj.find('table').each(function () {
-				// shortcut for TableRegistry
-				var tr = TablePlugin.TableRegistry;
-				for (var i = 0; i < tr.length; i++) {
-					if (tr[i].obj.attr('id') == jQuery(this).attr('id')) {
-						// activate the table
-						tr[i].activate();
-						// and continue with the next table tag
-						return true;
-					}
-				}
-
-				// if we come here, we did not find the table in our registry, so we need to create a new one
-				// only convert tables which are editable
-				if ( that.isEditableTable( this ) &&
-						!TablePlugin.isWithinTable( this ) ) {
-					var table = new Table( this, TablePlugin );
-					table.parentEditable = props.editable;
-					table.activate();
-					TablePlugin.TableRegistry.push( table );
-				}
-				
-				TablePlugin.checkForNestedTables( props.editable.obj );
-			});
+			registerNewTables( props.editable );
 		});
 
 		// subscribe for the 'editableDeactivated' event to deactivate all tables in the editable
@@ -243,19 +216,7 @@ define( [
 		
 		Aloha.bind( 'aloha-smart-content-changed', function ( event ) {
 			if ( Aloha.activeEditable ) {
-				Aloha.activeEditable.obj.find( 'table' ).each( function () {
-					if ( TablePlugin.indexOfTableInRegistry( this ) == -1 &&
-							!TablePlugin.isWithinTable( this ) ) {
-						this.id = GENTICS.Utils.guid();
-						
-						var table = new Table( this, TablePlugin );
-						table.parentEditable = Aloha.activeEditable;
-						TablePlugin.TableRegistry.push( table );
-						table.activate();
-					}
-					
-					TablePlugin.checkForNestedTables( Aloha.activeEditable.obj );
-				} );
+				registerNewTables( Aloha.activeEditable );
 			}
 		} );
 		
@@ -264,6 +225,8 @@ define( [
 				that.initSidebar( Aloha.Sidebar.right.show() );  
 			} );
 		}
+
+		initWikidocs();
 	};
 
 	//namespace prefix for this plugin
@@ -412,19 +375,6 @@ define( [
 		return ( jQuery( elem )
 					.parents( '.aloha-editable table' )
 						.length > 0 );
-	};
-	
-	/**
-	 * Checks for the presence of nested tables in the given editable.
-	 * @todo complete
-	 * @param {jQuery} editable
-	 */
-	TablePlugin.checkForNestedTables = function ( editable ) {
-		if ( editable.find( 'table table' ).length ) {
-			// show warning
-		} else {
-			// hide warning
-		}
 	};
 	
 	/**
@@ -626,24 +576,27 @@ define( [
 					  var sc = that.activeTable.selection.selectedCells;
 					  // if a selection was made, transform the selected cells
 					  for (var i = 0; i < sc.length; i++) {
-						  for (var j = 0; j < sc[i].length; j++) {
-							  // remove all row formattings
-							  for (var f = 0; f < that.rowConfig.length; f++) {
-								  jQuery(sc[i][j]).removeClass(that.rowConfig[f].cssClass);
-							  }
-							  // set new style 
-							  jQuery(sc[i][j]).addClass(itemConf.cssClass);
-						  }
-					  }
-					  
-					  // selection could have changed.
-					  that.activeTable.selectRows();
-				  }
-			  }
-		  });
-      });
-    
-      if (this.rowMSItems.length > 0) {
+						if ( jQuery(sc[i]).attr('class').indexOf(itemConf.cssClass) > -1 ) {
+							jQuery(sc[i]).removeClass(itemConf.cssClass);
+						} else {
+							jQuery(sc[i]).addClass(itemConf.cssClass);
+							// remove all row formattings
+							for (var f = 0; f < that.rowConfig.length; f++) {
+								if (that.rowConfig[f].cssClass != itemConf.cssClass) {
+									jQuery(sc[i]).removeClass(that.rowConfig[f].cssClass);
+								}
+							}
+							
+						}
+					}
+					// selection could have changed.
+					that.activeTable.selectRows();
+				}
+			}
+		});
+	});
+
+	if (this.rowMSItems.length > 0) {
 		  this.rowMSItems.push({
 			  name: 'removeFormat',
 			  text: i18n.t('button.removeFormat.text'),
@@ -651,20 +604,17 @@ define( [
 			  iconClass: 'aloha-button aloha-button-removeFormat',
 			  wide: true,
 			  click: function () {
-				  if (that.activeTable) {
-					  var sc = that.activeTable.selection.selectedCells;
-					  // if a selection was made, transform the selected cells
-					  for (var i = 0; i < sc.length; i++) {
-						  for (var j = 0; j < sc[i].length; j++) {
-							  for (var f = 0; f < that.rowConfig.length; f++) {
-								  jQuery(sc[i][j]).removeClass(that.rowConfig[f].cssClass);
-							  }
-						  }
-					  }
-					  
-					  // selection could have changed.
-					  that.activeTable.selectRows();
-				  }
+				if (that.activeTable) {
+					var sc = that.activeTable.selection.selectedCells;
+					// if a selection was made, transform the selected cells
+					for (var i = 0; i < sc.length; i++) {
+						for (var f = 0; f < that.rowConfig.length; f++) {
+							jQuery(sc[i]).removeClass(that.rowConfig[f].cssClass);
+						}
+					}
+					// selection could have changed.
+					that.activeTable.selectRows();
+				}
 			  }
 		  });
       }
@@ -837,7 +787,6 @@ define( [
       i18n.t('floatingmenu.tab.table'),
       1
     );
-
     
     // generate formatting buttons
     this.columnMSItems = [];
@@ -852,13 +801,16 @@ define( [
 				var sc = that.activeTable.selection.selectedCells;
 				// if a selection was made, transform the selected cells
 				for (var i = 0; i < sc.length; i++) {
-					for (var j = 0; j < sc[i].length; j++) {
-						// remove all columnformattings
+					if ( jQuery(sc[i]).attr('class').indexOf(itemConf.cssClass) > -1 ) {
+						jQuery(sc[i]).removeClass(itemConf.cssClass);
+					} else {
+						jQuery(sc[i]).addClass(itemConf.cssClass);
+						// remove all column formattings
 						for (var f = 0; f < that.columnConfig.length; f++) {
-							jQuery(sc[i][j]).removeClass(that.columnConfig[f].cssClass);
+							if (that.columnConfig[f].cssClass != itemConf.cssClass) {
+								jQuery(sc[i]).removeClass(that.columnConfig[f].cssClass);
+							}
 						}
-						// set new style
-						jQuery(sc[i][j]).addClass(itemConf.cssClass);
 					}
 				}
 				// selection could have changed.
@@ -882,13 +834,10 @@ define( [
 				var sc = that.activeTable.selection.selectedCells;
 				// if a selection was made, transform the selected cells
 				for (var i = 0; i < sc.length; i++) {
-					for (var j = 0; j < sc[i].length; j++) {
-						for (var f = 0; f < that.columnConfig.length; f++) {
-							jQuery(sc[i][j]).removeClass(that.columnConfig[f].cssClass);
-						}
+					for (var f = 0; f < that.columnConfig.length; f++) {
+						jQuery(sc[i]).removeClass(that.columnConfig[f].cssClass);
 					}
 				}
-				
 				// selection could have changed.
 				that.activeTable.selectColumns();
 			}
@@ -1058,7 +1007,7 @@ define( [
 						var captionText = i18n.t('empty.caption');
 						var c = jQuery('<caption></caption>');
 						that.activeTable.obj.append(c);
-						that.makeCaptionEditable(c, captionText);
+						that.activeTable.makeCaptionEditable(captionText);
 
 						// get the editable span within the caption and select it
 						var cDiv = c.find('div').eq(0);
@@ -1107,44 +1056,6 @@ define( [
 				1
 			);
 		}
-	};
-
-	/**
-	 * Helper method to make the caption editable
-	 * @param caption caption as jQuery object
-	 * @param captionText default text for the caption
-	 */
-	TablePlugin.makeCaptionEditable = function(caption, captionText) {
-		var that = this;
-		var cSpan = caption.children('div').eq(0);
-		if (cSpan.length == 0) {
-			// generate a new div
-			cSpan = jQuery('<div></div>');
-			jQuery(cSpan).addClass('aloha-ui');
-			jQuery(cSpan).addClass('aloha-editable-caption');
-			if (caption.contents().length > 0) {
-				// when the caption has content, we wrap it with the new div
-				caption.contents().wrap(cSpan);
-			} else {
-				// caption has no content, so insert the default caption text
-				if (captionText) {
-					cSpan.text(captionText);
-				}
-				// and append the div into the caption
-				caption.append(cSpan);
-			}
-		}
-		// make the div editable
-		cSpan.contentEditable(true);
-		cSpan.unbind('mousedown');
-		// focus on click
-		cSpan.bind('mousedown', function(jqEvent) {
-			cSpan.focus();
-			// stop bubble, otherwise the mousedown of the table is called ...
-			jqEvent.preventDefault();
-			jqEvent.stopPropagation();
-			return false;
-		});
 	};
 
 	/**
@@ -1234,9 +1145,6 @@ define( [
 
 				TablePlugin.TableRegistry.push( tableObj );
 			}
-			
-			TablePlugin.checkForNestedTables( Aloha.activeEditable.obj );
-		// no active editable => error
 		} else {
 			this.error( 'There is no active Editable where the table can be\
 				inserted!' );
@@ -1259,8 +1167,7 @@ define( [
 			if ( focusTable.obj.children("caption").is('caption') ) {
 				// set caption button
 				that.captionButton.setPressed(true);
-				var c = focusTable.obj.children("caption");
-				that.makeCaptionEditable(c);
+				focusTable.makeCaptionEditable();
 			}
 			focusTable.hasFocus = true;
 		}
@@ -1370,23 +1277,6 @@ define( [
 	};
 
 	/**
-	 * Make the given jQuery object (representing an editable) clean for saving
-	 * Find all tables and deactivate them
-	 * @param obj jQuery object to make clean
-	 * @return void
-	 */
-	TablePlugin.makeClean = function ( obj ) {
-		var that = this;
-		obj.find( 'table' ).each( function () {
-			// Make sure that we only deactivate tables in obj which have the
-			// same id as tables which have been activated and registered
-			if ( that.getTableFromRegistry( this ) ) {
-				( new Table( this, that ) ).deactivate();
-			}
-		} );
-	};
-	
-	/**
 	 * String representation of the Table-object
 	 *
 	 * @return The plugins namespace (string)
@@ -1494,5 +1384,104 @@ define( [
 		}
 	};
 	
+	function registerNewTables( editable ) {
+		editable.obj.find( "table" ).each(function () {
+			var table = TablePlugin.getTableFromRegistry( this );
+			if ( null == table ) {
+				if (   TablePlugin.isEditableTable( this )
+					&& ! TablePlugin.isWithinTable( this ) ) {
+					table = new Table( this, TablePlugin );
+					table.parentEditable = editable;
+					TablePlugin.TableRegistry.push( table );
+				}
+			}
+			if ( null != table && ! table.isActive && editable.isActive ) {
+				table.activate();
+			}
+		});
+	}
+
+	function unregisterTables( editable ) {
+		var registry = TablePlugin.TableRegistry;
+		var numEntries = registry.length;
+		while ( numEntries-- ) {
+			var table = registry[ numEntries ];
+			if ( table.parentEditable === editable ) {
+				if ( table.isActive ) {
+					table.deactivate();
+				}
+				registry.splice( numEntries, 1 );
+			}
+		}
+	}
+
+	/**
+	 * Called during table-plugin initialization to perform wikidocs-plugin specific initialization.
+	 */
+	function initWikidocs() {
+		// Wait until Aloha is ready which ensures all plugins that are to be loaded have been loaded
+		Aloha.ready(function(){
+			// Specialy initialization only needs to be done if the wikidocs-plugin actually is loaded
+			if (Aloha.isPluginLoaded("wikidocs")) {
+				Aloha.require([ 'wikidocs/wikidocs-plugin' ], initWithWikidocs);
+			}
+		});
+	}
+
+	/**
+	 * When Aloha is ready and if (and only if) the wikidocs-plugin was
+	 * loaded, will be invoked with the wikidocs-plugin.
+	 *
+	 * @param Wikidocs
+	 *        The wikdiocs plugin that was loaded by Aloha.
+	 */
+	function initWithWikidocs(Wikidocs) {
+		// Should the table structure be modified, we'll have
+		// to update the internal state to reflect the new structure.
+		// Optimally, there should be no internal state.
+		Wikidocs.bindRemoteChanges(
+			{ withName: [ "table", "th", "td", "tr", "caption" ] },
+			function ( inserted, deleted, editable ) {
+				// We update the internal state by just resetting
+				// everything, although that's not optimal.
+				unregisterTables( editable );
+
+				// Although unregisterTables() will deactivate tables,
+				// we may still have some UI elements floating around if
+				// a table object itself was removed, since the
+				// deactivation code can't re-find the UI elements if
+				// for example the table element itself was
+				// deleted.
+				// TODO: Optimizable with something like a
+				// before-document-changes event so that we could remove
+				// the ui code before the changes are actually applied.
+				removeUiElements( editable );
+
+				registerNewTables( editable );
+			});
+	}
+
+	/**
+	 * Removes table-plugin UI elements from the given editable.
+	 *
+	 * @param editable
+	 *        Only descendants of the given editable will be affected.
+	 */
+	function removeUiElements( editable ) {
+		var remove
+			=   "." + TablePlugin.get( "classSelectionColumn" )
+			+ ", ." + TablePlugin.get( "classSelectionRow" )
+		editable.obj.find( remove ).each(function(){
+			jQuery( this ).remove();
+		});
+		var unwrapChildren
+			= "." + TablePlugin.get( "classTableWrapper" )
+			+ ", .aloha-editable-caption"
+			+ ", .aloha-table-cell-editable";
+		editable.obj.find( unwrapChildren  ).each(function(){
+			jQuery( this ).replaceWith( jQuery( this ).contents() );
+		});
+	}
+
 	return TablePlugin;
 });
