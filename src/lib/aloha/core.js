@@ -22,10 +22,11 @@ define(
 
 [
 	'aloha/jquery',
-	'aloha/pluginmanager'
+	'aloha/pluginmanager',
+	'require'
 ],
 
-function ( jQuery, PluginManager ) {
+	function ( jQuery, PluginManager, requirejs ) {
 	"use strict";
 
 
@@ -520,16 +521,17 @@ function ( jQuery, PluginManager ) {
 		},
 
 		/**
-		 * Determines the Aloha Url
+		 * Gets the absolute URL of the aloha.js script include.
+		 *
+		 * The aloha.js script include is usually used to load Aloha-Editor.
+		 * For example http://example.com:8080/Aloha-Editor/src/lib.
+		 *
 		 * @method
 		 * @return {String} alohaUrl
 		 */
 		getAlohaUrl: function( suffix ) {
-			// aloha base path is defined by a script tag with 2 data attributes
-			var requireJs = jQuery('[data-aloha-plugins]'),
-				baseUrl = ( requireJs.length ) ? requireJs[0].src.replace( /\/?aloha.js$/ , '' ) : '';
-				
-			return baseUrl;
+			// toUrl will return "<whatever>/src/lib/." and we strip the trailing "/."
+			return requirejs.toUrl(".").replace(/\/\.$/, "");
 		},
 
 		/**
