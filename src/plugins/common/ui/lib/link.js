@@ -79,11 +79,15 @@ function( Aloha, jQuery, i18n, Browser, Component, Surface, Autocomplete, Button
 		selectionChange: function() {
 			var value = Aloha.queryCommandValue( "createLink" );
 			if ( value ) {
-				this.show();
-				value = jQuery( findAnchor() ).attr( "data-name" ) || value;
+				jQuery( this.element ).prop( "disabled", false );
+				jQuery( this.element ).removeClass( "button-disabled" );
+				this.anchor = findAnchor();
+				value = jQuery( this.anchor ).attr( "data-name" ) || value;
 				this.element.val( value );
 			} else {
-				this.hide();
+				jQuery( this.element ).addClass( "button-disabled" );
+				jQuery( this.element ).prop( "disabled", true );
+				jQuery( this.anchor ).attr( "href", this.element.val() );
 			}
 		},
 
@@ -136,9 +140,9 @@ function( Aloha, jQuery, i18n, Browser, Component, Surface, Autocomplete, Button
 		selectionChange: function() {
 			var value = Aloha.queryCommandValue( "createLink" );
 			if ( value ) {
-				this.show();
+				jQuery( this.element ).removeClass( "button-disabled" );
 			} else {
-				this.hide();
+				jQuery( this.element ).addClass( "button-disabled" );
 			}
 		}
 	});

@@ -1,12 +1,13 @@
 define([
 	"aloha/core",
+	"aloha/jquery",
 	"i18n!ui/nls/i18n",
 	"ui/component",
 	"ui/surface",
 	"ui/button",
 	"ui/toggleCommandButton"
 ],
-function( Aloha, i18n, Component, Surface, Button, ToggleCommandButton ) {
+function( Aloha, $, i18n, Component, Surface, Button, ToggleCommandButton ) {
 	/**
 	 * Ordered list component
 	 * @class
@@ -116,9 +117,9 @@ function( Aloha, i18n, Component, Surface, Button, ToggleCommandButton ) {
 		 */
 		selectionChange: function() {
 			if ( inList() ) {
-				this.show();
+				$( this.element ).removeClass( "button-disabled" );
 			} else {
-				this.hide();
+				$( this.element ).addClass( "button-disabled" );
 			}
 		}
 	});
@@ -161,9 +162,9 @@ function( Aloha, i18n, Component, Surface, Button, ToggleCommandButton ) {
 		 */
 		selectionChange: function() {
 			if ( inList() ) {
-				this.show();
+				$( this.element ).removeClass( "button-disabled" );
 			} else {
-				this.hide();
+				$( this.element ).addClass( "button-disabled" );
 			}
 		}
 	});
