@@ -1,9 +1,9 @@
 define([
 	"aloha/jquery",
 	"aloha/repositorymanager",
-	"ui/component",
+	"ui/component"
 	
-	"jquery-plugin!./vendor/jquery-ui-autocomplete-html"
+/*	,"jquery-plugin!./vendor/jquery-ui-autocomplete-html"*/
 ],
 function( jQuery, RepositoryManager, Component ) {
 	/**
@@ -32,7 +32,7 @@ function( jQuery, RepositoryManager, Component ) {
 			this._super();
 			var that = this;
 			this.element = jQuery( "<input>" )
-				.autocomplete({
+				/*.autocomplete({
 					html: true,
 					source: function( req, res ) {
 						RepositoryManager.query({
@@ -48,7 +48,7 @@ function( jQuery, RepositoryManager, Component ) {
 							}));
 						});
 					}
-				})
+				})*/
 				.bind( "autocompletechange", jQuery.proxy( function( event, ui ) {
 					this.setValue( event.target.value, ui.item ? ui.item.obj : null );
 				}, this ) );
