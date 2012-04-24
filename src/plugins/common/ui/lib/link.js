@@ -87,7 +87,10 @@ function( Aloha, jQuery, i18n, Browser, Component, Surface, Autocomplete, Button
 			} else {
 				jQuery( this.element ).addClass( "button-disabled" );
 				jQuery( this.element ).prop( "disabled", true );
-				jQuery( this.anchor ).attr( "href", this.element.val() );
+				var newValue = this.element.val();
+				if ( newValue )
+					jQuery( this.anchor ).attr( "href",  newValue );
+				this.element.val( "" );
 			}
 		},
 
