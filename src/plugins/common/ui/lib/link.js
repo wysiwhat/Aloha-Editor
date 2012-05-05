@@ -72,6 +72,20 @@ function( Aloha, jQuery, i18n, Browser, Component, Surface, Autocomplete, Button
 		 */
 		template: "{{name}}<br>{{url}}",
 
+		init: function() {
+			this._super();
+			this.element.keypress(function(e){
+				// When the user presses enter after editing a link, set
+				// the selection back to where it originally was. This
+				// will also deactivate the input element.
+				if (13 === e.which && Surface.range) {
+					var selection = Aloha.getSelection();
+					selection.removeAllRanges();
+					selection.addRange(Surface.range)
+				}
+			});
+		},
+
 		/**
 		 * Selection change callback
 		 * @override
