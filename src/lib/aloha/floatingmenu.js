@@ -1151,6 +1151,10 @@ function(Aloha, jQuery, Ext, Class, console) {
 				i, editableLength, target,
 				targetObj, scrollTop, top;
 
+			if ( ! this.obj ) {
+				return;
+			}
+
 			// TODO in IE8 somteimes a broken range is handed to this function - investigate this
 			if (!Aloha.activeEditable || typeof range.getCommonAncestorContainer === 'undefined') {
 				return false;
