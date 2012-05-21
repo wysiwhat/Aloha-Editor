@@ -32,6 +32,7 @@
 					type: 'GET',
 				  	url: url,
 				  	cache: true,
+					async: false,
 				  	dataType: 'text',
 				  	success: function(plugin) {
 //						plugin = '(function(jQuery) { var $ = jQuery;\n' + plugin + '}(window.alohaQuery));';
