@@ -9,14 +9,9 @@ function(){
       var native_method = Function.prototype.bind;          
       var args= Array.prototype.slice.call(arguments, 1);
 
-      if(native_method){
-        return native_method.apply(obj, arguments); 
-      }
-      else{
         return function() {
           return obj.apply(owner, arguments.length===0? args : args.concat(Array.prototype.slice.call(arguments)));
-        }
-      }
+        };
     },
 
     // String trim
@@ -24,12 +19,7 @@ function(){
       var obj = this.obj || this;
       var native_method = String.prototype.trim;
 
-      if(native_method){
-        return native_method.call(obj); 
-      }
-      else {
         return obj.replace(/^\s+/, '').replace(/\s+$/, '');
-      }
     },
 
     // Array methods 
@@ -37,10 +27,6 @@ function(){
       var obj = this.obj || this;
       var native_method = Array.prototype.indexOf;     
 
-      if(native_method){
-        return native_method.call(obj, find, i); 
-      }
-      else {
         if (i===undefined) i= 0;
         if (i<0) i+= obj.length;
         if (i<0) i= 0;
@@ -48,21 +34,16 @@ function(){
             if (i in obj && obj[i]===find)
                 return i;
         return -1;
-      }
+
     },
     
     forEach: function(action, that /*opt*/){
       var obj = this.obj || this;
       var native_method = Array.prototype.forEach;          
 
-      if(native_method){
-        return native_method.call(obj, action, that); 
-      }
-      else {
         for (var i= 0, n = obj.length; i<n; i++)
           if (i in obj)
             action.call(that, obj[i], i, obj);
-      }
     },
 
     map: function(mapper, that /*opt*/, chain /*opt */){
@@ -71,16 +52,11 @@ function(){
       var returnWrapper = (typeof arguments[arguments.length - 1] == "boolean") ? Array.prototype.pop.call(arguments) : false;
       var result = [];
 
-      if(native_method){
-        result = native_method.call(obj, mapper, that); 
-      }
-      else {
         var other= new Array(obj.length);
         for (var i= 0, n= obj.length; i<n; i++)
             if (i in obj)
                 other[i]= mapper.call(that, obj[i], i, obj);
         result = other;
-      }
 
       return returnWrapper ? $_(result) : result;
     },
@@ -91,16 +67,11 @@ function(){
       var returnWrapper = (typeof arguments[arguments.length - 1] == "boolean") ? Array.prototype.pop.call(arguments) : false;
       var result = [];
 
-      if(native_method){
-       result = native_method.call(obj, filterFunc, that); 
-      }
-      else {
         var other= [], v;
         for (var i=0, n= obj.length; i<n; i++)
             if (i in obj && filterFunc.call(that, v= obj[i], i, obj))
                 other.push(v);
         result = other;
-      }
 
       return returnWrapper ? $_(result) : result;
     },
@@ -109,30 +80,20 @@ function(){
        var obj = this.obj || this;
        var native_method = Array.prototype.every;
 
-       if(native_method){
-         return native_method.call(obj, tester, that); 
-       }
-       else {
          for (var i= 0, n= obj.length; i<n; i++)
             if (i in obj && !tester.call(that, obj[i], i, obj))
                 return false;
          return true;
-       }
     },
 
     some: function(tester, that /*opt*/){
        var obj = this.obj || this;
        var native_method = Array.prototype.some;  
 
-       if(native_method){
-         return native_method.call(obj, tester, that); 
-       }
-       else {
          for (var i= 0, n= obj.length; i<n; i++)
            if (i in obj && tester.call(that, obj[i], i, obj))
                return true;
          return false;
-       }
     },
 
     // Since IE7 doesn't support 'hasAttribute' method on nodes
