@@ -1,0 +1,27 @@
+{
+  "name": "oerpub.editor",
+  "description": "Document collaboration engine",
+  "version": "0.1.0",
+  "homepage": "http://wysiwhat.github.com/Aloha-Editor",
+  "node": "~0.8.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wysiwhat/Aloha-Editor"
+  },
+  "dependencies": {
+    "cookie-sessions": "0.0.2",
+    "express": "2.5.9",
+    "coffee-script": "1.2.0",
+    "less": "1.3.0",
+    "request": "2.9.3",
+    "socket.io": "0.9.5"
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "start": "node collaboration-server"
+  }
+}

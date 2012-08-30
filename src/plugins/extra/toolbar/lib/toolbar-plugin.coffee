@@ -14,7 +14,7 @@ toolbarSettings = [
  'bold', 'italic', 'underline', '', 'insertImage', 'insertFigure', '', 'orderedList', 'unorderedList', 'outdentList', 'indentList'
 ]
 
-define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', '../../appmenu/appmenu', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, Ui, Ribbon, appmenu, i18n, i18nCore) ->
+define 'toolbar/toolbar-plugin', [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', '../../appmenu/appmenu', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, Ui, Ribbon, appmenu, i18n, i18nCore) ->
 
   CONTAINER_JQUERY = jQuery('.toolbar')
   if CONTAINER_JQUERY.length == 0
@@ -23,145 +23,139 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', '../../appmen
   ###
    register the plugin with unique name
   ###
-  Plugin.create "toolbar",
-    init: ->
 
-      window.menubar = menubar = new appmenu.MenuBar []
-      menubar.el.appendTo CONTAINER_JQUERY
+  menubar = new appmenu.MenuBar []
+  menubar.el.appendTo CONTAINER_JQUERY
 
-      window.toolbar = toolbar = new appmenu.ToolBar()
-      toolbar.el.appendTo CONTAINER_JQUERY
-      toolbar.el.addClass 'aloha'
+  toolbar = new appmenu.ToolBar()
+  toolbar.el.appendTo CONTAINER_JQUERY
+  toolbar.el.addClass 'aloha'
 
-      menuLookup = {}
-      toolbarLookup = {}
+  menuLookup = {}
+  toolbarLookup = {}
 
-      recurse = (item, lookupMap) ->
-        if 'string' == $.type item
-          if '' == item
-            return new appmenu.Separator()
-          menuItem = new appmenu.MenuItem 'EMPTY_LABEL'
-          lookupMap[item] = menuItem
-          return menuItem
-        else
-          subItems = for subItem in item.subMenu or []
-            recurse subItem, lookupMap
-          subMenu = new appmenu.Menu subItems
-          subMenu.el.addClass 'aloha' # Hack to get the Aloha icons working
-          menuItem = new appmenu.MenuItem item.text,
-            subMenu: subMenu
-          return menuItem
+  recurse = (item, lookupMap) ->
+    if 'string' == $.type item
+      if '' == item
+        return new appmenu.Separator()
+      menuItem = new appmenu.MenuItem 'EMPTY_LABEL'
+      lookupMap[item] = menuItem
+      return menuItem
+    else
+      subItems = for subItem in item.subMenu or []
+        recurse subItem, lookupMap
+      subMenu = new appmenu.Menu subItems
+      subMenu.el.addClass 'aloha' # Hack to get the Aloha icons working
+      menuItem = new appmenu.MenuItem item.text,
+        subMenu: subMenu
+      return menuItem
 
+  
+  for tab in menuSettings
+    subMenuItems = for item in tab.subMenu
+      recurse item, menuLookup
+
+    menu = new appmenu.Menu subMenuItems
+    menu.el.addClass 'aloha' # Added so the CSS for aloha icons gets matched
+    
+    menubar.append(new appmenu.MenuButton tab.text, menu)
+
+  for item in toolbarSettings
+      toolbar.append (recurse item, toolbarLookup)
+
+    
+
+  # Hijack the toolbar buttons so we can customize where they are placed.
+  
+  Ui.adopt = (slot, type, settings) ->
+    # This class adapts button functions Aloha expects to functions the appmenu uses
+    class ItemRelay
+      constructor: (@items) ->
+      show: () -> item.setHidden false for item in @items
+      hide: () -> item.setHidden true for item in @items
+      setActive: (bool) -> item.setChecked bool for item in @items
+      setState: (bool) -> @setActive bool
+      enable: (bool=true) -> item.setDisabled !bool for item in @items
+      disable: () -> item.setDisabled true for item in @items
+      setActiveButton: (a, b) ->
+        console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
+      focus: (a) ->
+        console.log "#{slot} TODO:FOCUS:", a
+      foreground: (a) ->
+        console.log "#{slot} TODO:FOREGROUND:", a
+
+    if slot of menuLookup and slot of toolbarLookup
+      item = menuLookup[slot]
+      item2 = toolbarLookup[slot]
+      item.element = item.el # CreateTable and some others do onclick () -> this.element
+      item2.element = item2.el # CreateTable and some others do onclick () -> this.element
+
+      item.setText(settings.tooltip)
+      item.setIcon(settings.icon)
+      item.setAction(settings.click)
+
+      item2.setText(settings.tooltip)
+      item2.setIcon(settings.icon)
+      item2.setAction(settings.click)
+
+      return new ItemRelay([item, item2])
       
-      for tab in menuSettings
-        subMenuItems = for item in tab.subMenu
-          recurse item, menuLookup
+    else if slot of menuLookup or slot of toolbarLookup
+      item = menuLookup[slot] or toolbarLookup[slot]
+    else
+      item = new appmenu.MenuItem 'DUMMY_ITEM_THAT_SQUASHES_STATE_CHANGES'
+                
+    item.setText(settings.tooltip)
+    item.setIcon(settings.icon)
+    item.setAction(settings.click)
+    item.element = item.el # CreateTable and some others do onclick () -> this.element
 
-        menu = new appmenu.Menu subMenuItems
-        menu.el.addClass 'aloha' # Added so the CSS for aloha icons gets matched
-        
-        menubar.append(new appmenu.MenuButton tab.text, menu)
+    return new ItemRelay([item])
 
-      for item in toolbarSettings
-          toolbar.append (recurse item, toolbarLookup)
+  
+  applyHeading = (hTag) -> () ->
+    rangeObject = Aloha.Selection.getRangeObject()
+    GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
 
-        
+    Aloha.Selection.changeMarkupOnSelection Aloha.jQuery("<#{hTag}></#{hTag}>")
+    # Attach the id and classes back onto the new element
+    $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer())
+    $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
+    $newEl.addClass($oldEl.attr('class'))
+    # $newEl.attr('id', $oldEl.attr('id))
+    # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
 
-      # Hijack the toolbar buttons so we can customize where they are placed.
-      
-      Ui.adopt = (slot, type, settings) ->
-        # This class adapts button functions Aloha expects to functions the appmenu uses
-        class ItemRelay
-          constructor: (@items) ->
-          show: () -> item.setHidden false for item in @items
-          hide: () -> item.setHidden true for item in @items
-          setActive: (bool) -> item.setChecked bool for item in @items
-          setState: (bool) -> @setActive bool
-          enable: (bool=true) -> item.setDisabled !bool for item in @items
-          disable: () -> item.setDisabled true for item in @items
-          setActiveButton: (a, b) ->
-            console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
-          focus: (a) ->
-            console.log "#{slot} TODO:FOCUS:", a
-          foreground: (a) ->
-            console.log "#{slot} TODO:FOREGROUND:", a
+  
+  order = [ 'p', 'h1', 'h2', 'h3' ]
+  labels =
+    'p':  'Normal Text'
+    'h1': 'Heading 1'
+    'h2': 'Heading 2'
+    'h3': 'Heading 3'
 
-        if slot of menuLookup and slot of toolbarLookup
-          item = menuLookup[slot]
-          item2 = toolbarLookup[slot]
-          item.element = item.el # CreateTable and some others do onclick () -> this.element
-          item2.element = item2.el # CreateTable and some others do onclick () -> this.element
+  headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {accel: "Ctrl+#{ h.charAt(1) or 0 }", action: applyHeading(h) }) for h in order)
+  
+  headingsButton = new appmenu.ToolButton("Heading 1", {subMenu: new appmenu.Menu(headingButtons)})
+  toolbar.prepend(new appmenu.Separator())
+  toolbar.prepend(headingsButton)
 
-          item.setText(settings.tooltip)
-          item.setIcon(settings.icon)
-          item.setAction(settings.click)
+  Aloha.bind 'aloha-editable-activated', (e, params) ->
+    menubar.setAccelContainer(params.editable.obj)
+    toolbar.setAccelContainer(params.editable.obj)
 
-          item2.setText(settings.tooltip)
-          item2.setIcon(settings.icon)
-          item2.setAction(settings.click)
-
-          return new ItemRelay([item, item2])
-          
-        else if slot of menuLookup or slot of toolbarLookup
-          item = menuLookup[slot] or toolbarLookup[slot]
-        else
-          item = new appmenu.MenuItem 'DUMMY_ITEM_THAT_SQUASHES_STATE_CHANGES'
-                    
-        item.setText(settings.tooltip)
-        item.setIcon(settings.icon)
-        item.setAction(settings.click)
-        item.element = item.el # CreateTable and some others do onclick () -> this.element
-
-        return new ItemRelay([item])
-
-      
-      applyHeading = (hTag) -> () ->
-        rangeObject = Aloha.Selection.getRangeObject()
-        GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
-
-        Aloha.Selection.changeMarkupOnSelection Aloha.jQuery("<#{hTag}></#{hTag}>")
-        # Attach the id and classes back onto the new element
-        $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer())
-        $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
-        $newEl.addClass($oldEl.attr('class'))
-        # $newEl.attr('id', $oldEl.attr('id))
-        # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
-
-      
-      order = [ 'p', 'h1', 'h2', 'h3' ]
-      labels =
-        'p':  'Normal Text'
-        'h1': 'Heading 1'
-        'h2': 'Heading 2'
-        'h3': 'Heading 3'
-
-      headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {accel: "Ctrl+#{ h.charAt(1) or 0 }", action: applyHeading(h) }) for h in order)
-      
-      headingsButton = new appmenu.ToolButton("Heading 1", {subMenu: new appmenu.Menu(headingButtons)})
-      toolbar.prepend(new appmenu.Separator())
-      toolbar.prepend(headingsButton)
-
-      Aloha.bind 'aloha-editable-activated', (e, params) ->
-        menubar.setAccelContainer(params.editable.obj)
-        toolbar.setAccelContainer(params.editable.obj)
-
-      Aloha.bind 'aloha-editable-deactivated', (e, params) ->
-        menubar.setAccelContainer()
-        toolbar.setAccelContainer()
-      
-      # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
-      Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
-        # Squirrel away the range because clicking the button changes focus and removed the range
-        $el = Aloha.jQuery(rangeObject.startContainer)
-        for h, i in order
-          isActive = $el.parents(h).length > 0
-          headingButtons[i].setChecked(isActive)
-          # Update the toolbar to show the current heading level
-          if isActive
-            headingsButton.setText labels[h]
-
-    ###
-     toString method
-    ###
-    toString: ->
-      "toolbar"
+  Aloha.bind 'aloha-editable-deactivated', (e, params) ->
+    menubar.setAccelContainer()
+    toolbar.setAccelContainer()
+  
+  # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
+  Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
+    # Squirrel away the range because clicking the button changes focus and removed the range
+    $el = Aloha.jQuery(rangeObject.startContainer)
+    for h, i in order
+      isActive = $el.parents(h).length > 0
+      headingButtons[i].setChecked(isActive)
+      # Update the toolbar to show the current heading level
+      if isActive
+        headingsButton.setText labels[h]
+  
+  return { menubar: menubar, toolbar: toolbar }

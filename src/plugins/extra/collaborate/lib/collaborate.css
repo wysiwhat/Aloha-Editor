@@ -1,0 +1,12 @@
+
+.handle {
+  position: absolute;
+  background-color: #999;
+  width: 20px;
+  min-height: 1em;
+  z-index: -1;
+}
+
+.remote-selected {
+  opacity: 0.5;
+}

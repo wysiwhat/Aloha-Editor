@@ -1,0 +1,171 @@
+/* Hide the toolbar */
+.aloha-ui-toolbar { display: none; }
+
+/******************
+    Page styling
+******************/
+body {
+  margin: 0;
+  color: #404040;
+  background-color: #F0F1EB;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  /* Just enough so it's over the editable area that occurs after */
+  z-index: 1;
+}
+
+.document {
+  counter-reset: section, sub-section;
+  min-width: 300px;
+  margin: 3em 70px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.35), inset 0px 0px 1px rgba(255, 255, 255, 0.15);
+  background-color: white;
+  -webkit-font-smoothing: subpixel-antialiased;
+  line-height: 30px;
+  padding: 3em 6em;
+  /* To prevent the need to make the toolbar float
+     and have the rest of the page scroll off the top of the window
+     Javascript can set the height of the div to fit within the screen
+     
+     For this, we need the following attributes
+  */
+  overflow-y: auto;
+  /* This one is needed so the section numbers scroll with the text
+     (they are absolutely positioned
+  */
+  position: relative;
+}
+
+h1 {
+  counter-increment: section;
+  counter-reset: sub-section;
+  font-size: 20pt;
+  font-weight: bold;
+}
+h2 {
+  counter-increment: sub-section;
+  font-size: 18pt;
+  font-weight: bold;
+}
+/* Use ::after, position:absolute, and left: 4em so the number doesn't affect Title layout */
+h1::before,
+h2::before,
+h3::before {
+  color: #CCC;
+  position: absolute;
+  left: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+h1::before { content: counter(section); }
+h2::before { content: counter(section) "." counter(sub-section); }
+
+
+/* Collaboration handle */
+.handle {
+  left: 50px;
+  cursor: pointer;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+
+/* Figure numbering and styling */
+
+figure:first-child {
+  counter-reset: sub-figure;
+}
+/* HACK: resetting the counter on the figure and overriding
+   it in figure > figure does not work. The counter is still
+   reset so all subfigures are numbered the same ( as "a")
+*/
+figure:first-child {
+  counter-reset: sub-figure;
+}
+
+figure {
+  counter-increment: figure;
+  border: 1px solid #ccc;
+  margin: 1em;
+}
+figure > figcaption::before {
+  content: "Figure " counter(figure) " ";
+  font-weight: bold;
+}
+
+figure > figure {
+  counter-increment: sub-figure;
+  border: 1px solid #ccc;
+  margin: 1em;
+}
+figure > figure > figcaption::before {
+  content: "(" counter(sub-figure, lower-latin) ") ";
+  font-weight: bold;
+}
+
+
+/******************
+    OER Tags
+******************/
+span.term {
+  font-weight: bold;
+  border-bottom: 1px dotted black;
+}
+
+/* Inline notes */
+span.note {
+  background-color: #ffcccc;
+}
+span.note::before {
+  content: "Note: ";
+  color: gray;
+  font-weight: bold;
+}
+
+
+span.footnote {
+  font-size: 66.66%;
+  vertical-align: super;
+}
+span.footnote::before {
+  content: "[#]";
+  color: lightgray;
+  font-size: 150%;
+  vertical-align: sub;
+}
+
+
+/***************
+  Github Ribbon
+*****************/
+
+.github-ribbon {
+  z-index: 1000;
+  background-color: orangered;
+
+  top: 3.2em;
+  right: -3.7em;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-box-shadow: 0 0 0 1px #1d212e inset,0 0 2px 1px #fff inset,0 0 1em #888;
+  -moz-box-shadow: 0 0 0 1px #1d212e inset,0 0 2px 1px #fff inset,0 0 1em #888;
+  box-shadow: 0 0 0 1px #1d212e inset,0 0 2px 1px #fff inset,0 0 1em #888;
+  color: rgba(255,255,255,0.90);
+  display: block;
+  padding: .6em 3.5em;
+  position: fixed;
+  font: bold .82em sans-serif;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 1px -1px 8px rgba(0,0,0,0.60);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none
+}
