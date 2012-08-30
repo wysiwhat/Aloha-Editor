@@ -249,7 +249,7 @@
       action: reset,
       disabled: true
     });
-    collabMenu = new appmenu.MenuButton('Cool Stuff!', new appmenu.Menu([
+    collabMenu = new appmenu.MenuButton('Collaborate!', new appmenu.Menu([
       new appmenu.MenuItem('Enable!', {
         accel: 'Meta+E',
         action: function(evt) {

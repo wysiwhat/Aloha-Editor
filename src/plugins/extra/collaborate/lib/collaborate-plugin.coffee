@@ -233,7 +233,7 @@ define 'collaborate/collaborate-plugin', [ 'toolbar/toolbar-plugin', '../../appm
 
   resetBtn = new appmenu.MenuItem('Reset Document', {accel: 'Meta+Shift+E', action: reset, disabled: true})
 
-  collabMenu = new appmenu.MenuButton('Cool Stuff!', new appmenu.Menu([
+  collabMenu = new appmenu.MenuButton('Collaborate!', new appmenu.Menu([
     new appmenu.MenuItem('Enable!', {accel: 'Meta+E', action: (evt) -> enable evt, 'http://boole.cnx.rice.edu:3001'})
     resetBtn
     new appmenu.Separator()
