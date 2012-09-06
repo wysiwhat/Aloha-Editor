@@ -1,0 +1,130 @@
+body {
+    font-family: Verdana,DejaVu Sans,Tahoma;
+    font-size: 0.8em;
+    margin: 0;
+}
+.toolbar{
+    position: fixed;
+   top: 100px;
+   width: 100%;
+    z-index: 100;
+}
+
+#sidebar {
+    float: left;
+    margin: 1em 25px;
+    position: fixed;
+    width: 200px;
+}
+
+#canvas {
+    background-color: #FFFFFF;
+    border: 1px solid #AAAAAA;
+    box-shadow: 0 0 10px #9F9F9F;
+    cursor: text;
+    margin: 180px 25px 0 250px;
+    min-height: 100%;
+    padding: 30px;
+
+}
+
+
+#workflownav-container .button {
+    background-color: #DAE7F2;
+    border: 1px outset #DAE7F2;
+    font-weight: bold;
+}
+.forward-button {
+    background-color: #FFDD66 !important;
+    border: 1px outset #FFDD66 !important;
+}
+.button {
+    background-color: #D4D0C8;
+    border: 1px outset #D4D0C8;
+    cursor: default;
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 0.3em 0.5em;
+    text-decoration: none;
+}
+input {
+    font-family: Verdana,DejaVu Sans,Tahoma;
+    font-size: 1em;
+}
+
+#workflownav-container {
+    background-color: #9ABCDC;
+    border-bottom: 1px solid #7E9AB4;
+    box-shadow: 2px 1px 2px 2px #DDDDDD;
+    padding: 0.75em 2em;
+    text-align: right;
+}
+
+#workflownav-wrap {
+    position: fixed;
+    top: 56px;
+    width: 100%;
+    z-index: 2;
+}
+
+#back-steps {
+    float: left;
+}
+#header-container {
+    background-color: #71A238;
+    border-bottom: 1px solid #587E2C;
+    height: 55px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 3;
+}
+#header-wrap a, #header-wrap {
+    color: white;
+}
+#header h1 {
+    color: #333344;
+    font-size: 1.5em;
+    font-weight: normal;
+}
+
+#header h1 a {
+    color: white;
+    text-decoration: none;
+}
+#header-functions {
+    float: right;
+    text-align: right;
+}
+#status {
+    clear: right;
+    float: right;
+    font-size: 0.85em;
+    padding: 6px;
+}
+
+#sidebar dl {
+    background-color: #EEEEEE;
+    border: 1px solid #AAAAAA;
+    box-shadow: 0 0 5px #AAAAAA;
+    margin: 0 0 15px;
+    padding: 0;
+}
+
+#pedagog ul, #pedagog li, #pedagog dd {
+    clear: right;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-icon.aloha-icon-undo{
+    height: 20px;
+    width: 33px;
+    background: url('icons/undo-01-disabled.png') 0 -10px;
+}
+.menu-icon.aloha-icon-redo{
+    height: 20px;
+    width: 33px;
+    background: url('icons/redo-01-disabled.png') 0 -10px;
+}

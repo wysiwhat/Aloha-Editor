@@ -25,9 +25,10 @@
  * recipients can access the Corresponding Source.
  */
 define(
-['aloha', 'jquery', 'aloha/plugin', 'undo/vendor/undo', 'undo/vendor/diff_match_patch_uncompressed'],
-function( Aloha, jQuery, Plugin) {
+['aloha', 'jquery', 'aloha/plugin',  'ui/ui', 'ui/button', 'undo/vendor/undo', 'undo/vendor/diff_match_patch_uncompressed'],
+function( Aloha, jQuery, Plugin, Ui, Button) {
 	"use strict";
+
 	var
 	    dmp = new diff_match_patch,
 	    resetFlag = false;
@@ -50,7 +51,7 @@ function( Aloha, jQuery, Plugin) {
 		 * Initialize the plugin and set initialize flag on true
 		 */
 		init: function () {
-
+            var that = this;
 			var stack = new Undo.Stack(),
 			    EditCommand = Undo.Command.extend({
 					constructor: function(editable, patch) {
@@ -109,6 +110,7 @@ function( Aloha, jQuery, Plugin) {
 				// update UI
 			};
 
+            this.createButtons();
 			// @todo use aloha hotkeys here
 			jQuery(document).keydown(function(event) {
 				if (!event.metaKey || event.keyCode != 90) {
@@ -141,8 +143,32 @@ function( Aloha, jQuery, Plugin) {
 					stack.execute( new EditCommand( aevent.editable, patch ) );
 				}
 			});
+            Aloha.bind('aloha-editable-activated', function() {
+                that._undoButton.show(true);
+                that._redoButton.show(true);
+            });
 		},
 
+        createButtons: function(){
+            this._undoButton = Ui.adopt("undo", Button, {
+//                    tooltip: i18n.t("button.undo.tooltip"),
+                    icon: "aloha-icon aloha-icon-undo",
+                    scope: 'Aloha.continuoustext',
+                    click: function() {
+                        console.log('works undo');
+//                        that.insertLink(false);
+                    }
+                });
+            this._redoButton = Ui.adopt("redo", Button, {
+//                    tooltip: i18n.t("button.redo.tooltip"),
+                    icon: "aloha-icon aloha-icon-redo",
+                    scope: 'Aloha.continuoustext',
+                    click: function() {
+                        console.log('works redo');
+//                        that.insertLink(false);
+                    }
+                });
+        },
 
 		/**
 		 * toString method
