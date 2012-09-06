@@ -59,10 +59,15 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })();
 
+
   appmenu.Menu = (function(_super) {
 
     __extends(Menu, _super);
 
+      /**
+       * @property jQuery el
+       * @type {*}
+       */
     function Menu(items) {
       var item, _i, _len, _ref;
       this.items = items != null ? items : [];

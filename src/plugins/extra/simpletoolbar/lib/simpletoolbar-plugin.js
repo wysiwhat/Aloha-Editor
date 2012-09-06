@@ -25,7 +25,7 @@
      }
      ];*/
 
-    toolbarSettings = ['undo','bold', 'italic','underline', 'superscript','subscript','',
+    toolbarSettings = ['undo','redo','','bold', 'italic','underline', 'superscript','subscript','',
         'insertLink','removeLink','','orderedList', 'unorderedList','', 'createTable', 'insertImage', 'insertFigure' ];
 
 //        formatAbbr, insertAbbr, abbrText
@@ -79,6 +79,7 @@
                     toolbar.append(this.recurse(item, toolbarLookup));
                 }
                 Ui.adopt = function (slot, type, settings) {
+                    console.log(slot);
                     var ItemRelay, item2;
 //                    ItemRelay = (function () {
 //

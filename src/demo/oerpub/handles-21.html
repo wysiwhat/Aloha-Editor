@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head>
+    <title>
+      Connexions Document Importer
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <script src="handles-21_archivos/jquery-1.js"></script>
+    <script src="handles-21_archivos/draggable.js"></script>
+    <script src="handles-21_archivos/scrollto.js"></script>
+    <script src="handles-21_archivos/jquery.js"></script>
+    <script src="handles-21_archivos/googlejsapi.js"></script>
+<!--
+    <script src="helper_files/swordpush.js"></script>
+-->
+    <script src="handles-21_archivos/swordpush-max-03.js"></script>
+
+    <!-- Max writes: This doesn't need to be the Connexions X ... but it was useful to have something there when making these mock-ups. -->
+    <link rel="shortcut icon" type="image/x-icon" href="http://www.mountainbunker.org/%7Emaxwell/oerpub/editor-ideas/helper_files/favicon.ico">
+
+<link type="text/css" href="handles-21_archivos/document-in-oerpub-01.css" media="screen" title="newlook" rel="stylesheet">
+
+<!--
+    <link rel="stylesheet" href="helper_files/main.css" type="text/css" media="screen" charset="utf-8" />
+-->
+    <link rel="stylesheet" href="handles-21_archivos/main-max-03.css" type="text/css" media="screen" charset="utf-8">
+    <!--[if IE 6]>
+    <link rel="stylesheet" href="helper_files/ie6.css" type="text/css" media="screen" charset="utf-8" />
+    <![endif]-->
+
+<script type="text/javascript">
+
+$(window).resize(function(){               
+
+  var winh = $(window).height();                
+  var headerh = $("#header-container").outerHeight();
+  var wfnh = $("#workflownav-wrap").outerHeight();
+  var contentp = parseInt($("#content").css("paddingTop"));
+  var contentp = contentp + parseInt($("#content").css("paddingBottom"));
+  var phwh = $("#pageheader-wrap").outerHeight();   
+  var ma = $("#module-actions .advanced").outerWidth();
+/*
+  var cmt = parseInt($("#canvas").css("marginTop"));
+  var cpt = parseInt($("#canvas").css("paddingTop"));
+*/
+
+  // Make the editor fit exactly inside the remaining space
+//  $("#editor").height(winh - headerh - wfnh - contentp - phwh + 10);
+//  $("#artboard").height(winh - headerh - wfnh - contentp - phwh + 10 - 46 - cmt - cpt*2);
+//  $("#artboard").height(winh - headerh - wfnh - contentp - phwh + 10 - 44);
+  $("#artboard").height(winh - headerh - wfnh - contentp - phwh + 13);
+//  $("#artboard").height(winh - 43);
+  $("#editor").width($(window).width() - 0);
+
+});
+
+
+$(document).ready(function(){
+
+/* Moved this portion back directly into the file because 'headerh' wasn't always correctly calculated when done from the external file. */
+
+  var winh = $(window).height();
+  var headerh = $("#header-container").outerHeight();
+  var wfnh = $("#workflownav-wrap").outerHeight();
+  var contentp = parseInt($("#content").css("paddingTop"));
+  var contentp = contentp + parseInt($("#content").css("paddingBottom"));
+  var phwh = $("#pageheader-wrap").outerHeight();
+  var ma = $("#module-actions .advanced").outerWidth();
+
+  // Make the editor fit exactly inside the remaining space
+//  $("#editor").height(winh - headerh - wfnh - contentp - phwh + 10);
+//  $("#artboard").height(winh - headerh - wfnh - contentp - phwh + 10 - 44);
+  $("#artboard").height(winh - headerh - wfnh - contentp - phwh + 13);
+//  $("#editor").height(winh - 30);
+//  $("#artboard").height(winh - 43);
+  $("#editor").width($(window).width() - 0);
+
+  // Give the page's header the correct top margin (since the elements above it are in a fixed position)
+  $("#content").css({'margin-top': headerh + wfnh})
+
+
+  $(".icon").not(".disabled").each(function(){
+    var img = $(this).children("a").children("img");
+    var src = img.attr("src");
+    var origsrc = src;
+
+    $(this).children("a").hover(function(){
+      if ($(this).children("img").attr("src").indexOf("-selected") == -1) {
+        var newsrc = src.replace(/.png$/gi,"-hover.png");
+        img.attr("src",newsrc);
+      }
+    }, function(){
+      if ($(this).children("img").attr("src").indexOf("-selected") == -1) {  // repeated (instead of on the outside) b/c this condition can change between hover steps
+        img.attr("src",src);
+      }
+    });
+
+    $(this).children("a").toggle(function(e){
+/*
+      $(".icon").not(".disabled").each(function(){
+        var img3 = $(this).children("a").children("img");
+        var src3 = img3.attr("src");
+        var newsrc3 = src3.replace(/-selected.png$/gi,".png");
+        img3.attr("src",newsrc3);
+      });
+*/
+      var newsrc2 = src.replace(/.png$/gi,"-selected.png");
+      img.attr("src",newsrc2);
+      e.preventDefault();
+    }, function(){
+      img.attr("src",src);
+      e.preventDefault();
+    });
+
+  });
+
+  $(".icon.disabled").click(function(e){
+    e.preventDefault();
+  });
+
+  var makeopake = $("#iconbar, #editor-mode, #sidebar");
+  var makeopake = $("#iconbar, #sidebar");
+//  var makeopake = $("#iconbar, #editor-mode, #sidebar, #header-wrap, #workflownav-wrap, #pageheader-wrap");
+  var makeopake = $("#header-wrap, #workflownav-wrap, #pageheader-wrap");
+/*
+  $("#editor").hover(function(){
+//    makeopake.css({"opacity":"0"}).hide();
+//    makeopake.fadeOut('slow');
+    var t = setTimeout(function() {
+      makeopake.animate({opacity:.25},1500);
+      $("#editor-mode").animate({opacity:0},1500);
+    }, 1000);
+    $(this).data('timeout', t);
+  }, function(){
+//    makeopake.css({"opacity":"1"}).hide();
+//    makeopake.fadeIn('slow');
+    clearTimeout($(this).data('timeout'));
+    makeopake.animate({opacity:1},300);
+    $("#editor-mode").animate({opacity:1},300);
+  });
+*/
+
+/*
+  $("#sidebar dt a").hover(function(){
+    $(this).attr("title","Click to collapse");
+  }, function(){
+    $(this).attr("title","Click to expand");
+  });
+
+  $("#sidebar dt a").toggle(function(){
+    $(this).css("background-image","url(toolbar/arrow-left-white-02.png)");
+    $(this).parent().next().slideUp(200);
+  }, function(){
+    $(this).css("background-image","url(toolbar/arrow-down-white-02.png)");
+    $(this).parent().next().slideDown(200);
+  });
+*/
+
+
+
+
+
+
+  $('html').click(function(e){
+    // Run through all the "canvases" and "turn them off"
+    $('.canvas').each(function(i){
+      $(this).removeClass('active');
+      $(this).addClass('inactive');
+    });
+    // Same with the "drag me" bars
+    $('.canvas-buddy, .canvas-buddy-2').each(function(i){
+      $(this).hide();
+    });
+    $("#canvas").removeClass("inactive")
+    $(".add-solution").css("visibility","hidden");
+    $(".node-list").hide();
+    $(".count").removeClass("count-on");
+  });
+
+  $('.canvas').click(function(e){
+/*
+    // Run through all the "canvases" and "turn them off"
+    $('.canvas').each(function(i){
+      $(this).removeClass('active');
+      $(this).addClass('inactive');
+      $(this).css("border-color","transparent");
+    });
+    // Same with the "drag me" bars
+    $('.canvas-buddy, .canvas-buddy-2').each(function(i){
+      $(this).hide();
+    });
+    // Now "turn on" the current canvas that was just clicked on
+    $(this).removeClass('inactive');
+    $(this).addClass('active');
+    $("#canvas").addClass('inactive');
+    $(this).find(".add-solution").css("visibility","visible");
+    $(this).children().children('.canvas-buddy, .canvas-buddy-2').show();
+*/
+    // For fun pretend that there is a blinking cursor where you clicked
+    var cursorX = e.pageX - this.offsetLeft + 'px';
+    var cursorY = e.pageY - this.offsetTop - 5 + 'px';
+    $(this).css('background-image','url("source-files/cursor-01.gif")');
+    $(this).css('background-repeat','no-repeat');
+    $(this).css('background-position', cursorX + ' ' + cursorY);
+    $(this).css('background-position', cursorX + ' ' + cursorY);
+    // Don't go up the tree looking for other "canvases" also clicked on
+    e.stopPropagation();
+  });
+
+  $('.canvas-wrap').hover(function(e){
+//    if ( !$(this).parents().closest(".active").length ) {
+      $('.canvas-wrap').each(function(){
+        $(this).children().children().children('.canvas-buddy, .canvas-buddy-2').hide();
+        $(this).children().children().children().children().children('.canvas-buddy, .canvas-buddy-2').hide();
+//        $(this).children('.canvas').css("border-color","transparent");
+        $(this).children('.canvas').removeClass("canvas-hovered");
+      });
+      $(this).children().children().children('.canvas-buddy, .canvas-buddy-2').show();
+      $(this).children().children().children().children().children('.canvas-buddy, .canvas-buddy-2').show();
+//      $(this).children('.canvas').css("border-color","#bbbbbb");
+      $(this).children('.canvas').addClass("canvas-hovered");
+//    }
+  }, function(e){
+//    if ( !$(this).children().hasClass('active') ) {
+      $(this).children().children().children('.canvas-buddy, .canvas-buddy-2').hide();
+      $(this).children().children().children().children().children('.canvas-buddy, .canvas-buddy-2').hide();
+//      $(this).children('.canvas').css("border-color","transparent");
+      $(this).children('.canvas').removeClass("canvas-hovered");
+      if ( !$(this).parents().closest(".active").length ) {
+        $(this).parent().closest('.canvas-wrap').each(function(){
+          $(this).children().children().children('.canvas-buddy, .canvas-buddy-2').show();
+          $(this).children().children().children().children().children('.canvas-buddy, .canvas-buddy-2').show();
+//          $(this).children('.canvas').css("border-color","#bbbbbb");
+          $(this).children('.canvas').addClass("canvas-hovered");
+        });
+      }
+/*
+    } else {
+      $(this).children('.canvas').css("border-color","transparent");
+    }
+*/
+  });
+
+  $('.remove-element').click(function(e){
+     var c = confirm('Are you sure you want to remove this element?');
+     if (c == true) {
+       $(this).closest('.canvas-wrap').hide("slow", function(){ $(this).remove(); });
+     }
+  });
+
+  $('.canvas-buddy a').mousedown(function(e){
+//    $(this).css("cursor","url('content_files/closedhand.cur')");
+    $(this).addClass("dragging");
+  });
+  $('.canvas-buddy a').mouseup(function(e){
+//    $(this).css("cursor","url('content_files/openhand.cur')");
+    $(this).removeClass("dragging");
+  });
+
+  $('.canvas-buddy').hover(function(e){
+/*
+    if ($(this).hasClass("nodrag")) {
+      $(this).css("background-color","#fafafa");
+      $(this).css("background-color","#f2f2f2");
+    } else {
+*/
+      $(this).css("background-color","#666");
+      $(this).parent().css("background-color","#f2f2f2");
+//  }
+      $(this).find("img").attr("src","content_files/drag-element-20.png");
+      $(this).parent().children(".canvas-buddy-2").hide();
+  }, function(e){
+      $(this).css("background-color","transparent");
+      $(this).parent().css("background-color","transparent");
+      $(this).find("img").attr("src","content_files/drag-element-19.png");
+      $(this).parent().children(".canvas-buddy-2").show();
+  });
+
+  $('.remove-element').hover(function(e){
+      $(this).parent().css("border-left-width","0");
+      $(this).parent().parent().children(".canvas-buddy").hide();
+      $(this).parent().find(".edit-element").hide();
+      $(this).parent().parent().parent().css("background-color","#f9f9f9");
+      $(this).parent().parent().addClass("to-remove");
+//      $(this).parent().parent().parent().css("border-color","#999");
+//      $(this).parent().parent().children(".canvas-buddy").not(".nodrag").css("background-color","#eee");
+      $(this).find("img").attr("src","content_files/remove-element-07.png");
+  }, function(e){
+      $(this).parent().css("border-left-width","1px");
+      $(this).parent().parent().children(".canvas-buddy").show();
+      $(this).parent().find(".edit-element").show();
+      $(this).parent().parent().parent().css("background-color","transparent");
+      $(this).parent().parent().removeClass("to-remove");
+//      $(this).parent().parent().parent().css("border-color","#bbb");
+//      $(this).parent().parent().parent().removeClass("canvas-hovered");
+//      $(this).parent().parent().children(".canvas-buddy").not(".nodrag").css("background-color","#f2f2f2");
+//      $(this).parent().parent().children(".canvas-buddy").css("background-color","#f2f2f2");
+      $(this).find("img").attr("src","content_files/remove-element-06.png");
+  });
+
+
+  $('.edit-element').hover(function(e){
+      $(this).find("img").attr("src","content_files/options-03.png");
+      $(this).parent().css("background-color","transparent");
+      $(this).parent().parent().css("background-color","#eee");
+      $(this).parent().css("border-left-color","#c2c2c2");
+      $(this).parent().parent().children(".canvas-buddy").hide();
+      $(this).parent().parent().parent().css("background-color","#eee");
+  }, function(e){
+      $(this).find("img").attr("src","content_files/options-02.png");
+      $(this).parent().css("background-color","#f7f7f7");
+      $(this).parent().parent().css("background-color","transparent");
+      $(this).parent().css("border-left-color","#ddd");
+      $(this).parent().parent().children(".canvas-buddy").show();
+      $(this).parent().parent().parent().css("background-color","transparent");
+  });
+
+
+
+  $("#pedagog ul a").toggle(function(e){
+    $(this).addClass("pedagog-click");
+  }, function(e){
+    $(this).removeClass("pedagog-click");
+  });
+
+  //$(".canvas-wrap").has(".canvas-buddy-2").css("padding-left","20px");
+
+  $(".exercise").hover(function(e){
+    $(".add-solution").css("visibility","visible");
+    $(".add-solution").find("a").css("visibility","visible");
+  }, function(e){
+//    if ( !$(this).hasClass('active') ) {
+      $(".add-solution").css("visibility","hidden");
+      $(".add-solution").find("a").css("visibility","hidden");
+//    }
+  });
+
+/*
+  $(".add-solution").toggle(function(e){
+    $(this).find("a").css("visibility","hidden");
+  }, function(e){
+    $(this).find("a").css("visibility","visible");
+  });
+*/
+  $(".add-solution").click(function(e){
+    $(this).find("a").css("visibility","hidden");
+    e.preventDefault();
+  });
+  $(".add-solution").mouseleave(function(e){
+    if ($(this).find("a").css("visibility") == "hidden") { 
+      $(this).find("a").css("visibility","visible");
+    }
+  });
+
+  $("#pedagog .count").hover(function(e){
+    var arrow = "<span class='count-arrow' style='height: ";
+    var height = $(this).outerHeight();
+    var arrow = arrow + height + "px\; width: " + height/2 + "px\;'></span>"
+    $(this).append(arrow);
+    $(this).attr("title","Click to view a list of these elements already in the document.")
+    $(this).find(".count-total").addClass("count-total-hover");
+  }, function(e){
+    $(".node-list").hide();
+    $(".count").removeClass("count-on");
+    $(this).find(".count-total").removeClass("count-total-hover");
+    $(this).find(".count-arrow").remove();
+  });
+
+/*
+  $("#pedagog .count-total").hover(function(e){
+  }, function(e){
+    $(this).parent().find(".count-arrow").remove();
+  });
+*/
+
+  $("#pedagog .count-total").click(function(e){
+    var nl = $(this).parent().find(".node-list");
+    if (nl.css("display") == 'none') {
+      nl.show();
+      $(this).parent().addClass("count-on");
+    } else {
+      nl.hide();
+    }
+//    $(this).parent().find(".count-arrow").remove();
+    $(this).parent().removeAttr("title");
+  });
+
+  $(".node-list a").click(function(e){
+    target = $(this).attr("href");
+//    $(target).addClass("active");
+    window.location = target;
+  });
+
+  $(".node").hover(function(e){
+    $(this).find(".plus").css("visibility","visible");
+  }, function(e){
+    $(this).find(".plus").css("visibility","hidden");
+  });
+
+  $("#pedagog .node").parent().not(".pedagog-glossary").attr("title","Drag this item to the place you want it on the page.");
+//  $("#pedagag .node").draggable({opacity: 0.7, helper: "clone"});
+
+  $(".pedagog-glossary").click(function(e){
+    $(this).find("input").attr("checked","checked");
+    $("#artboard").scrollTo(".glossary-outer",{duration:700,over:0.5,onAfter:function(){
+        $(".glossary-container").show();
+        $("#artboard").scrollTo(".glossary-outer",{duration:500});
+      }
+    });
+  });
+
+  $("em.emphasis,dfn.term").addClass("edhint");
+
+/*
+  $("#hints, #hints input").toggle(function(e){
+    if(e.target.type=="checkbox") {
+      $("em.emphasis,dfn.term").removeClass("edhint");
+      $(this).attr("checked",false);
+      e.stopPropagation();
+    } else {
+      $(this).find("input").attr("checked",false);
+      $("em.emphasis,dfn.term").removeClass("edhint");
+    }
+  }, function(e){
+    if(e.target.type=="checkbox") {
+      $("em.emphasis,dfn.term").addClass("edhint");    
+      $(this).attr("checked",true);
+      e.stopPropagation();
+    } else {
+      $(this).find("input").attr("checked",true);
+      $("em.emphasis,dfn.term").addClass("edhint");    
+    }
+  });
+*/
+  $("#hints").click(function(e){
+    if ( $(this).children("input").attr("checked") ) {
+//alert("here1");
+      //e.preventDefault();
+      //$(this).children("input").attr("checked",false);
+      $("em.emphasis,dfn.term").removeClass("edhint");
+    } else {
+//alert("here2");
+      //e.preventDefault();
+      //$(this).find("input").attr("checked",true);
+      $("em.emphasis,dfn.term").addClass("edhint");    
+    }
+  });
+
+
+  $(".canvas-buddy").each(function(e){
+    ttl = $(this).children("a").attr("title");
+    $(this).attr("title",ttl);
+  });
+
+
+});
+
+</script>
+
+
+<style type="text/css">
+
+#editor{
+  background-color: #bbb;
+  background-color: #c7c7c7;
+  background-color: #ccc;
+//  background-color: #d4d4d4;
+}
+#content{
+  padding-left: 0em;
+  padding-right: 0em;
+  padding-bottom: 0em;
+padding-top: 0;
+}
+#pageheader-wrap{
+  margin-top: -10px;
+  margin-left: 2em;
+  margin-right: 2em;
+display: none;
+}
+
+#workflownav-wrap, #header-wrap{
+}
+
+#iconbar{
+  height: 42px;
+  background-image: url(toolbar/toolbar-bg-01.png);
+  background-repeat: repeat-x;
+  background-position: 0 -1px;
+  background-position: 0 0;
+  background-color: #fff;
+  padding: 0 1em;
+  border-bottom: 1px solid #bbb;
+  border-bottom: 1px solid #aaa;
+// white-space: nowrap;
+// display: table;
+  position: relative;
+  z-index: 1;
+clear: both;
+}
+
+.icon, .icon a, .icon img{
+  height: 42px;
+  width: 33px;
+}
+
+.icon a{
+  outline: 0;
+}
+
+.disabled a{
+  cursor: default;
+}
+
+.separator{
+  width: 19px;
+  height: 42px;
+  background-image: url(toolbar/separator-01.png);
+  background-repeat: no-repeat;
+  background-position: 7px 0;
+  background-position: 4px 0;
+}
+
+.icon, .separator, .icon-like{
+//  float: left;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+
+.icon-like{
+  padding: 0 4px;
+}
+
+.icon-like input{
+//  font-size: .85em;
+  padding: .35em 1em;
+  padding: .2em .5em;
+}
+
+.icon-like select{
+  width: 10em;
+}
+
+a.menu-like{
+  padding: .5em .4em;
+  color: black;
+  text-decoration: none;
+  font-size: .85em;
+}
+
+.menu-like:hover{
+  background-color: #ccc;
+  background-color: #fff;
+}
+
+#hints{
+  font-size: .85em;
+  float: right;
+  padding: 1.2em .4em 0;
+}
+
+#editor-mode{
+  font-size: .85em;
+  position: relative;
+  z-index: 2;
+  height: 30px;
+background-color: #666;
+display: none;
+}
+
+#editor-mode ul, #editor-mode li{
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+#editor-mode ul{
+  position: absolute;
+  right: 17px;
+  bottom: 0;
+}
+
+#editor-mode li{
+  float: right;
+  padding: .35em 0 .4em;
+}
+
+#editor-mode a{
+  padding: .5em 1em;
+  padding: .35em 1em .4em;
+  border: 1px solid #aaa;
+  background-color: #eee;
+  background-color: #ccc;
+  text-decoration: none;
+  color: black;
+  outline: 0;
+  margin-left: -1px;
+  color: #666;
+font-weight: bold;
+}
+
+#editor-mode a:hover{
+  color: #000;
+}
+
+#editor-mode .current a{
+  color: black;
+  cursor: default;
+  background-color: #fff;
+  border-bottom: 1px solid #fff;
+  font-weight: bold;
+}
+
+#sidebar{
+  float: left;
+  position: fixed;
+  margin: 1em 25px;
+  width: 200px;
+}
+
+#sidebar dl{
+  background-color: #eee;
+  margin: 0 0 15px;
+  padding: 0;
+  border: 1px solid #aaa;
+  box-shadow: 0px 0px 5px #9f9f9f;
+  box-shadow: 0px 0px 5px #aaa;
+}
+
+#sidebar dt{
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+/*
+  background-image: url(toolbar/toolbar-bg-01.png);
+  background-repeat: repeat-x;
+  background-position: 0 0;
+*/
+  background-color: #999;
+  background-color: #666;
+  background-color: #888;
+  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #666;
+  color: white;
+  padding: .25em .5em;
+}
+
+#sidebar dt a{
+  text-decoration: none;
+  color: black;
+  color: white;
+  display: block;
+  padding: .25em .5em;
+  padding: .25em 1.5em .25em .5em;
+  background-image: url(toolbar/arrow-down-white-02.png);
+  background-repeat: no-repeat;
+  background-position: right .35em;
+}
+
+#sidebar dd{
+  margin: 0;
+  padding: .5em 1em;
+  background-color: #ccc;
+  background-color: #eee;
+}
+
+#artboard{
+  overflow: auto;
+}
+
+#canvas{
+  margin: 1em 25px 0 250px;
+  background-color: #fff;
+  border: 1px solid #aaa;
+  border-width-bottom: 0;
+  padding: 2em;
+padding: 30px;
+  box-shadow: 0px 0px 10px #9f9f9f;
+  cursor: text;
+  min-height: 100%;
+}
+
+
+
+/* =============== from earlier mock-ups (edited) ================ */
+
+
+.canvas-wrap{
+  margin: 1em -20px;
+  margin: 1em -10px 1em -10px;
+}
+
+.canvas-wrap .canvas-wrap{
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0 .5em 0 1em;
+}
+
+.canvas{
+  border: 1px solid transparent;
+}
+.canvas-hovered{
+  border-color: #bbb #ccc;
+  border-color: #c8c8c8;
+}
+
+
+.solution.canvas, .proof.canvas{
+  margin-left: 1.5em;
+}
+
+.canvas-inner{
+  position: relative;
+  min-height: 35px;
+  padding: .5em;
+  padding-left: .75em;
+  padding: .5em 1em;
+  padding: .5em 30px .5em .75em;
+  padding: .5em 25px .5em 20px;
+  padding: .5em 25px .5em 10px;
+}
+
+.active{
+  border: 1px dotted #bbb !important;
+  background-image: url('source-files/cursor-01.gif');
+  background-repeat: no-repeat;
+  background-position: .75em 1em;
+}
+
+.equation-number{
+  right: 1em;
+  top: 40%;
+  right: 30px;
+  right: 25px;
+}
+
+.canvas-buddy{
+  position: absolute;
+  left: 47%;
+  top: -4px;
+  height: 13px;
+  width: 50px;
+  cursor: url(content_files/openhand.cur), default;
+  display: none;
+  overflow: hidden;
+}
+
+.dragging{
+  cursor: url(content_files/closedhand.cur), default !important;
+}
+
+.canvas-buddy a{
+}
+
+.canvas-buddy img{
+  display: block;
+}
+
+/*
+.nodrag{
+  cursor: not-allowed !important;
+}
+
+.nodrag img{
+  opacity: .5;
+}
+*/
+
+.canvas-buddy-2{
+  position: absolute;
+  top: 0;
+  left: auto;
+  right: 0;
+  display: none;
+  height: 100%;
+  background-color: #f7f7f7;
+  border-left: 1px solid #ddd;
+  width: 19px;
+}
+
+.canvas-buddy a, .canvas-buddy-2 a{
+  text-decoration: none;
+}
+
+.section-header{
+  position: relative;
+}
+
+.remove-element{
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  cursor: pointer;
+  right: 15px;
+}
+.drag-element{
+/*
+cursor: move;
+cursor: grab;
+cursor: -moz-grab;
+cursor: -webkit-grab;
+cursor: url(https://mail.google.com/mail/images/2/openhand.cur), grab, -moz-grab, -webkit-grab, move, default;
+*/
+cursor: url(content_files/openhand.cur), default;
+}
+/*
+.nodrag .drag-element{
+  cursor: not-allowed;
+}
+*/
+.edit-element{
+  position: absolute;
+  top: 25px;
+  cursor: pointer;
+  padding: 2px;
+left: 1px;
+  height: 13px;
+  width: 13px;
+  overflow: hidden;
+}
+.edit-element img{
+  width: 13px;
+  height: 13px;
+  float: left;
+}
+
+.to-remove *{
+  color: #999 !important;
+  color: #bbb !important;
+  background-color: transparent !important;
+}
+.to-remove img{
+  opacity: .25;
+}
+.to-remove .remove-element img{
+  opacity: 1;
+}
+
+
+.active>div>.canvas-buddy, .active>div>.canvas-buddy-2{
+  display: block;
+/*
+  border-style: solid;
+  border-color: #999;
+  background-color: #ddd;
+  border-style: solid;
+*/
+/*
+  opacity: .5;
+*/
+}
+/*
+.active>div>.canvas-buddy{
+  opacity: .75;
+}
+.active>div>.canvas-buddy:hover, .active>div>.canvas-buddy-2:hover{
+  opacity: 1;
+}
+*/
+
+#canvas .section-header{
+  font-size: 1.65em;
+}
+#canvas .section .section .section-header{
+  font-size: 1.25em;
+}
+
+.cnx_label{
+  cursor: default;
+}
+
+.exericse{
+  margin: 0;
+  padding: 0;
+}
+
+.add-solution{
+  margin: -.5em 20px 1em 3em;
+  margin: -.5em 20px 1em 3em;
+  margin: -1.5em 20px .5em 3em;
+  margin: 0 0 .5em 2em;
+  border: 1px dashed #ccc;
+  padding: .5em 1em;
+  padding: .2em .5em;
+  cursor: text;
+visibility: hidden;
+}
+
+.add-solution a{
+  color: #888 !important;
+  text-decoration: none;
+  cursor: text;
+}
+
+.drag{
+  position: absolute;
+  margin-top: 0;
+  margin-left: 680px;
+  width: 150px;
+  border: 1px solid #bbb;
+  border-left-width: 0;
+  z-index: 3;
+  background-color: #f2f2f2;
+  padding: 10px;
+}
+
+.drag ul, .drag li{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  float: left;
+}
+
+.drag ul a{
+  width: 55px;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin: .5em .5em 0em 0;
+  display: block;
+  padding: .25em .5em;
+  background-color: #e3e3e3;
+  color: #000;
+cursor: url(content_files/openhand.cur), default;
+}
+
+.drag ul a:hover{
+  background-color: #fff;
+}
+
+.drag h2{
+  font-size: 1.15em;
+  margin-bottom: .25em;
+  color: #666;
+}
+
+.drag .help{
+  float: right;
+}
+
+.add-glossary{
+  clear: both;
+  font-size: .9em;
+  padding-top: .5em;
+}
+
+.add-glossary span{
+  clear: both;
+  margin-top: .5em;
+  border-top: 1px solid #bbb;
+  padding-top: .75em;
+  display: block;
+}
+
+/* ============== end earlier mock-ups =============== */
+
+#pedagog ul, #pedagog li, #pedagog dd{
+  padding:  0;
+  margin: 0;
+  list-style-type: none;
+  clear: right;
+}
+
+#pedagog .node, #pedagog .pedagog-glossary{
+  padding: .5em;
+  display: block;
+  background-color: #eee;
+  border-bottom: 1px solid #999;
+  text-decoration: none;
+  color: black;
+}
+
+#pedagog .node{
+cursor: url(content_files/openhand.cur), default;
+}
+
+.plus{
+  visibility: hidden;
+}
+
+#pedagog .node:hover{
+  background-color: #C5DAE9;
+}
+
+#pedagog node.pedagog-click{
+  background-color: #Ccc;
+}
+
+#pedagog .count{
+  float: right;
+  padding: .5em 0;
+  color: #666;
+  font-size: 1em;
+  background-color: #eee;
+  border-left: 1px dotted #bbb;
+  position: relative;
+}
+
+#pedagog .count-total{
+  text-decoration: none;
+  color: #000;
+  padding: .5em;
+}
+
+#pedagog .count-total-hover{
+  background-color: #555;
+  color: white;
+}
+
+.zero{
+  display: none;
+}
+
+.count-arrow{
+  background-image: url(helper_files/gray-arrow-01.png);
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-position: 100% middle;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  z-index: 3;
+}
+
+.node-list{
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: -1px;
+  background-color: white;
+  white-space: nowrap;
+  padding: .75em 1.5em;
+  border: 1px solid #aaa;
+//  border-left: 1px solid #fff;
+  box-shadow: 0px 0px 5px #aaa;
+  box-shadow: 2px 2px 5px -2px #aaa;
+  z-index: 2;
+}
+
+/*
+#pedagog .count-on{
+  box-shadow: 2px 2px 5px -2px #aaa;
+  border: 1px solid #aaa;
+  background-color: white;
+}
+
+#pedagog .count-on .count-total{
+  visibility: hidden;
+}
+*/
+
+.node-list a{
+  color: #369;
+}
+
+.node-list strong{
+  color: black;
+  display: block;
+  margin-bottom: .5em;
+}
+
+.pedagog-glossary{
+  background-color: #e3e3e3 !important;
+  cursor: default;
+}
+
+.glossary-container{
+  display: none;
+}
+
+em.emphasis.edhint{
+  border-bottom: 1px dashed #999;
+  border-bottom: 2px dotted #333;
+  border-bottom: 2px dotted #6c6;
+  border-bottom: 3px dotted #6c6;
+}
+
+dfn.term.edhint{
+  border-bottom: 2px dotted #6c6;
+  border-bottom: 2px dotted #e70;
+  border-bottom: 2px dotted #f90;
+  border-bottom: 2px dotted #fc0;
+  border-bottom: 3px dotted #d9f;
+}
+
+.section{
+  margin-top: 0;
+}
+
+.note-contents{
+  display: inline;
+}
+
+.equation-contents{
+  text-align: center;
+  padding-top: .5em;
+}
+
+</style>
+
+
+  <style type="text/css" charset="utf-8">/* See license.txt for terms of usage */
+/** reset styling **/
+.firebugResetStyles {
+    z-index: 2147483646 !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: block !important;
+    border: 0 none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    outline: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    position: fixed !important;
+    -moz-transform: rotate(0deg) !important;
+    -moz-transform-origin: 50% 50% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent none !important;
+    pointer-events: none !important;
+}
+
+.firebugBlockBackgroundColor {
+    background-color: transparent !important;
+}
+
+.firebugResetStyles:before, .firebugResetStyles:after {
+    content: "" !important;
+}
+/**actual styling to be modified by firebug theme**/
+.firebugCanvas {
+    display: none !important;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+.firebugLayoutBox {
+    width: auto !important;
+    position: static !important;
+}
+
+.firebugLayoutBoxOffset {
+    opacity: 0.8 !important;
+    position: fixed !important;
+}
+
+.firebugLayoutLine {
+    opacity: 0.4 !important;
+    background-color: #000000 !important;
+}
+
+.firebugLayoutLineLeft, .firebugLayoutLineRight {
+    width: 1px !important;
+    height: 100% !important;
+}
+
+.firebugLayoutLineTop, .firebugLayoutLineBottom {
+    width: 100% !important;
+    height: 1px !important;
+}
+
+.firebugLayoutLineTop {
+    margin-top: -1px !important;
+    border-top: 1px solid #999999 !important;
+}
+
+.firebugLayoutLineRight {
+    border-right: 1px solid #999999 !important;
+}
+
+.firebugLayoutLineBottom {
+    border-bottom: 1px solid #999999 !important;
+}
+
+.firebugLayoutLineLeft {
+    margin-left: -1px !important;
+    border-left: 1px solid #999999 !important;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+.firebugLayoutBoxParent {
+    border-top: 0 none !important;
+    border-right: 1px dashed #E00 !important;
+    border-bottom: 1px dashed #E00 !important;
+    border-left: 0 none !important;
+    position: fixed !important;
+    width: auto !important;
+}
+
+.firebugRuler{
+    position: absolute !important;
+}
+
+.firebugRulerH {
+    top: -15px !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 14px !important;
+    background: url("data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%13%88%00%00%00%0E%08%02%00%00%00L%25a%0A%00%00%00%04gAMA%00%00%D6%D8%D4OX2%00%00%00%19tEXtSoftware%00Adobe%20ImageReadyq%C9e%3C%00%00%04%F8IDATx%DA%EC%DD%D1n%E2%3A%00E%D1%80%F8%FF%EF%E2%AF2%95%D0D4%0E%C1%14%B0%8Fa-%E9%3E%CC%9C%87n%B9%81%A6W0%1C%A6i%9A%E7y%0As8%1CT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AATE9%FE%FCw%3E%9F%AF%2B%2F%BA%97%FDT%1D~K(%5C%9D%D5%EA%1B%5C%86%B5%A9%BDU%B5y%80%ED%AB*%03%FAV9%AB%E1%CEj%E7%82%EF%FB%18%BC%AEJ8%AB%FA'%D2%BEU9%D7U%ECc0%E1%A2r%5DynwVi%CFW%7F%BB%17%7Dy%EACU%CD%0E%F0%FA%3BX%FEbV%FEM%9B%2B%AD%BE%AA%E5%95v%AB%AA%E3E5%DCu%15rV9%07%B5%7F%B5w%FCm%BA%BE%AA%FBY%3D%14%F0%EE%C7%60%0EU%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5JU%88%D3%F5%1F%AE%DF%3B%1B%F2%3E%DAUCNa%F92%D02%AC%7Dm%F9%3A%D4%F2%8B6%AE*%BF%5C%C2Ym~9g5%D0Y%95%17%7C%C8c%B0%7C%18%26%9CU%CD%13i%F7%AA%90%B3Z%7D%95%B4%C7%60%E6E%B5%BC%05%B4%FBY%95U%9E%DB%FD%1C%FC%E0%9F%83%7F%BE%17%7DkjMU%E3%03%AC%7CWj%DF%83%9An%BCG%AE%F1%95%96yQ%0Dq%5Dy%00%3Et%B5'%FC6%5DS%95pV%95%01%81%FF'%07%00%00%00%00%00%00%00%00%00%F8x%C7%F0%BE%9COp%5D%C9%7C%AD%E7%E6%EBV%FB%1E%E0(%07%E5%AC%C6%3A%ABi%9C%8F%C6%0E9%AB%C0'%D2%8E%9F%F99%D0E%B5%99%14%F5%0D%CD%7F%24%C6%DEH%B8%E9rV%DFs%DB%D0%F7%00k%FE%1D%84%84%83J%B8%E3%BA%FB%EF%20%84%1C%D7%AD%B0%8E%D7U%C8Y%05%1E%D4t%EF%AD%95Q%BF8w%BF%E9%0A%BF%EB%03%00%00%00%00%00%00%00%00%00%B8vJ%8E%BB%F5%B1u%8Cx%80%E1o%5E%CA9%AB%CB%CB%8E%03%DF%1D%B7T%25%9C%D5(%EFJM8%AB%CC'%D2%B2*%A4s%E7c6%FB%3E%FA%A2%1E%80~%0E%3E%DA%10x%5D%95Uig%15u%15%ED%7C%14%B6%87%A1%3B%FCo8%A8%D8o%D3%ADO%01%EDx%83%1A~%1B%9FpP%A3%DC%C6'%9C%95gK%00%00%00%00%00%00%00%00%00%20%D9%C9%11%D0%C0%40%AF%3F%EE%EE%92%94%D6%16X%B5%BCMH%15%2F%BF%D4%A7%C87%F1%8E%F2%81%AE%AAvzr%DA2%ABV%17%7C%E63%83%E7I%DC%C6%0Bs%1B%EF6%1E%00%00%00%00%00%00%00%00%00%80cr%9CW%FF%7F%C6%01%0E%F1%CE%A5%84%B3%CA%BC%E0%CB%AA%84%CE%F9%BF)%EC%13%08WU%AE%AB%B1%AE%2BO%EC%8E%CBYe%FE%8CN%ABr%5Dy%60~%CFA%0D%F4%AE%D4%BE%C75%CA%EDVB%EA(%B7%F1%09g%E5%D9%12%00%00%00%00%00%00%00%00%00H%F6%EB%13S%E7y%5E%5E%FB%98%F0%22%D1%B2'%A7%F0%92%B1%BC%24z3%AC%7Dm%60%D5%92%B4%7CEUO%5E%F0%AA*%3BU%B9%AE%3E%A0j%94%07%A0%C7%A0%AB%FD%B5%3F%A0%F7%03T%3Dy%D7%F7%D6%D4%C0%AAU%D2%E6%DFt%3F%A8%CC%AA%F2%86%B9%D7%F5%1F%18%E6%01%F8%CC%D5%9E%F0%F3z%88%AA%90%EF%20%00%00%00%00%00%00%00%00%00%C0%A6%D3%EA%CFi%AFb%2C%7BB%0A%2B%C3%1A%D7%06V%D5%07%A8r%5D%3D%D9%A6%CAu%F5%25%CF%A2%99%97zNX%60%95%AB%5DUZ%D5%FBR%03%AB%1C%D4k%9F%3F%BB%5C%FF%81a%AE%AB'%7F%F3%EA%FE%F3z%94%AA%D8%DF%5B%01%00%00%00%00%00%00%00%00%00%8E%FB%F3%F2%B1%1B%8DWU%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*UiU%C7%BBe%E7%F3%B9%CB%AAJ%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5J%95*U%AAT%A9R%A5*%AAj%FD%C6%D4%5Eo%90%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5%86%AF%1B%9F%98%DA%EBm%BBV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%ADV%AB%D5j%B5Z%AD%D6%E4%F58%01%00%00%00%00%00%00%00%00%00%00%00%00%00%40%85%7F%02%0C%008%C2%D0H%16j%8FX%00%00%00%00IEND%AEB%60%82") repeat-x !important;
+    border-top: 1px solid #BBBBBB !important;
+    border-right: 1px dashed #BBBBBB !important;
+    border-bottom: 1px solid #000000 !important;
+}
+
+.firebugRulerV {
+    top: 0 !important;
+    left: -15px !important;
+    width: 14px !important;
+    height: 100% !important;
+    background: url("data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%0E%00%00%13%88%08%02%00%00%00%0E%F5%CB%10%00%00%00%04gAMA%00%00%D6%D8%D4OX2%00%00%00%19tEXtSoftware%00Adobe%20ImageReadyq%C9e%3C%00%00%06~IDATx%DA%EC%DD%D1v%A20%14%40Qt%F1%FF%FF%E4%97%D9%07%3BT%19%92%DC%40(%90%EEy%9A5%CB%B6%E8%F6%9Ac%A4%CC0%84%FF%DC%9E%CF%E7%E3%F1%88%DE4%F8%5D%C7%9F%2F%BA%DD%5E%7FI%7D%F18%DDn%BA%C5%FB%DF%97%BFk%F2%10%FF%FD%B4%F2M%A7%FB%FD%FD%B3%22%07p%8F%3F%AE%E3%F4S%8A%8F%40%EEq%9D%BE8D%F0%0EY%A1Uq%B7%EA%1F%81%88V%E8X%3F%B4%CEy%B7h%D1%A2E%EBohU%FC%D9%AF2fO%8BBeD%BE%F7X%0C%97%A4%D6b7%2Ck%A5%12%E3%9B%60v%B7r%C7%1AI%8C%BD%2B%23r%00c0%B2v%9B%AD%CA%26%0C%1Ek%05A%FD%93%D0%2B%A1u%8B%16-%95q%5Ce%DCSO%8E%E4M%23%8B%F7%C2%FE%40%BB%BD%8C%FC%8A%B5V%EBu%40%F9%3B%A72%FA%AE%8C%D4%01%CC%B5%DA%13%9CB%AB%E2I%18%24%B0n%A9%0CZ*Ce%9C%A22%8E%D8NJ%1E%EB%FF%8F%AE%CAP%19*%C3%BAEKe%AC%D1%AAX%8C*%DEH%8F%C5W%A1e%AD%D4%B7%5C%5B%19%C5%DB%0D%EF%9F%19%1D%7B%5E%86%BD%0C%95%A12%AC%5B*%83%96%CAP%19%F62T%86%CAP%19*%83%96%CA%B8Xe%BC%FE)T%19%A1%17xg%7F%DA%CBP%19*%C3%BA%A52T%86%CAP%19%F62T%86%CA%B0n%A9%0CZ%1DV%C6%3D%F3%FCH%DE%B4%B8~%7F%5CZc%F1%D6%1F%AF%84%F9%0F6%E6%EBVt9%0E~%BEr%AF%23%B0%97%A12T%86%CAP%19%B4T%86%CA%B8Re%D8%CBP%19*%C3%BA%A52huX%19%AE%CA%E5%BC%0C%7B%19*CeX%B7h%A9%0C%95%E1%BC%0C%7B%19*CeX%B7T%06%AD%CB%5E%95%2B%BF.%8F%C5%97%D5%E4%7B%EE%82%D6%FB%CF-%9C%FD%B9%CF%3By%7B%19%F62T%86%CA%B0n%D1R%19*%A3%D3%CA%B0%97%A12T%86uKe%D0%EA%B02*%3F1%99%5DB%2B%A4%B5%F8%3A%7C%BA%2B%8Co%7D%5C%EDe%A8%0C%95a%DDR%19%B4T%C66%82fA%B2%ED%DA%9FC%FC%17GZ%06%C9%E1%B3%E5%2C%1A%9FoiB%EB%96%CA%A0%D5qe4%7B%7D%FD%85%F7%5B%ED_%E0s%07%F0k%951%ECr%0D%B5C%D7-g%D1%A8%0C%EB%96%CA%A0%A52T%C6)*%C3%5E%86%CAP%19%D6-%95A%EB*%95q%F8%BB%E3%F9%AB%F6%E21%ACZ%B7%22%B7%9B%3F%02%85%CB%A2%5B%B7%BA%5E%B7%9C%97%E1%BC%0C%EB%16-%95%A12z%AC%0C%BFc%A22T%86uKe%D0%EA%B02V%DD%AD%8A%2B%8CWhe%5E%AF%CF%F5%3B%26%CE%CBh%5C%19%CE%CB%B0%F3%A4%095%A1%CAP%19*Ce%A8%0C%3BO*Ce%A8%0C%95%A12%3A%AD%8C%0A%82%7B%F0v%1F%2FD%A9%5B%9F%EE%EA%26%AF%03%CA%DF9%7B%19*Ce%A8%0C%95%A12T%86%CA%B8Ze%D8%CBP%19*Ce%A8%0C%95%D1ae%EC%F7%89I%E1%B4%D7M%D7P%8BjU%5C%BB%3E%F2%20%D8%CBP%19*Ce%A8%0C%95%A12T%C6%D5*%C3%5E%86%CAP%19*Ce%B4O%07%7B%F0W%7Bw%1C%7C%1A%8C%B3%3B%D1%EE%AA%5C%D6-%EBV%83%80%5E%D0%CA%10%5CU%2BD%E07YU%86%CAP%19*%E3%9A%95%91%D9%A0%C8%AD%5B%EDv%9E%82%FFKOee%E4%8FUe%A8%0C%95%A12T%C6%1F%A9%8C%C8%3D%5B%A5%15%FD%14%22r%E7B%9F%17l%F8%BF%ED%EAf%2B%7F%CF%ECe%D8%CBP%19*Ce%A8%0C%95%E1%93~%7B%19%F62T%86%CAP%19*Ce%A8%0C%E7%13%DA%CBP%19*Ce%A8%0CZf%8B%16-Z%B4h%D1R%19f%8B%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1%A2%A52%CC%16-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2EKe%98-Z%B4h%D1%A2EKe%D02%5B%B4h%D1%A2EKe%D02%5B%B4h%D1%A2E%8B%96%CA0%5B%B4h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%16-%95a%B6h%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-Z*%C3l%D1%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z%B4T%86%D9%A2E%8B%16-Z%B4T%06-%B3E%8B%16-Z%B4T%06-%B3E%8B%16-Z%B4h%A9%0C%B3E%8B%16-Z%B4h%A9%0CZf%8B%16-Z%B4h%A9%0CZf%8B%16-Z%B4h%D1R%19f%8B%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1%A2%A52%CC%16-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2EKe%98-Z%B4h%D1%A2EKe%D02%5B%B4h%D1%A2EKe%D02%5B%B4h%D1%A2E%8B%96%CA0%5B%B4h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%16-%95a%B6h%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-Z*%C3l%D1%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z%B4T%86%D9%A2E%8B%16-Z%B4T%06-%B3E%8B%16-Z%B4T%06-%B3E%8B%16-Z%B4h%A9%0C%B3E%8B%16-Z%B4h%A9%0CZf%8B%16-Z%B4h%A9%0CZf%8B%16-Z%B4h%D1R%19f%8B%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1R%19%B4%CC%16-Z%B4h%D1%A2%A52%CC%16-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2%A52h%99-Z%B4h%D1%A2EKe%98-Z%B4h%D1%A2EKe%D02%5B%B4h%D1%A2EKe%D02%5B%B4h%D1%A2E%8B%96%CA0%5B%B4h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%96%CA%A0e%B6h%D1%A2E%8B%16-%95a%B6h%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-%95A%CBl%D1%A2E%8B%16-Z*%C3l%D1%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z*%83%96%D9%A2E%8B%16-Z%B4T%86%D9%A2E%8B%16-Z%B4T%06-%B3E%8B%16-Z%B4%AE%A4%F5%25%C0%00%DE%BF%5C'%0F%DA%B8q%00%00%00%00IEND%AEB%60%82") repeat-y !important;
+    border-left: 1px solid #BBBBBB !important;
+    border-right: 1px solid #000000 !important;
+    border-bottom: 1px dashed #BBBBBB !important;
+}
+
+.overflowRulerX > .firebugRulerV {
+    left: 0 !important;
+}
+
+.overflowRulerY > .firebugRulerH {
+    top: 0 !important;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+.fbProxyElement {
+    position: fixed !important;
+    pointer-events: auto !important;
+}</style></head>
+
+  <body>
+    
+    
+  <div id="header-wrap">
+    <div id="header-container">
+      <div id="header-functions">
+        <div id="expertmode">
+          <span id="expand-advanced" style="display: inline;">
+            «
+                  </span>
+          <span id="basic-message" style="display: none;">
+            <span class="link-like">Switch to advanced mode</span>
+          </span>
+          <span id="advanced-message" style="display: none;">
+            You are in advanced mode. 
+            <span class="link-like">Return to basic mode.</span>
+          </span>
+        </div>
+        <div id="status">
+          <span id="user-id">You are logged in as: <strong>starkenbury</strong></span>.
+          <a href="#" target="_top">Sign out.</a>
+        </div>
+      </div>
+      <div id="header">
+        <img class="cnxlogo" src="handles-21_archivos/connexions_icon.png">
+        <h1><a href="#">Connexions Importer</a></h1>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="workflownav-wrap">
+    <div id="workflownav-container">
+      <div id="back-steps">
+        <input class="button" value="« Back: Return to start page" id="back-to-chooser-2" title="Return to the previous screen to choose a different import or editing option" onclick="window.location = 'choose-27.html'" type="button">
+      </div>
+      <div id="forward-steps">
+        <input class="button forward-button" value="Next Step »" id="show-neworexisting" title="Select whether this will be used for a new module or to override the contents of an existing module" type="button">
+      </div>
+    </div>
+  </div>
+
+
+  <div id="ie6-container-wrap">
+    <div id="container">
+      <div style="margin-top: 101px;" id="content">
+
+
+        <div style="" id="pageheader-wrap">
+
+          <div id="module-actions">
+            <div class="advanced" style="display: none;">
+              <h2 class="advanced-label">
+                Advanced
+              </h2>
+              <strong>Module actions: </strong>
+              <a title="Save a ZIP file containing the module's XML and metadata to your local computer." id="download-copy" href="#asdfaasdf" style="color: black; text-decoration: none;">
+               <span class="button" style="margin-left: 0;">Download a copy</span>
+              </a>
+              <a title="Make changes to the module by editing its XML code." id="edit-xml" href="#asdfaasdf" style="color: black; text-decoration: none;">
+               <span class="button" style="margin-left: 0;">Edit XML</span>
+              </a>
+            </div>
+          </div>
+
+
+          <div id="page-title">
+            <h1>
+              Edit:
+              <span class="metatitle">
+                Conversion of Cooking_with_spam.doc
+              </span>
+            </h1>
+          </div>
+
+          <div id="page-description">
+            <p class="forminfo">
+              Make any changes you would like to the module below.
+            </p>
+          </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+<div id="editor-mode">
+  <ul>
+    <li id="xml-mode">
+      <a href="#">Edit XML Source</a>
+    </li>
+    <li id="visual-mode" class="current">
+      <a href="#">Edit Visually</a>
+    </li>
+  </ul>
+</div>
+
+        <div style="width: 1366px;" id="editor">
+
+<div id="iconbar">
+
+  <span class="icon-like" id="hints">
+    <input checked="checked" type="checkbox">
+    <span href="#" class="checkbox">Show hints</span>
+  </span>
+  <span class="icon-like">
+    <input value="Saved" disabled="disabled" type="submit">
+  </span>
+  <span class="icon-like">
+    <input value="Preview" type="submit">
+  </span>
+<!--
+  <span class="icon-like">
+    <input type="submit" value="Preview"/>
+  </span>
+-->
+  <span class="icon-like">
+<!--
+    <input type="submit" value="Options ..." class="menu-like"/>
+-->
+    <a href="#" class="menu-like">Edit/Options ...</a>
+  </span>
+  <span class="icon disabled" id="undo" title="Undo">
+    <a href="#">
+      <img src="handles-21_archivos/undo-01-disabled.png">
+    </a>
+  </span>
+  <span class="icon disabled" id="redo" title="Redo">
+    <a href="#">
+      <img src="handles-21_archivos/redo-01-disabled.png">
+    </a>
+  </span>
+  <span class="separator">  </span>
+  <span class="icon-like">
+      <select>
+        <option selected="selected">Normal text</option>
+        <option>Header Level 1</option>
+        <option>Header Level 2</option>
+        <option>Header Level 3</option>
+      </select>
+  </span>
+  <span class="icon" id="bold" title="Bold (Ctrl + B)">
+    <a href="#">
+      <img src="handles-21_archivos/bold-01.png">
+    </a>
+  </span>
+  <span class="icon" id="italics" title="Italics (Ctrl + I)">
+    <a href="#">
+      <img src="handles-21_archivos/italics-01.png">
+    </a>
+  </span>
+  <span class="icon" id="underline" title="Underline (Ctrl + U)">
+    <a href="#">
+      <img src="handles-21_archivos/underline-02.png">
+    </a>
+  </span>
+<!--
+  <span class="icon" id="smallcaps" title="Small caps">
+    <a href="#">
+      <img src="toolbar/smallcaps-01.png" />
+    </a>
+  </span>
+  <span class="separator">  </span>
+-->
+  <span class="icon" id="superscript" title="Superscript">
+    <a href="#">
+      <img src="handles-21_archivos/superscript-01.png">
+    </a>
+  </span>
+  <span class="icon" id="subscript" title="Subscript">
+    <a href="#">
+      <img src="handles-21_archivos/subscript-01.png">
+    </a>
+  </span>
+<!--
+  <span class="separator" style="width: 16px; background-position: 3px 0;">  </span>
+-->
+  <span class="separator">  </span>
+  <span class="icon" id="link" title="Link">
+    <a href="#">
+      <img src="handles-21_archivos/link-01.png">
+    </a>
+  </span>
+  <span class="icon disabled" id="unlink" title="Unlink (remove the link, leaving just the text)">
+    <a href="#">
+      <img src="handles-21_archivos/unlink-01-disabled.png">
+    </a>
+  </span>
+<!--
+  <span class="icon" id="specialchars" title="Insert special characters">
+    <a href="#">
+      <img src="toolbar/specialchars-01.png" />
+    </a>
+  </span>
+  <span class="icon" id="footnote" title="Footnote">
+    <a href="#">
+      <img src="toolbar/footnote-01.png" />
+    </a>
+  </span>
+-->
+  <span class="separator">  </span>
+  <span class="icon" id="unorderedlist" title="Unordered List">
+    <a href="#">
+      <img src="handles-21_archivos/unorderedlist-01.png">
+    </a>
+  </span>
+  <span class="icon" id="orderedlist" title="Ordered List">
+    <a href="#">
+      <img src="handles-21_archivos/orderedlist-01.png">
+    </a>
+  </span>
+  <span class="separator">  </span>
+  <span class="icon" id="table" title="Table">
+    <a href="#">
+      <img src="handles-21_archivos/table-01.png">
+    </a>
+  </span>
+  <span class="icon" id="image" title="Image">
+    <a href="#">
+      <img src="handles-21_archivos/image-01.png">
+    </a>
+  </span>
+<!--
+  <span class="icon" id="video" title="Video">
+    <a href="#">
+      <img src="toolbar/video-01.png" />
+    </a>
+  </span>
+  <span class="icon" id="audio" title="Audio">
+    <a href="#">
+      <img src="toolbar/audio-01.png" />
+    </a>
+  </span>
+-->
+</div>
+
+
+<div style="height: 529px;" id="artboard">
+
+<div id="sidebar">
+<!--
+<dl id="toc">
+  <dt><a href="#">Module contents</a></h2>
+  <dd>asdf</dd>
+</dl>
+-->
+<dl id="pedagog">
+  <dt>Add a new ...</dt>
+  <dd>
+    <ul>
+      <li title="Drag this item to the place you want it on the page.">
+        <div class="count">
+          <a href="#" class="count-total">1</a>
+          <div style="display: none;" class="node-list">
+            <strong>Exercises in this document</strong>
+            <ul>
+              <li>
+                <a href="#swsuper" title="Jump to this exercise">Exercise 1</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <a class="node" href="#"><span class="plus">+ </span>Exercise</a>
+      </li>
+      <li title="Drag this item to the place you want it on the page.">
+        <div class="count zero">0</div>
+        <a class="node" href="#"><span class="plus">+ </span>Definition</a>
+      </li>
+      <li title="Drag this item to the place you want it on the page.">
+        <div class="count">
+          <div style="display: none;" class="node-list">
+            <strong>Examples in this document</strong>
+            <ul>
+              <li>
+                <a href="#ex1" title="Jump to this example">Example 1</a>
+              </li>
+            </ul>
+          </div>
+          <a href="#" class="count-total">1</a>
+        </div>
+        <a class="node" href="#"><span class="plus">+ </span>Example</a>
+      </li>
+      <li title="Drag this item to the place you want it on the page.">
+        <span class="count zero">0</span>
+        <a class="node" href="#"><span class="plus">+ </span>Figure</a>
+      </li>
+<!--
+      <li>
+        <span class="count zero">0</span>
+        <a class="node" href="#"><span class="plus">+ </span>Block quote</a>
+      </li>
+      <li>
+        <span class="count zero">(0)</span>
+        <a class="node" href="#"><span class="plus">+ </span>Block of code font</a>
+      </li>
+-->
+      <li title="Drag this item to the place you want it on the page.">
+        <div class="count">
+          <div style="display: none;" class="node-list">
+            <strong>Equations in this document</strong>
+            <ul>
+              <li>
+                <a href="#eq1" title="Jump to this equation">Equation 1</a>
+              </li>
+            </ul>
+          </div>
+          <a href="#" class="count-total">1</a>
+        </div>
+        <a class="node" href="#"><span class="plus">+ </span>Equation</a>
+      </li>
+      <li title="Drag this item to the place you want it on the page.">
+        <span class="count zero">0</span>
+        <a class="node" href="#"><span class="plus">+ </span>Note</a>
+      </li>
+      <li class="pedagog-glossary">
+        <input type="checkbox">
+        <span>Include a Glossary</span>
+      </li>
+    </ul>
+  </dd>
+</dl>
+</div>
+
+<div id="canvas">
+<!--
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+asdf<br/>
+-->
+
+<div class="canvas2 special-canvas inactive2" style="padding: 0; margin: 0;">
+
+        <div id="cnx_module_header" style="margin-bottom: 1.5em;">
+
+          <h1>Linear and Time-Invariant Systems</h1>
+
+        </div>
+
+        <div xmlns:md="http://cnx.rice.edu/mdml/0.4" xmlns:qml="http://cnx.rice.edu/qml/1.0" xmlns:mod="http://cnx.rice.edu/#moduleIds" xmlns:bib="http://bibtexml.sf.net/" id="cnx_main">
+
+<div class="section" style="display: none;">
+  <h2 class="section-header">
+    <strong class="title">Introduction</strong>
+  </h2>
+  <div class="section-contents">
+
+    <p class="para" id="p01">
+    This module contains an introduction to the study of electrical engineering
+    and some of the historical points of interest which formed the basis of study
+    in the field.  The overall themes of the cirriculum of the electrical engineering
+    department are discussed.
+    </p>
+
+  </div>
+</div>
+
+
+
+<div class="section">
+  <h2 class="section-header">
+    <strong class="title">Signals</strong>
+  </h2>
+
+  <div class="section-contents">
+
+  <p class="para" id="para1"> 
+    A signal's complexity is not related to how wiggly it is. Rather, a signal 
+    expert looks for ways of decomposing a given signal into a  <em class="emphasis edhint">sum of 
+    simpler signals</em>, which we term the <dfn class="term edhint">signal decomposition</dfn>. 
+    Though we will never compute a signal's complexity, it essentially equals the 
+    number of terms in its decomposition. In writing a signal as a sum of component 
+    signals, we can change the component signal's gain by multiplying it by a constant 
+    and by delaying it. More complicated decompositions could contain derivatives 
+    or integrals of simple signals. In short, signal decomposition amounts to 
+    thinking of the signal as the output of a linear system having simple signals as 
+    its inputs. We would build such a system, but envisioning the signal's components
+    helps understand the signal's structure. Furthermore, you can readily compute a
+    linear system's output to an input decomposed as a superposition of simple signals.
+  </p>
+
+<div class="canvas-wrap">
+  <div style="background-image: url(&quot;source-files/cursor-01.gif&quot;); background-repeat: no-repeat; background-position: 158px -284px;" class="canvas inactive" id="ex1">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<h2 class="example-header"><span class="cnx_label">Example 1</span></h2><div class="example-contents">
+
+<p class="para" id="paraex1">
+      As an example of signal complexity, we can express the pulse  
+      <span style="" aria-readonly="true" role="textbox" class="MathJax"><nobr><span id="MathJax-Span-9" class="math"><span style="display: inline-block; position: 
+relative; width: 2.757em; height: 0px; font-size: 139%;"><span style="position: absolute; top: -2.319em; left: 0em; clip: rect(1.277em, 1000em, 2.86em, -0.579em);"><span id="MathJax-Span-10" class="mrow"><span id="MathJax-Span-11" class="mrow"><span id="MathJax-Span-12" class="mrow"><span id="MathJax-Span-13" class="mrow"><span id="MathJax-Span-14" class="mi"></span><span id="MathJax-Span-15" class="msub"><span style="display: inline-block; position: relative; width: 1.109em; height: 0px;"><span style="position: absolute; top: -2.199em; left: 0em; clip: rect(1.569em, 1000em, 2.576em, -0.579em);"><span id="MathJax-Span-16" class="mi"><img style="width: 10px; 
+height: 10px; vertical-align: -3px; margin-left: -0.04em; margin-right: 0.006em;" src="handles-21_archivos/0070.png"></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span><span style="position: absolute; top: -1.966em; left: 0.614em;"><span style="font-size: 70.7%;" id="MathJax-Span-17" class="mi"><img style="width: 
+7px; height: 8px; margin-right: -0.041em;" src="handles-21_archivos/003F.png"></span>&nbsp;<span style="display: 
+inline-block; width: 0px; height: 2.199em;"></span></span></span></span><span id="MathJax-Span-18" class="mi"></span></span><span id="MathJax-Span-19" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-20" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-21" class="mo"><span><img style="width: 7px; height: 20px; vertical-align: -6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-22" class="mrow"><span id="MathJax-Span-23" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-24" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span></span></span></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.319em;"></span></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 1.7em; vertical-align: 
+-0.502em;"></span></span></nobr></span><script type="math/mml" id="MathJax-Element-1">&lt;math xmlns="http://www.w3.org/1998/Math/MathML" 
+display="inline"&gt;&lt;semantics&gt;&lt;mrow&gt;
+        &lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;&lt;/mi&gt;&lt;msub&gt;
+              &lt;mi&gt;p&lt;/mi&gt;
+              &lt;mi&gt;?&lt;/mi&gt;
+            &lt;/msub&gt;&lt;mi&gt;&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfenced open="(" close=")" 
+separators=","&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;/mrow&gt;
+      &lt;/mrow&gt;&lt;annotation-xml encoding="MathML-Content"&gt;&lt;apply&gt;
+          &lt;ci type="fn"&gt;
+            &lt;msub&gt;
+              &lt;mi&gt;p&lt;/mi&gt;
+              &lt;mi&gt;?&lt;/mi&gt;
+            &lt;/msub&gt;
+          &lt;/ci&gt;
+          &lt;ci&gt;t&lt;/ci&gt;
+        &lt;/apply&gt;&lt;/annotation-xml&gt;&lt;/semantics&gt;&lt;/math&gt;</script>
+      as a sum of delayed unit steps.
+</p>
+
+
+
+<div class="canvas-wrap">
+      <div class="equation canvas inactive" id="eq1">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<div class="equation-contents"> 
+        <div aria-readonly="true" role="textbox" style="width: 100%; position: relative; text-align: center;" class="MathJax_Display"><span style="" class="MathJax"><nobr><span id="MathJax-Span-25" class="math"><span style="display: inline-block; position: relative; width: 11.688em; height: 0px; font-size: 
+139%;"><span style="position: absolute; top: -2.319em; left: 0em; clip: rect(1.277em, 1000em, 2.86em, -0.579em);"><span id="MathJax-Span-26" class="mrow"><span id="MathJax-Span-27" class="mrow"><span id="MathJax-Span-28" class="mrow"><span id="MathJax-Span-29" class="mrow"><span id="MathJax-Span-30" class="mrow"><span id="MathJax-Span-31" class="mi"></span><span id="MathJax-Span-32" class="msub"><span style="display: inline-block; position: relative; width: 1.109em; height: 0px;"><span style="position: absolute; top: -2.199em; left: 0em; clip: rect(1.569em, 1000em, 2.576em, -0.579em);"><span id="MathJax-Span-33" class="mi"><img style="width: 10px; 
+height: 10px; vertical-align: -3px; margin-left: -0.04em; margin-right: 0.006em;" src="handles-21_archivos/0070.png"></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span><span style="position: absolute; top: -1.966em; left: 0.614em;"><span style="font-size: 70.7%;" id="MathJax-Span-34" class="mi"><img style="width: 
+7px; height: 8px; margin-right: -0.041em;" src="handles-21_archivos/003F.png"></span>&nbsp;<span style="display: 
+inline-block; width: 0px; height: 2.199em;"></span></span></span></span><span id="MathJax-Span-35" class="mi"></span></span><span id="MathJax-Span-36" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-37" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-38" class="mo"><span><img style="width: 7px; height: 20px; vertical-align: -6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-39" class="mrow"><span id="MathJax-Span-40" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-41" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span></span></span><span style="padding-left: 0.278em;" id="MathJax-Span-42" class="mrow"><span id="MathJax-Span-43" class="mo"><img style="width: 12px; height: 4px; vertical-align: 2px; margin-right: 0.057em;" src="handles-21_archivos/003D_002.png"></span></span><span style="padding-left: 0.278em;" id="MathJax-Span-44" class="mrow"><span id="MathJax-Span-45" class="mrow"><span id="MathJax-Span-46" class="mrow"><span id="MathJax-Span-47" class="mrow"><span id="MathJax-Span-48" class="mi"><img style="width: 10px; height: 7px; margin-right: 0.021em;" src="handles-21_archivos/0075.png"></span></span><span id="MathJax-Span-49" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-50" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-51" class="mo"><span><img style="width: 7px; 
+height: 20px; vertical-align: -6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-52" class="mrow"><span id="MathJax-Span-53" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-54" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span></span><span style="padding-left: 0.222em;" id="MathJax-Span-55" class="mo"><img style="width: 12px; height: 1px; 
+vertical-align: 4px; margin-right: 0.086em;" src="handles-21_archivos/2212_002.png"></span><span style="padding-left: 
+0.222em;" id="MathJax-Span-56" class="mrow"><span id="MathJax-Span-57" class="mrow"><span id="MathJax-Span-58" class="mi"><img style="width: 10px; height: 7px; 
+margin-right: 0.021em;" src="handles-21_archivos/0075.png"></span></span><span id="MathJax-Span-59" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-60" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-61" class="mo"><span><img style="width: 7px; height: 20px; vertical-align: -6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-62" class="mrow"><span id="MathJax-Span-63" class="mrow"><span id="MathJax-Span-64" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="padding-left: 0.222em;" id="MathJax-Span-65" class="mo"><img style="width: 12px; height: 1px; vertical-align: 4px; margin-right: 0.086em;" src="handles-21_archivos/2212_002.png"></span><span style="padding-left: 0.222em;" id="MathJax-Span-66" class="mrow"><span id="MathJax-Span-67" class="mi"><img style="width: 10px; height: 11px; margin-right: -0.041em;" src="handles-21_archivos/003F_003.png"></span></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-68" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span></span></span></span></span></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.319em;"></span></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 1.7em; vertical-align: 
+-0.502em;"></span></span></nobr></span></div><script type="math/mml" id="MathJax-Element-2">&lt;math xmlns="http://www.w3.org/1998/Math/MathML" 
+display="block"&gt;&lt;semantics&gt;&lt;mrow&gt;
+          &lt;mrow&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;&lt;/mi&gt;&lt;msub&gt;
+                    &lt;mi&gt;p&lt;/mi&gt;
+                    &lt;mi&gt;?&lt;/mi&gt;
+                  &lt;/msub&gt;&lt;mi&gt;&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfenced open="(" close=")" 
+separators=","&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfenced 
+open="(" close=")" 
+separators=","&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;/mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfenced 
+open="(" close=")" 
+separators=","&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;?&lt;/mi&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mrow&gt;
+        &lt;/mrow&gt;&lt;annotation-xml encoding="MathML-Content"&gt;&lt;apply&gt;
+            &lt;eq/&gt;
+              &lt;apply&gt;
+                &lt;ci type="fn"&gt;
+                  &lt;msub&gt;
+                    &lt;mi&gt;p&lt;/mi&gt;
+                    &lt;mi&gt;?&lt;/mi&gt;
+                  &lt;/msub&gt;
+                &lt;/ci&gt;
+                &lt;ci&gt;t&lt;/ci&gt;
+              &lt;/apply&gt;
+              &lt;apply&gt;
+                &lt;minus/&gt;
+                &lt;apply&gt;
+                    &lt;ci type="fn"&gt;u&lt;/ci&gt;
+                  &lt;ci&gt;t&lt;/ci&gt;
+                &lt;/apply&gt;
+                &lt;apply&gt;
+                    &lt;ci type="fn"&gt;u&lt;/ci&gt;
+                  &lt;apply&gt;
+
+                      &lt;minus/&gt;
+                        &lt;ci&gt;t&lt;/ci&gt;
+                        &lt;ci&gt;?&lt;/ci&gt;
+                  &lt;/apply&gt;
+                &lt;/apply&gt;
+
+              &lt;/apply&gt;
+          &lt;/apply&gt;&lt;/annotation-xml&gt;&lt;/semantics&gt;&lt;/math&gt;</script>
+      </div><span class="equation-number">(1)</span></div>
+</div>
+</div>
+
+      Thus, the pulse is a more complex signal than the step. Be that as it may,
+      the pulse is very useful to us.
+    <p></p></div>
+</div>
+</div>
+</div>
+
+
+<div class="canvas-wrap">
+  <div class="canvas inactive exercise" id="swsuper">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png" style="">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<h2 class="exercise-header"><span class="cnx_label">Exercise 1</span></h2><div class="exercise-contents"><div class="problem"><div class="problem-contents">
+
+      <p class="para" id="swsupera">
+        Express a square wave having period   
+        <span style="" aria-readonly="true" role="textbox" class="MathJax"><nobr><span id="MathJax-Span-69" class="math"><span style="display: inline-block; position: 
+relative; width: 0.599em; height: 0px; font-size: 139%;"><span style="position: absolute; top: -2.199em; left: 0em; clip: rect(1.328em, 1000em, 2.379em, -0.518em);"><span id="MathJax-Span-70" class="mrow"><span id="MathJax-Span-71" class="mrow"><span id="MathJax-Span-72" class="mrow"><span id="MathJax-Span-73" class="mi"><img style="width: 
+12px; height: 11px; margin-right: -0.123em;" src="handles-21_archivos/0054.png"></span></span></span></span>&nbsp;<span style="display: inline-block; width: 0px; 
+height: 2.199em;"></span></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 0.96em; vertical-align: 
+0em;"></span></span></nobr></span><script type="math/mml" id="MathJax-Element-3">&lt;math xmlns="http://www.w3.org/1998/Math/MathML" 
+display="inline"&gt;&lt;semantics&gt;&lt;mrow&gt;
+          &lt;mrow&gt;&lt;mi&gt;T&lt;/mi&gt;&lt;/mrow&gt;
+        &lt;/mrow&gt;&lt;annotation-xml encoding="MathML-Content"&gt;&lt;ci&gt;T&lt;/ci&gt;&lt;/annotation-xml&gt;&lt;/semantics&gt;&lt;/math&gt;</script> and amplitude
+        <span style="" aria-readonly="true" role="textbox" class="MathJax"><nobr><span id="MathJax-Span-74" class="math"><span style="display: inline-block; position: 
+relative; width: 0.779em; height: 0px; font-size: 139%;"><span style="position: absolute; top: -2.199em; left: 0em; clip: rect(1.288em, 1000em, 2.379em, -0.504em);"><span id="MathJax-Span-75" class="mrow"><span id="MathJax-Span-76" class="mrow"><span id="MathJax-Span-77" class="mrow"><span id="MathJax-Span-78" class="mi"><img style="width: 
+13px; height: 11px; margin-right: 0.023em;" src="handles-21_archivos/0041.png"></span></span></span></span>&nbsp;<span style="display: inline-block; width: 0px; 
+height: 2.199em;"></span></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 1.016em; vertical-align: 
+0em;"></span></span></nobr></span><script type="math/mml" id="MathJax-Element-4">&lt;math xmlns="http://www.w3.org/1998/Math/MathML" 
+display="inline"&gt;&lt;semantics&gt;&lt;mrow&gt;
+          &lt;mrow&gt;&lt;mi&gt;A&lt;/mi&gt;&lt;/mrow&gt;
+        &lt;/mrow&gt;&lt;annotation-xml encoding="MathML-Content"&gt;&lt;ci&gt;A&lt;/ci&gt;&lt;/annotation-xml&gt;&lt;/semantics&gt;&lt;/math&gt;</script>
+        as a superposition of delayed and amplitude-scaled pulses.
+      </p>
+
+    </div></div>
+<div class="canvas-wrap">
+<div class="solution canvas inactive" style="display: block; background-image: url(&quot;source-files/cursor-01.gif&quot;); background-repeat: no-repeat; background-position: 507px 248px;">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png" style="">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="You can only drag this element within exercises!" class="canvas-buddy nodrag" style="cursor: auto; display: none;">
+  <a class="drag-element" href="#" title="You can only drag this element within exercises!">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<h3 class="solution-header"><span class="cnx_label">Solution</span></h3><div class="solution-contents">
+
+<p class="para" id="swsuperb">
+        <span style="" aria-readonly="true" role="textbox" class="MathJax"><nobr><span id="MathJax-Span-79" class="math"><span style="display: inline-block; position: 
+relative; width: 16.843em; height: 0px; font-size: 139%;"><span style="position: absolute; top: -2.858em; left: 0em; clip: rect(1.143em, 1000em, 3.819em, 
+-0.507em);"><span id="MathJax-Span-80" class="mrow"><span id="MathJax-Span-81" class="mrow"><span id="MathJax-Span-82" class="mrow"><span id="MathJax-Span-83" class="mrow"><span id="MathJax-Span-84" class="mrow"><span id="MathJax-Span-85" class="mi"><img style="width: 6px; height: 8px; margin-right: 0.036em;" src="handles-21_archivos/0073.png"><img style="width: 9px; height: 12px; vertical-align: -4px; margin-right: 
+-0.007em;" src="handles-21_archivos/0071.png"></span></span><span id="MathJax-Span-86" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-87" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-88" class="mo"><span><img style="width: 7px; 
+height: 20px; vertical-align: -6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-89" class="mrow"><span id="MathJax-Span-90" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-91" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span></span><span style="padding-left: 0.278em;" id="MathJax-Span-92" class="mo"><img style="width: 12px; height: 4px; 
+vertical-align: 2px; margin-right: 0.057em;" src="handles-21_archivos/003D_002.png"></span><span id="MathJax-Span-93" class="mrow"><span id="MathJax-Span-94" class="munderover"><span style="display: inline-block; position: relative; width: 2.038em; height: 0px;"><span style="position: 
+absolute; top: -2.199em; left: 0.779em; clip: rect(1.3em, 1000em, 2.378em, -0.483em);"><span id="MathJax-Span-95" class="mo"><img style="width: 7px; height: 12px; 
+margin-right: 0.057em;" src="handles-21_archivos/003F_002.png"></span>&nbsp;<span style="display: inline-block; width: 
+0px; height: 2.199em;"></span></span><span style="position: absolute; top: -1.517em; left: 0em; clip: rect(1.503em, 1000em, 2.479em, -0.539em);"><span id="MathJax-Span-96" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-97" class="mi"><span id="MathJax-Span-98" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-99" class="mi"><img style="width: 7px; height: 5px; margin-right: 0.02em;" src="handles-21_archivos/006E.png"></span></span></span><span style="font-size: 70.7%;" id="MathJax-Span-100" class="mi"><img style="width: 10px; height: 3px; vertical-align: 1px; margin-right: -0.009em;" src="handles-21_archivos/003D.png"></span><span id="MathJax-Span-101" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-102" class="mo"><img style="width: 9px; height: 1px; vertical-align: 2px; margin-right: 0.085em;" src="handles-21_archivos/2212.png"></span><span style="font-size: 70.7%;" id="MathJax-Span-103" class="mi"><img style="width: 7px; height: 8px; margin-right: -0.041em;" src="handles-21_archivos/003F.png"></span></span></span>&nbsp;<span style="display: inline-block; width: 0px; 
+height: 2.199em;"></span></span><span style="position: absolute; top: -3.118em; left: 0.809em; clip: rect(1.403em, 1000em, 2.379em, -0.399em);"><span id="MathJax-Span-104" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-105" class="mi"><img style="width: 7px; height: 8px; margin-right: -0.041em;" src="handles-21_archivos/003F.png"></span></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span></span></span><span id="MathJax-Span-106" class="mrow"><span id="MathJax-Span-107" class="msup"><span style="display: inline-block; position: 
+relative; width: 2.907em; height: 0px;"><span style="position: absolute; top: -2.319em; left: 0em; clip: rect(1.277em, 1000em, 2.86em, -0.385em);"><span id="MathJax-Span-108" class="mfenced"><span style="vertical-align: -0.005em;" id="MathJax-Span-109" class="mo"><span><img style="width: 7px; height: 20px; vertical-align: 
+-6px; margin-right: 0.037em;" src="handles-21_archivos/0028.png"></span></span><span id="MathJax-Span-110" class="mrow"><span id="MathJax-Span-111" class="mo"><img style="width: 12px; height: 1px; vertical-align: 4px; margin-right: 0.086em;" src="handles-21_archivos/2212_002.png"></span><span id="MathJax-Span-112" class="mn"><img style="width: 8px; height: 
+12px; margin-right: 0.074em;" src="handles-21_archivos/0031.png"></span></span><span style="vertical-align: 
+-0.006em;" id="MathJax-Span-113" class="mo"><span><img style="width: 6px; height: 20px; vertical-align: -6px; margin-right: 0.156em;" src="handles-21_archivos/0029.png"></span></span><span style="border-left: 0em solid; display: inline-block; 
+overflow: hidden; width: 0px; height: 0.861em; vertical-align: 0em;"></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; 
+height: 0.861em; vertical-align: 0em;"></span></span>&nbsp;<span style="display: inline-block; width: 0px; height: 2.319em;"></span></span><span style="position: 
+absolute; top: -2.787em; left: 2.413em;"><span id="MathJax-Span-114" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-115" class="mi"><img style="width: 7px; 
+height: 5px; margin-right: 0.02em;" src="handles-21_archivos/006E.png"></span></span>&nbsp;<span style="display: 
+inline-block; width: 0px; height: 2.199em;"></span></span></span></span><span id="MathJax-Span-116" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-117" class="mrow"><span id="MathJax-Span-118" class="mi"><img style="width: 13px; height: 11px; margin-right: 0.023em;" src="handles-21_archivos/0041.png"></span></span><span id="MathJax-Span-119" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-120" class="mrow"><span id="MathJax-Span-121" class="mi"></span><span id="MathJax-Span-122" class="msub"><span style="display: inline-block; position: relative; width: 2.008em; height: 0px;"><span style="position: absolute; top: -2.199em; left: 0em; clip: rect(1.569em, 1000em, 
+2.576em, -0.579em);"><span id="MathJax-Span-123" class="mi"><img style="width: 10px; height: 10px; vertical-align: -3px; margin-left: -0.04em; margin-right: 0.006em;" src="handles-21_archivos/0070.png"></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span><span style="position: absolute; top: -1.966em; left: 0.614em;"><span style="font-size: 70.7%;" id="MathJax-Span-124" class="mi"><img style="width: 8px; height: 8px; margin-right: 0.038em;" src="handles-21_archivos/0054_003.png"><img style="width: 6px; 
+height: 11px; vertical-align: -3px; margin-right: 0.056em;" src="handles-21_archivos/002F.png"><img style="width: 
+6px; height: 8px; margin-right: 0.052em;" src="handles-21_archivos/0032.png"></span>&nbsp;<span style="display: 
+inline-block; width: 0px; height: 2.199em;"></span></span></span></span><span id="MathJax-Span-125" class="mi"></span></span><span id="MathJax-Span-126" class="mo"></span><span style="padding-left: 0.278em;" id="MathJax-Span-127" class="mrow"><span style="vertical-align: -0.005em;" id="MathJax-Span-128" class="mo"><span><img style="width: 10px; height: 30px; vertical-align: -11px; margin-right: 0.037em;" src="handles-21_archivos/0028_002.png"></span></span><span id="MathJax-Span-129" class="mrow"><span id="MathJax-Span-130" class="mi"><img style="width: 6px; height: 10px; margin-right: 0.032em;" src="handles-21_archivos/0074.png"></span></span><span style="padding-left: 0.222em;" id="MathJax-Span-131" class="mo"><img style="width: 12px; height: 1px; vertical-align: 4px; margin-right: 0.086em;" src="handles-21_archivos/2212_002.png"></span><span style="padding-left: 0.222em;" id="MathJax-Span-132" class="mrow"><span id="MathJax-Span-133" class="mrow"><span id="MathJax-Span-134" class="mi"><img style="width: 10px; height: 7px; margin-right: 0.02em;" src="handles-21_archivos/006E_002.png"></span></span><span id="MathJax-Span-135" class="mo"></span><span style="padding-left: 0.398em; padding-right: 0.12em;" id="MathJax-Span-136" class="mfrac"><span style="display: inline-block; position: relative; width: 0.6em; height: 
+0px;"><span style="position: absolute; top: -2.621em; left: 50%; clip: rect(1.531em, 1000em, 2.379em, -0.524em); margin-left: -0.24em;"><span id="MathJax-Span-137" class="mrow"><span style="font-size: 70.7%;" id="MathJax-Span-138" class="mi"><img style="width: 9px; height: 8px; margin-right: -0.123em;" src="handles-21_archivos/0054_002.png"></span></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span><span style="position: absolute; top: -1.797em; left: 50%; clip: rect(1.54em, 1000em, 2.379em, -0.504em); margin-left: -0.21em;"><span style="font-size: 70.7%;" id="MathJax-Span-139" class="mn"><img style="width: 6px; height: 8px; margin-right: 0.052em;" src="handles-21_archivos/0032.png"></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span><span style="position: absolute; top: -2.419em; left: 0em; clip: rect(1.944em, 1000em, 2.379em, -0.539em);"><span style="border-left: 0.6em solid; 
+display: inline-block; overflow: hidden; width: 0px; height: 0.075em; vertical-align: 0em;"></span>&nbsp;<span style="display: inline-block; width: 0px; height: 
+2.199em;"></span></span></span></span></span><span style="vertical-align: -0.006em;" id="MathJax-Span-140" class="mo"><span><img style="width: 7px; height: 30px; 
+vertical-align: -11px; margin-right: 0.184em;" src="handles-21_archivos/0029_002.png"></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 1.167em; vertical-align: 0em;"></span><span style="border-left: 0em solid; 
+display: inline-block; overflow: hidden; width: 0px; height: 1.167em; vertical-align: 0em;"></span></span></span></span></span></span></span>&nbsp;<span style="display: 
+inline-block; width: 0px; height: 2.858em;"></span></span></span><span style="border-left: 0em solid; display: inline-block; overflow: hidden; width: 0px; height: 
+3.221em; vertical-align: -1.086em;"></span></span></nobr></span><script type="math/mml" id="MathJax-Element-5">&lt;math xmlns="http://www.w3.org/1998/Math/MathML" 
+display="inline"&gt;&lt;semantics&gt;&lt;mrow&gt;
+          &lt;mrow&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;sq&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfenced open="(" close=")" 
+separators=","&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;/mrow&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mrow&gt;&lt;munderover&gt;&lt;mo&gt;?&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;
+                  &lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/mrow&gt;
+                
+&lt;/mi&gt;&lt;mi&gt;=&lt;/mi&gt;&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;?&lt;/mi&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;?&lt;/mi&gt;&lt;/mrow&gt;&lt;/munderover&gt;&lt;mrow&gt;&lt;msup&gt;&lt;mfenced 
+separators=" 
+"&gt;&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/mfenced&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/mrow&gt;&lt;/msup&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;A&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;
+                    &lt;/mi&gt;&lt;msub&gt;
+                      &lt;mi&gt;p&lt;/mi&gt;
+                      &lt;mi&gt;T/2&lt;/mi&gt;
+                    &lt;/msub&gt;&lt;mi&gt;
+                  
+&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mrow&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mrow&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/mrow&gt;&lt;mo&gt;&lt;/mo&gt;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;T&lt;/mi&gt;&lt;/mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mfrac&gt;&lt;/mrow&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/mrow&gt;
+        &lt;/mrow&gt;&lt;annotation-xml encoding="MathML-Content"&gt;&lt;apply&gt;
+            &lt;eq/&gt;
+              &lt;apply&gt;
+                &lt;ci type="fn"&gt;sq&lt;/ci&gt;
+                &lt;ci&gt;t&lt;/ci&gt;
+              &lt;/apply&gt;
+              &lt;apply&gt;
+                &lt;sum/&gt;
+                &lt;bvar&gt;
+                  &lt;ci&gt;n&lt;/ci&gt;
+                &lt;/bvar&gt;
+                &lt;lowlimit&gt;
+                  &lt;apply&gt;
+                    &lt;minus/&gt;
+                    &lt;infinity/&gt;
+                  &lt;/apply&gt;
+                  &lt;/lowlimit&gt;
+                &lt;uplimit&gt;
+                  &lt;infinity/&gt;
+                &lt;/uplimit&gt;
+                 &lt;apply&gt;
+                  &lt;times/&gt;
+                  &lt;apply&gt;
+                    &lt;power/&gt;
+                      &lt;apply&gt;
+                        &lt;minus/&gt;
+                          &lt;cn&gt;1&lt;/cn&gt;
+                      &lt;/apply&gt;
+                      &lt;ci&gt;n&lt;/ci&gt;
+                  &lt;/apply&gt;
+                  &lt;ci&gt;A&lt;/ci&gt;
+                  &lt;ci&gt;
+                    &lt;msub&gt;
+                      &lt;mi&gt;p&lt;/mi&gt;
+                      &lt;mi&gt;T/2&lt;/mi&gt;
+                    &lt;/msub&gt;
+                  &lt;/ci&gt;
+                  &lt;apply&gt;
+                    &lt;minus/&gt;
+                      &lt;ci&gt;t&lt;/ci&gt;
+                      &lt;apply&gt;
+                        &lt;times/&gt;
+                          &lt;ci&gt;n&lt;/ci&gt;
+                          &lt;apply&gt;
+                            &lt;divide/&gt;
+                            &lt;ci&gt;T&lt;/ci&gt;
+                            &lt;cn&gt;2&lt;/cn&gt;
+                          &lt;/apply&gt;
+                      &lt;/apply&gt;
+                    &lt;/apply&gt;
+                &lt;/apply&gt;
+              &lt;/apply&gt;
+          &lt;/apply&gt;&lt;/annotation-xml&gt;&lt;/semantics&gt;&lt;/math&gt;</script>
+      </p>
+
+
+<div class="canvas-wrap">
+  <div class="canvas inactive rule" id="rulephth">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+
+
+<h3 class="rule-header"><span class="cnx_label">Theorem 3: </span><strong class="title">Pythagorean 
+Theorem</strong></h3><div class="rule-contents"><div class="statement"><p class="para" id="st1">On a right triangle, the sum of the
+            squares of the sides equals the square of the hypotenus.
+          </p></div>
+
+<div class="canvas-wrap">
+  <div class="canvas inactive proof">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="You can only drag this element to another rule!" style="display: none;" class="canvas-buddy nodrag">
+  <a class="drag-element" href="#" title="You can only drag this element to another rule!">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+
+
+<h4 class="proof-header"><span class="cnx_label">Proof</span>
+</h4>
+
+<p class="para" id="phthexp1">
+            Take a right triangle whose sides are of length 3, 4, and 5.
+            In this case the sum of the square of the two shorter sides is
+            9+16=25.  The square of the hypotenus is 25.  So the theorem holds.
+          </p>
+
+
+<div class="canvas-wrap">
+  <div class="canvas inactive">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+
+<h4 class="note-header"><span class="cnx_label">note: </span></h4><div class="note-contents">
+
+The Pythagorean Theorem does not apply to <dfn class="term edhint">acute</dfn> and <dfn class="term edhint">obtuse</dfn>
+ triangles.  It can only be applied to right triangles.  
+However, a corollary of the Pythagorean theorem's converse is a simple 
+means of determining whether a triangle is right, obtuse, or acute. 
+
+<div class="canvas-wrap">
+  <div class="canvas inactive" id="ex1">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<h2 class="example-header"><span class="cnx_label">Example 2</span></h2><div class="example-contents">
+
+<div class="canvas-wrap">
+      <div class="equation canvas inactive" id="eq1">
+<div class="canvas-inner">
+<div style="display: none;" class="canvas-buddy-2">
+  <a class="edit-element" href="#" title="Edit options for this element">
+    <img src="handles-21_archivos/options-02.png">
+  </a>
+  <a class="remove-element" href="#" title="Remove this element">
+    <img src="handles-21_archivos/remove-element-01.png">
+  </a>
+</div>
+<div title="Drag this element to another location" style="display: none;" class="canvas-buddy">
+  <a class="drag-element" href="#" title="Drag this element to another location">
+    <img src="handles-21_archivos/drag-element-19.png">
+  </a>
+</div>
+<div class="equation-contents">
+5<sup>2</sup> + 7<sup>2</sup> &lt; 9<sup>2</sup>
+<span class="equation-number">(1)</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div></div>
+
+</div></div>
+
+</div></div>
+
+</div></div>
+
+</div></div>
+
+</div></div>
+
+<div class="solution-toggles" style="display: none;"><a href="#" onclick="toggleSolution('swsuper',1); return false;"><span class="solution-toggle">
+          [
+          Show Solution
+          ]
+        </span><span class="solution-toggle" style="display: none;">
+          [ 
+          Hide Solution
+          ]
+        </span></a></div></div>
+</div>
+</div>
+
+
+<div style="visibility: hidden;" class="add-solution">
+  <a style="visibility: hidden;" href="#asdf">Click to add another solution</a>
+</div>
+
+
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+  <p class="para" id="para2"> 
+    Because the sinusoid is a superposition of two complex exponentials, the 
+    sinusoid is more complex. We could not prevent ourselves from the pun in 
+    this statement. Clearly, the word "complex" is used in two different ways 
+    here. The complex exponential can also be written (using <a title="Strength 5" class="cnxn" href="http://www.mountainbunker.org/content/m0004/latest/#3">Euler's relation</a>) as a sum of a sine 
+and a 
+    cosine. We will discover that virtually every signal can be decomposed into a
+    sum of complex exponentials, and that this decomposition is  <em class="emphasis edhint">very 
+    </em>useful. Thus, the complex exponential is more fundamental, and 
+    Euler's relation does not adequately reveal its complexity.
+  </p>
+
+  </div>
+</div>
+
+<div class="glossary-outer">
+<div class="glossary-container" id="cnx_glossary">
+<h2 class="glossary-header">Glossary</h2>
+    <dl class="definition glossary" id="side"><dt><dfn class="term edhint">sidereal period:</dfn></dt><dd><div class="meaning">A period determined by or from the 
+stars.</div></dd></dl>
+</div>
+  </div>
+
+
+
+
+
+
+
+
+
+</div>
+</div>
+</div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+        <div id="footer">
+          <a href="http://www.shuttleworthfoundation.org/" target="_blank"><img src="helper_files/sf150.png" width="150"/></a>
+        </div>
+-->
+
+      </div>
+
+
+    </div>
+  
+
+
+  <div id="neworexisting" style="display: none;">
+    <p><strong>
+      Is this for a new module or will it override an existing one?
+    </strong></p>
+    <div>
+      <span class="button" onclick="window.location = 'metadata-41.html'">New module</span>
+      <div class="forminfo" style="margin: .5em 0 1em;">
+      <div>
+        This is an entirely new module. 
+      </div>
+    </div>
+    <div>
+      <span class="button" onclick="window.location = 'choose-module-16.html'">Override existing module</span>
+      <div class="forminfo" style="margin: .5em 0 1em;">
+      <div>
+        Choose an existing module to apply your import to, replacing its contents.  
+      </div>
+    </div>
+    <div class="headeraction" style="margin: 1.5em 0 0; text-align: center;">
+      <div>
+      <span class="button" id="cancel-neworexisting">Cancel</span>
+    </div>
+  </div>
+
+
+  
+
+
+
+
+</div></div></div></body></html>
