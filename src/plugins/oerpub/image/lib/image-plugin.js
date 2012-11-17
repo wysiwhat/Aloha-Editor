@@ -52,6 +52,11 @@ function(Aloha, plugin, $, Ui, Button, PubSub) {
                 editable.obj.find('img').each(function(){
                     prepareImage(plugin, $(this));
                 });
+
+                // Delegate the mouseup event (resizes, clicks)
+                editable.obj.delegate('img', 'mouseup', function(event){
+                    plugin.clickImage(event);
+                }
             });
             PubSub.sub('aloha.selection.context-change', function(m){
                 if ($(m.range.markupEffectiveAtStart).parent('img')
@@ -188,6 +193,10 @@ function(Aloha, plugin, $, Ui, Button, PubSub) {
             $modal.find('.upload-image-form').hide();
             $modal.modal('hide');
         },
+        clickImage: function(event){
+            plugin.imageObj = jQuery(e.target);
+        },
+        imageObj: undefined,
         _createImageButton: undefined
     });
 });
