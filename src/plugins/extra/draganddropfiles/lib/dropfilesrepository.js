@@ -59,7 +59,6 @@ function($, repository, i18nCore){
 		config: {
 			// can add more elements for Ext window styling
 			'method':'POST',
-			'callback': function(resp) { return resp;},
 			'url': "",
 			'accept': 'application/json',
 			'file_name_param':"filename",
@@ -211,7 +210,6 @@ function($, repository, i18nCore){
 
                 xhr.onload = function(load) {
                     try {
-                        that.src = that.upload_config.callback.call(that, xhr.responseText);
                         if(xhr.status / 100 == 2){
                             Aloha.trigger('aloha-upload-success', that);
                         } else {
