@@ -54,13 +54,19 @@ define [
       </div>
     </form>'''
 
-  showModalDialog = ($el) ->
+  showModalDialog = ($el, content) ->
       root = Aloha.activeEditable.obj
       dialog = jQuery(DIALOG_HTML)
 
-      if not $el.children()[0]
+      a = $el.get(0)
+      if a.childNodes.length > 0
+        # editing an existing link
         linkContents = dialog.find('#link-contents')
         linkContents.val($el.text())
+      else if content
+        # creating a new link
+        linkContents = dialog.find('#link-contents')
+        linkContents.val(content)
 
       # Build the link options and then populate one of them.
       linkExternal = dialog.find('.link-external')
@@ -135,15 +141,25 @@ define [
         dialog.remove()
       dialog
 
+  hidePopovers = ($a) ->
+      # see popover's on hide event handler
+      $a.removeData('aloha-bubble-openTimer', 0)
+      $a.removeData('aloha-bubble-closeTimer', 0)
+      $a.removeData('aloha-bubble-selected', false)
+      $a.popover('hide')
+
+  destroyPopovers = ($a) ->
+      hidePopovers($a)
+      $a.popover('destroy')
+      
   unlink = ($a) ->
       a = $a.get(0)
       
       # remove the link's popover HTML et al, before unwrapping the link/anchor
-      # see popover-plugin soptOne() method:
-      $a.removeData('aloha-bubble-openTimer', 0)
-      $a.removeData('aloha-bubble-closeTimer', 0)
-      $a.removeData('aloha-bubble-selected', false)
-      $a.popover('destroy')
+      # see popover-plugin stoptOne() method:
+      $links =  Aloha.activeEditable.obj.find 'a'
+      hidePopovers $links
+      destroyPopovers($a)
 
       # create a range based on the anchor node and select it, see GENTICS.Utils.Dom.selectDomNode
       newRange = new GENTICS.Utils.RangeObject()
@@ -152,7 +168,7 @@ define [
       newRange.endOffset = newRange.startOffset + 1
       newRange.select()
 
-      # remove the anchor but preserve its contents
+      # remove the anchor but preserve its contents aka unwrap anchor
       preserveContents = true
       GENTICS.Utils.Dom.removeFromDOM a, newRange, preserveContents
       
@@ -211,46 +227,90 @@ define [
       
       $bubble.contents()
 
+  getContainerAnchor = (a) ->
+    el = a
+    while el
+      return el  if el.nodeName.toLowerCase() is "a"
+      el = el.parentNode
+    false
 
   UI.adopt 'insertLink', null,
     click: () ->
-      newLink = jQuery('<a href="" class="aloha-new-link"></a>')
-      dialog = showModalDialog(newLink)
+      editable = Aloha.activeEditable
+      
+      # if range => selection is an anchor
+      #   do not create a new link, use existing link in call to showModalDialog()
+      # else
+      #   create a new link
+      #   extend selection to word boundaries, range.select()
+      #   get text from range/selection
+      #   call showModalDialog with empty link and text
+      # endif
+      range = Aloha.Selection.getRangeObject()
+      if range.startContainer is range.endContainer 
+        a = getContainerAnchor range.startContainer
+        if a
+          # want to prevent creating links within links so if the selection
+          # contained in a link we edit that link
+          $a = jQuery a
+          range.startContainer = range.endContainer = a
+          range.startOffset = 0
+          range.endOffset = a.childNodes.length
+          dialog = showModalDialog($a)
+        else
+          # create a new link aka insert a new link
+          if range.isCollapsed()
+            GENTICS.Utils.Dom.extendToWord(range)
+            range.select()
+          content = range.getText()
+          $a = jQuery '<a href="" class="aloha-new-link"></a>'
+          dialog = showModalDialog($a, content)
+      else
+        return
 
       # Wait until the dialog is closed before inserting it into the DOM
       # That way if it is cancelled nothing is inserted
       dialog.on 'hidden', =>
+        Aloha.activeEditable = editable
 
-        # If the user cancelled then don't create the link
-        if not newLink.attr 'href'
-          return
-        # Either insert a new span around the cursor and open the box or just open the box
-        range = Aloha.Selection.getRangeObject()
+        # link is now populated with dialog box values.
+        # Case 1: link is an existing link and we are good to go
+        # Case 2: link is a new link and needs to replace the selected text
 
-        # Extend to the whole word 1st
-        if range.isCollapsed()
-          # if selection is collapsed then extend to the word.
-          GENTICS.Utils.Dom.extendToWord(range)
+        if $a.hasClass 'aloha-new-link'
+          # this is a new link
+        
+          # If the user cancelled then don't create the link
+          if not $a.attr 'href'
+            return
 
-        if range.isCollapsed()
-          # insert a link with text here
-          # linkText = i18n.t( 'newlink.defaulttext' )
-          linkText = 'New Link'
-          newLink.append(linkText)
-          GENTICS.Utils.Dom.insertIntoDOM newLink,
-            range,
-            Aloha.activeEditable.obj
-          range.startContainer = range.endContainer = newLink.contents()[0]
-          range.startOffset = 0
-          range.endOffset = linkText.length
-        else
-          GENTICS.Utils.Dom.addMarkup(range, newLink, false)
+          # Either insert a new span around the cursor and open the box 
+          # or just open the box
+          range = Aloha.Selection.getRangeObject()
 
-        # addMarkup takes a template so we need to look up the inserted object
-        #   and remove the marker class
-        newLink = Aloha.activeEditable.obj.find('.aloha-new-link')
-        newLink.removeClass('aloha-new-link')
+          if range.isCollapsed()
+            # insert a link with text here
+            # linkText = i18n.t( 'newlink.defaulttext' )
+            linkText = 'New Link'
+            $a.append(linkText)
+            GENTICS.Utils.Dom.insertIntoDOM $a,
+              range,
+              Aloha.activeEditable.obj
+            range.startContainer = range.endContainer = $a.contents()[0]
+            range.startOffset = 0
+            range.endOffset = linkText.length
+          else
+            GENTICS.Utils.Dom.removeRange range
+            GENTICS.Utils.Dom.insertIntoDOM $a, range, Aloha.activeEditable.obj
 
+          # addMarkup takes a template so we need to look up the inserted object
+          #   and remove the marker class
+          newLink = Aloha.activeEditable.obj.find '.aloha-new-link'
+          newLink.removeClass 'aloha-new-link' 
+          
+        # hammer all visible popovers
+        $links =  Aloha.activeEditable.obj.find 'a'
+        hidePopovers $links
 
   Popover.register
     selector: selector
