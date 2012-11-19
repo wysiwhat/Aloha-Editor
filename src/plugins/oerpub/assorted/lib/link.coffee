@@ -141,6 +141,8 @@ define [
         dialog.remove()
       dialog
 
+  selector = 'a'
+
   hidePopovers = ($a) ->
       # see popover's on hide event handler
       $a.removeData('aloha-bubble-openTimer', 0)
@@ -157,7 +159,7 @@ define [
       
       # remove the link's popover HTML et al, before unwrapping the link/anchor
       # see popover-plugin stoptOne() method:
-      $links =  Aloha.activeEditable.obj.find 'a'
+      $links =  Aloha.activeEditable.obj.find selector
       hidePopovers $links
       destroyPopovers($a)
 
@@ -178,8 +180,31 @@ define [
       newRange.select()
       newRange
       
-  selector = 'a'
+  # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st
+  shortUrl = (url, l) ->
+    l = (if typeof (l) isnt "undefined" then l else 50)
+    chunk_l = (l / 2)
+    url = url.replace("http://", "").replace("https://", "")
+    return url  if url.length <= l
+    start_chunk = shortString(url, chunk_l, false)
+    end_chunk = shortString(url, chunk_l, true)
+    start_chunk + ".." + end_chunk
 
+  shortString = (s, l, reverse) ->
+    stop_chars = [" ", "/", "&"]
+    acceptable_shortness = l * 0.80 # When to start looking for stop characters
+    reverse = (if typeof (reverse) isnt "undefined" then reverse else false)
+    s = (if reverse then s.split("").reverse().join("") else s)
+    short_s = ""
+    i = 0
+
+    while i < l - 1
+      short_s += s[i]
+      break  if i >= acceptable_shortness and stop_chars.indexOf(s[i]) >= 0
+      i++
+    return short_s.split("").reverse().join("")  if reverse
+    short_s
+    
   populator = ($el) ->
       # When a click occurs, the activeEditable is cleared so squirrel it
       editable = Aloha.activeEditable
@@ -207,7 +232,7 @@ define [
             &nbsp; | &nbsp;
             <span  class="visit-link">
               <img src="''' + baseUrl + '''/../plugins/oerpub/assorted/img/external-link-02.png" />
-              <a href="''' + href + '''">''' + href + '''</a>
+              <a href="''' + href + '''">''' + shortUrl(href,30) + '''</a>
             </span>
           </div>
           <br/>
@@ -309,7 +334,7 @@ define [
           newLink.removeClass 'aloha-new-link' 
           
         # hammer all visible popovers
-        $links =  Aloha.activeEditable.obj.find 'a'
+        $links =  Aloha.activeEditable.obj.find selector
         hidePopovers $links
 
   Popover.register
