@@ -137,7 +137,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui'], (Aloha, jQuery, Popover, UI) ->
 
   selector = 'img'
 
-  populator = ($el) ->
+  populator = ($el, pover) ->
       # When a click occurs, the activeEditable is cleared so squirrel it
       editable = Aloha.activeEditable
       $bubble = jQuery '''
@@ -153,6 +153,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui'], (Aloha, jQuery, Popover, UI) ->
         dialog = showModalDialog($el)
         dialog.modal('show')
       $bubble.find('.remove').on 'click', ->
+        pover.stopOne($el)
         $el.remove()
       $bubble.contents()
 
