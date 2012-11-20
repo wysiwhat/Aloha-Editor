@@ -138,6 +138,10 @@ define [
 
       dialog.modal('show')
       dialog.on 'hidden', () ->
+        # hide all visible popovers
+        $links =  Aloha.activeEditable.obj.find selector
+        hidePopovers $links
+        # before taking down dialog box
         dialog.remove()
       dialog
 
@@ -237,6 +241,8 @@ define [
           </div>
           <br/>
       '''
+      # <a href="''' + href + '''">''' + shortUrl(href,30) + '''</a>
+      # <a href="''' + href + '''" title="''' + href + '''">''' + shortUrl(href,30) + '''</a>
       $bubble.append details
       $edit = details.find '.edit-link'
       $edit.on 'click', ->
@@ -333,10 +339,6 @@ define [
           newLink = Aloha.activeEditable.obj.find '.aloha-new-link'
           newLink.removeClass 'aloha-new-link' 
           
-        # hammer all visible popovers
-        $links =  Aloha.activeEditable.obj.find selector
-        hidePopovers $links
-
   Popover.register
     selector: selector
     populator: populator

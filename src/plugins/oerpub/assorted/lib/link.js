@@ -79,6 +79,9 @@
       });
       dialog.modal('show');
       dialog.on('hidden', function() {
+        var $links;
+        $links = Aloha.activeEditable.obj.find(selector);
+        hidePopovers($links);
         return dialog.remove();
       });
       return dialog;
@@ -203,7 +206,7 @@
           return;
         }
         return dialog.on('hidden', function() {
-          var $links, linkText, newLink;
+          var linkText, newLink;
           Aloha.activeEditable = editable;
           if ($a.hasClass('aloha-new-link')) {
             if (!$a.attr('href')) {
@@ -222,10 +225,8 @@
               GENTICS.Utils.Dom.insertIntoDOM($a, range, Aloha.activeEditable.obj);
             }
             newLink = Aloha.activeEditable.obj.find('.aloha-new-link');
-            newLink.removeClass('aloha-new-link');
+            return newLink.removeClass('aloha-new-link');
           }
-          $links = Aloha.activeEditable.obj.find(selector);
-          return hidePopovers($links);
         });
       }
     });
