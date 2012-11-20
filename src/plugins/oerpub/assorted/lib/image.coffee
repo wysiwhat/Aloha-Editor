@@ -128,9 +128,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui'], (Aloha, jQuery, Popover, UI) ->
 
         # Start uploading if a local file was chosen
         if $uploadImage[0].files.length
-          # HACK to get the dragndropfiles to recognize this image and upload it
-          $el[0].files = $uploadImage[0].files
-          Aloha.trigger 'aloha-upload-file', $el[0]
+          Aloha.trigger 'aloha-upload-file',
+            target: $el[0], files: $uploadImage[0].files
 
       dialog.on 'hidden', () ->
         dialog.remove()
@@ -180,7 +179,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui'], (Aloha, jQuery, Popover, UI) ->
 
       # Finally show the dialog
       dialog.modal('show')
-
 
   Popover.register
     selector: selector
