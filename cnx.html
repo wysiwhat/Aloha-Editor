@@ -5,17 +5,17 @@
 	<title>OER Editor</title>
 
 	<link rel="stylesheet" href="src/css/aloha.css" type="text/css"/>
-	<link rel="stylesheet" href="bootstrap/css/bootstrap.css" type="text/css"/>
-	<link rel="stylesheet" href="bootstrap/css/bootstrap-responsive.css" type="text/css"/>
+	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css"/>
+	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" type="text/css"/>
 	<link rel="stylesheet" type="text/css" href="cnx.css"/>
 
 
 	<!-- Manually link to jQuery because bootstrap relies on this for loading -->
 	<script src="src/lib/vendor/jquery-1.7.2.js"></script>
-	<script src="bootstrap/js/bootstrap.js"></script>
+	<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
   <script src="src/lib/require.js"></script>
 
-  <script src="src/plugins/extra/math/lib/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"></script>
+  <script src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"></script>
 
 
   <!-- ============================= -->
@@ -99,39 +99,25 @@
               }
             }
           }
-			  },
-				block: {
-					defaults : {
-						'.default-block': {
-						},
-						'figure': {
-							'aloha-block-type': 'EditableImageBlock'
-						},
-					}
-				}
+			  }
 			},
-			bundles: {
-				// Path for custom bundle relative from require.js path
-				user: '../demo/block'
-			}
 		};
 
 	</script>
 
 	<script src="src/lib/aloha.js" data-aloha-plugins="
-	  extra/toolbar,
+	  oer/toolbar,
 	  common/ui,
 	  common/format,
 	  common/paste,
 	  common/block,
-	  user/blockdemo,
 	  common/list,
 	  common/table,
 	  extra/draganddropfiles,
 	  common/image,
-    oerpub/popover,
-    oerpub/math,
-    oerpub/assorted
+    cnx/popover,
+    cnx/math,
+    cnx/assorted
 	"></script>
 
 </head>
