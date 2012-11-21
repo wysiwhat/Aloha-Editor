@@ -233,7 +233,8 @@
     });
     return Popover.register({
       selector: selector,
-      populator: populator
+      populator: populator,
+      noHover: true
     });
   });
 

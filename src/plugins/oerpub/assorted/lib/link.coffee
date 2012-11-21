@@ -343,3 +343,4 @@ define [
   Popover.register
     selector: selector
     populator: populator
+    noHover: true
