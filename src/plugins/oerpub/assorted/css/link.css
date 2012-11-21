@@ -24,10 +24,6 @@ ul.nav.nav-tabs {
   width: 600px;
 }
 
-#linkModal .modal-header {
-  background-color: #9ABCDC; /* Connexions Blue */
-}
-
 #link-contents {
   width: 97%;
 }
@@ -57,4 +53,3 @@ div.link-popover-details .delete-link {
 div.link-popover-details .visit-link {
   white-space: nowrap;
 }
-

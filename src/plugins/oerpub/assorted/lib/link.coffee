@@ -25,7 +25,7 @@ define [
       </div>
       <div class="modal-body">
         <div id="link-text">
-          <h4>Text to display</h4>
+          <span>Text to display</span>
           <div>
             <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />
           </div>
@@ -38,7 +38,7 @@ define [
           </ul>
           <div class="tab-content">
             <div class="tab-pane" id="link-tab-external">
-              <h4 for="link-external">Link to webpage</h4>
+              <span for="link-external">Link to webpage</span>
               <input class="link-input link-external" id="link-external" type="url" placeholder="http://"/>
             </div>
             <div class="tab-pane" id="link-tab-internal">
@@ -185,13 +185,14 @@ define [
       newRange
       
   # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st
-  shortUrl = (url, l) ->
+  shortUrl = (linkurl, l) ->
     l = (if typeof (l) isnt "undefined" then l else 50)
     chunk_l = (l / 2)
-    url = url.replace("http://", "").replace("https://", "")
-    return url  if url.length <= l
-    start_chunk = shortString(url, chunk_l, false)
-    end_chunk = shortString(url, chunk_l, true)
+    linkurl = linkurl.replace("http://", "")
+    linkurl = linkurl.replace("https://", "")
+    return linkurl  if linkurl.length <= l
+    start_chunk = shortString(linkurl, chunk_l, false)
+    end_chunk   = shortString(linkurl, chunk_l, true)
     start_chunk + ".." + end_chunk
 
   shortString = (s, l, reverse) ->
