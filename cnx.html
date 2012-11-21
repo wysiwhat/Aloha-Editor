@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>OER Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>OER Editor</title>
 
-	<link rel="stylesheet" href="src/css/aloha.css" type="text/css"/>
-	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css"/>
-	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" type="text/css"/>
-	<link rel="stylesheet" type="text/css" href="cnx.css"/>
+  <link rel="stylesheet" href="src/css/aloha.css" type="text/css"/>
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css"/>
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" type="text/css"/>
+  <link rel="stylesheet" type="text/css" href="cnx.css"/>
 
 
-	<!-- Manually link to jQuery because bootstrap relies on this for loading -->
-	<script src="src/lib/vendor/jquery-1.7.2.js"></script>
-	<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
+  <!-- Manually link to jQuery because bootstrap relies on this for loading -->
+  <script src="src/lib/vendor/jquery-1.7.2.js"></script>
+  <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
   <script src="src/lib/require.js"></script>
 
   <script src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"></script>
@@ -48,19 +48,19 @@
   </script>
   -->
 
-	<script type="text/javascript">
-		Aloha = window.Aloha || {};
+  <script type="text/javascript">
+    Aloha = window.Aloha || {};
 
-		Aloha.settings = {
-			jQuery: window.jQuery,
-			logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
-			errorhandling : true,
+    Aloha.settings = {
+      jQuery: window.jQuery,
+      logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
+      errorhandling : true,
 
-			plugins: {
-			  // This whole thing is what's needed to:
-			  // - set a custom URL to send files to
-			  // - register a callback that updates the IMG with the new src
-			  draganddropfiles: {
+      plugins: {
+        // This whole thing is what's needed to:
+        // - set a custom URL to send files to
+        // - register a callback that updates the IMG with the new src
+        draganddropfiles: {
           upload: {
             config: {
               method: 'POST',
@@ -99,26 +99,26 @@
               }
             }
           }
-			  }
-			},
-		};
+        }
+      },
+    };
 
-	</script>
+  </script>
 
-	<script src="src/lib/aloha.js" data-aloha-plugins="
-	  oer/toolbar,
-	  common/ui,
-	  common/format,
-	  common/paste,
-	  common/block,
-	  common/list,
-	  common/table,
-	  extra/draganddropfiles,
-	  common/image,
+  <script src="src/lib/aloha.js" data-aloha-plugins="
+    oer/toolbar,
+    common/ui,
+    common/format,
+    common/paste,
+    common/block,
+    common/list,
+    common/table,
+    extra/draganddropfiles,
+    common/image,
     cnx/popover,
     cnx/math,
     cnx/assorted
-	"></script>
+  "></script>
 
 </head>
 <body>
@@ -236,7 +236,7 @@
     <p>A signal's complexity is not related to how wiggly it is. Rather, a signal expert looks for ways of <a href="http://cnx.org/content/m9003">decomposing a given signal</a> into a <strong>sum of simpler signals</strong>, which we term the <strong>signal decomposition</strong>. Though we will never compute a signal's complexity, it essentially equals the number of terms in its decomposition. In writing a signal as a sum of component signals, we can change the component signal's gain by multiplying it by a constant and by delaying it.</p>
 
     <figure class="figure">
-    	<div class="title">A Title for a Figure</div>
+      <div class="title">A Title for a Figure</div>
       <img src="src/test/AlohaEditorLogo.png"/>
       <figcaption>This is a caption on a figure</figcaption>
     </figure>
@@ -278,6 +278,13 @@
       // losing all jQuery data attached to it (like popover data, the original Math Formula, etc)
       // add aloha-cleanme so this span is unwrapped
       jQuery('math').wrap('<span class="math-element aloha-cleanme"></span>')
+      MathJax.Hub.Configured();
+      //$('*[rel=tooltip]').tooltip();
+    });
+  </script>
+</body>
+</html>
+ery('math').wrap('<span class="math-element aloha-cleanme"></span>')
       MathJax.Hub.Configured();
       //$('*[rel=tooltip]').tooltip();
     });
