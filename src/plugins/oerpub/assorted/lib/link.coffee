@@ -340,7 +340,6 @@ define [
           newLink = Aloha.activeEditable.obj.find '.aloha-new-link'
           newLink.removeClass 'aloha-new-link' 
           
-  Popover.register
-    selector: selector
-    populator: populator
-    noHover: true
+  # Return config
+  selector: selector
+  populator: populator

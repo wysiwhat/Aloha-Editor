@@ -171,10 +171,10 @@
         return promise.show();
       }
     });
-    return Popover.register({
+    return {
       selector: selector,
       populator: populator
-    });
+    };
   });
 
 }).call(this);

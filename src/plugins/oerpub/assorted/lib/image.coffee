@@ -206,6 +206,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # Finally show the dialog
       promise.show()
 
-  Popover.register
-    selector: selector
-    populator: populator
+  # Return config
+  selector: selector
+  populator: populator

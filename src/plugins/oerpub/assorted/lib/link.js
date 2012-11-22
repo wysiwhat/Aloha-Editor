@@ -231,11 +231,10 @@
         });
       }
     });
-    return Popover.register({
+    return {
       selector: selector,
-      populator: populator,
-      noHover: true
-    });
+      populator: populator
+    };
   });
 
 }).call(this);
