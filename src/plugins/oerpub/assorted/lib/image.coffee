@@ -215,3 +215,4 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   # Return config
   selector: selector
   populator: populator
+  hover: true
