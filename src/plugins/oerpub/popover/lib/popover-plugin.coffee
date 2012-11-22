@@ -225,7 +225,7 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
         $node = jQuery(evt.target)
         clearTimeout($node.data('aloha-bubble-timer'))
 
-        if not @hover
+        if @hover
           ## (STATE_*) -> (STATE_WC)
           $node.data('aloha-bubble-timer', delayTimeout($node, 'show', Popover.MILLISECS)) ## (STATE_WC) -> (STATE_O)
           $node.on 'mouseleave.bubble', =>
