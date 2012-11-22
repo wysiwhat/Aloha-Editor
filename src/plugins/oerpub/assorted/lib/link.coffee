@@ -3,17 +3,17 @@
 # * This plugin provides a bubble next to a link when it is selected
 #
 define [
-  'aloha', 
-  'jquery', 
-  'popover', 
-  'ui/ui', 
+  'aloha',
+  'jquery',
+  'popover',
+  'ui/ui',
   'aloha/console',
   'css!assorted/css/link.css'
 ], (
-  Aloha, 
-  jQuery, 
-  Popover, 
-  UI, 
+  Aloha,
+  jQuery,
+  Popover,
+  UI,
   console
 ) ->
 
@@ -157,10 +157,10 @@ define [
   destroyPopovers = ($a) ->
       hidePopovers($a)
       $a.popover('destroy')
-      
+
   unlink = ($a) ->
       a = $a.get(0)
-      
+
       # remove the link's popover HTML et al, before unwrapping the link/anchor
       # see popover-plugin stoptOne() method:
       $links =  Aloha.activeEditable.obj.find selector
@@ -177,13 +177,13 @@ define [
       # remove the anchor but preserve its contents aka unwrap anchor
       preserveContents = true
       GENTICS.Utils.Dom.removeFromDOM a, newRange, preserveContents
-      
+
       # select the new, colapsed range
       newRange.startContainer = newRange.endContainer
       newRange.startOffset = newRange.endOffset
       newRange.select()
       newRange
-      
+
   # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st
   shortUrl = (linkurl, l) ->
     l = (if typeof (l) isnt "undefined" then l else 50)
@@ -209,14 +209,14 @@ define [
       i++
     return short_s.split("").reverse().join("")  if reverse
     short_s
-    
+
   populator = ($el) ->
       # When a click occurs, the activeEditable is cleared so squirrel it
       editable = Aloha.activeEditable
       $bubble = jQuery('<div class="link-popover"></div>')
-      
+
       href = $el.attr('href')
-      
+
       # we find the images relative to where require.js lives aka Aloha.settings.baseUrl
       #     http://localhost:xxxx/aloha/src/lib
       # the below png files live here: aloha/src/plugins/oerpub/assorted/img/pencil_cnx.png
@@ -256,7 +256,7 @@ define [
           # unsquirrel the activeEditable
           Aloha.activeEditable = editable
           unlink($el)
-      
+
       $bubble.contents()
 
   getContainerAnchor = (a) ->
@@ -269,7 +269,7 @@ define [
   UI.adopt 'insertLink', null,
     click: () ->
       editable = Aloha.activeEditable
-      
+
       # if range => selection is an anchor
       #   do not create a new link, use existing link in call to showModalDialog()
       # else
@@ -279,7 +279,7 @@ define [
       #   call showModalDialog with empty link and text
       # endif
       range = Aloha.Selection.getRangeObject()
-      if range.startContainer is range.endContainer 
+      if range.startContainer is range.endContainer
         a = getContainerAnchor range.startContainer
         if a
           # want to prevent creating links within links so if the selection
@@ -311,12 +311,12 @@ define [
 
         if $a.hasClass 'aloha-new-link'
           # this is a new link
-        
+
           # If the user cancelled then don't create the link
           if not $a.attr 'href'
             return
 
-          # Either insert a new span around the cursor and open the box 
+          # Either insert a new span around the cursor and open the box
           # or just open the box
           range = Aloha.Selection.getRangeObject()
 
@@ -338,8 +338,8 @@ define [
           # addMarkup takes a template so we need to look up the inserted object
           #   and remove the marker class
           newLink = Aloha.activeEditable.obj.find '.aloha-new-link'
-          newLink.removeClass 'aloha-new-link' 
-          
+          newLink.removeClass 'aloha-new-link'
+
   # Return config
   selector: selector
   populator: populator
