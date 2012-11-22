@@ -166,7 +166,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
     selector: SELECTOR
     populator: buildEditor
     placement: 'top'
-    noHover: true
+    hover: false
     focus: ($popover) ->
       # Give focus to the text box
       setTimeout( () ->

@@ -157,6 +157,7 @@ There are 3 variables that are stored on each element;
     Helper = (function() {
 
       function Helper(cfg) {
+        this.hover = false;
         jQuery.extend(this, cfg);
         if (this.focus || this.blur) {
           console && console.warn('Popover.focus and Popover.blur are deprecated in favor of listening to the "shown-popover" or "hide-popover" events on the original DOM element');
@@ -223,7 +224,7 @@ There are 3 variables that are stored on each element;
           var $node;
           $node = jQuery(evt.target);
           clearTimeout($node.data('aloha-bubble-timer'));
-          if (!_this.noHover) {
+          if (!_this.hover) {
             $node.data('aloha-bubble-timer', delayTimeout($node, 'show', Popover.MILLISECS));
             return $node.on('mouseleave.bubble', function() {
               var $tip;
