@@ -322,15 +322,12 @@ define [
 
           if range.isCollapsed()
             # insert a link with text here
-            # linkText = i18n.t( 'newlink.defaulttext' )
-            linkText = 'New Link'
-            $a.append(linkText)
             GENTICS.Utils.Dom.insertIntoDOM $a,
               range,
               Aloha.activeEditable.obj
             range.startContainer = range.endContainer = $a.contents()[0]
             range.startOffset = 0
-            range.endOffset = linkText.length
+            range.endOffset = $a.text().length
           else
             GENTICS.Utils.Dom.removeRange range
             GENTICS.Utils.Dom.insertIntoDOM $a, range, Aloha.activeEditable.obj

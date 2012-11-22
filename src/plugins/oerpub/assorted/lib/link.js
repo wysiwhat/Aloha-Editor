@@ -207,7 +207,7 @@
           return;
         }
         return dialog.on('hidden', function() {
-          var linkText, newLink;
+          var newLink;
           Aloha.activeEditable = editable;
           if ($a.hasClass('aloha-new-link')) {
             if (!$a.attr('href')) {
@@ -215,12 +215,10 @@
             }
             range = Aloha.Selection.getRangeObject();
             if (range.isCollapsed()) {
-              linkText = 'New Link';
-              $a.append(linkText);
               GENTICS.Utils.Dom.insertIntoDOM($a, range, Aloha.activeEditable.obj);
               range.startContainer = range.endContainer = $a.contents()[0];
               range.startOffset = 0;
-              range.endOffset = linkText.length;
+              range.endOffset = $a.text().length;
             } else {
               GENTICS.Utils.Dom.removeRange(range);
               GENTICS.Utils.Dom.insertIntoDOM($a, range, Aloha.activeEditable.obj);
