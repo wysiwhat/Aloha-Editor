@@ -214,7 +214,9 @@ There are 3 variables that are stored on each element;
           movePopover = function() {
             var that;
             that = $node.data('popover');
-            return Bootstrap_Popover__position.bind(that)(that.$tip);
+            if (that && that.$tip) {
+              return Bootstrap_Popover__position.bind(that)(that.$tip);
+            }
           };
           clearTimeout($node.data('aloha-bubble-timer'));
           $node.removeData('aloha-bubble-timer');

@@ -220,7 +220,8 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
         $node = jQuery(evt.target)
         movePopover = () ->
           that = $node.data('popover')
-          Bootstrap_Popover__position.bind(that)(that.$tip)
+          if that and that.$tip
+            Bootstrap_Popover__position.bind(that)(that.$tip)
 
         clearTimeout($node.data('aloha-bubble-timer'))
         $node.removeData('aloha-bubble-timer')
