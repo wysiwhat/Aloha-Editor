@@ -2,15 +2,16 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'aloha/console', 'css!assorted/css/link.css'], function(Aloha, jQuery, Popover, UI, console) {
-    var DIALOG_HTML, populator, selector, showModalDialog, unlink;
-    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <h4>Text to display</h4>\n      <div>\n        <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n    <h4 id="link-destination">Link Destination</h4>\n    <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->\n      <ul class="nav nav-tabs">\n        <li><a href="#link-tab-external" data-toggle="tab">External</a></li>\n        <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>\n      </ul>\n      <div class="tab-content">\n        <div class="tab-pane" id="link-tab-external">\n          <h4 for="link-external">Link to webpage</h4>\n          <input class="link-input link-external" id="link-external" type="url" placeholder="http://"/>\n        </div>\n        <div class="tab-pane" id="link-tab-internal">\n          <label for="link-internal">Link to a part in this document</label>\n          <select class="link-input link-internal" id="link-internal" size="5" multiple="multiple"></select>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
+    var DIALOG_HTML, getContainerAnchor, populator, selector, shortString, shortUrl, showModalDialog, unlink;
+    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n    <h4 id="link-destination">Link Destination</h4>\n    <div class="tabbable tabs-left"> <!-- Only required for left/right tabs -->\n      <ul class="nav nav-tabs">\n        <li><a href="#link-tab-external" data-toggle="tab">External</a></li>\n        <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>\n      </ul>\n      <div class="tab-content">\n        <div class="tab-pane" id="link-tab-external">\n          <span for="link-external">Link to webpage</span>\n          <input class="link-input link-external" id="link-external" type="url" placeholder="http://"/>\n        </div>\n        <div class="tab-pane" id="link-tab-internal">\n          <label for="link-internal">Link to a part in this document</label>\n          <select class="link-input link-internal" id="link-internal" size="5" multiple="multiple"></select>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
-      var appendOption, dialog, figuresAndTables, href, linkContents, linkExternal, linkInput, linkInputId, linkInternal, linkSave, orgElements, root,
+      var a, appendOption, dialog, figuresAndTables, href, linkContents, linkExternal, linkInput, linkInputId, linkInternal, linkSave, orgElements, root,
         _this = this;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
-      if (!$el.children()[0]) {
-        linkContents = dialog.find('#link-contents');
+      a = $el.get(0);
+      linkContents = dialog.find('#link-contents');
+      if (a.childNodes.length > 0) {
         linkContents.val($el.text());
       }
       linkExternal = dialog.find('.link-external');
@@ -99,13 +100,46 @@
       return newRange;
     };
     selector = 'a';
+    shortUrl = function(linkurl, l) {
+      var chunk_l, end_chunk, start_chunk;
+      l = (typeof l !== "undefined" ? l : 50);
+      chunk_l = l / 2;
+      linkurl = linkurl.replace("http://", "");
+      linkurl = linkurl.replace("https://", "");
+      if (linkurl.length <= l) {
+        return linkurl;
+      }
+      start_chunk = shortString(linkurl, chunk_l, false);
+      end_chunk = shortString(linkurl, chunk_l, true);
+      return start_chunk + ".." + end_chunk;
+    };
+    shortString = function(s, l, reverse) {
+      var acceptable_shortness, i, short_s, stop_chars;
+      stop_chars = [" ", "/", "&"];
+      acceptable_shortness = l * 0.80;
+      reverse = (typeof reverse !== "undefined" ? reverse : false);
+      s = (reverse ? s.split("").reverse().join("") : s);
+      short_s = "";
+      i = 0;
+      while (i < l - 1) {
+        short_s += s[i];
+        if (i >= acceptable_shortness && stop_chars.indexOf(s[i]) >= 0) {
+          break;
+        }
+        i++;
+      }
+      if (reverse) {
+        return short_s.split("").reverse().join("");
+      }
+      return short_s;
+    };
     populator = function($el) {
       var $bubble, $edit, $remove, baseUrl, details, editable, href;
       editable = Aloha.activeEditable;
       $bubble = jQuery('<div class="link-popover"></div>');
       href = $el.attr('href');
       baseUrl = Aloha.settings.baseUrl;
-      details = jQuery('<div class="link-popover-details">\n  <a class="edit-link" >\n    <img src="' + baseUrl + '/../plugins/cnx/assorted/img/pencil_cnx.png" />\n  <span title="Edit link">Edit link ...</span>\n</a>\n&nbsp; | &nbsp;\n<a class="delete-link">\n  <img src="' + baseUrl + '/../plugins/cnx/assorted/img/delete_icon.png" />\n  <span title="Unlink (remove the link, leaving just the text)">Unlink</span>\n</a>\n&nbsp; | &nbsp;\n<span  class="visit-link">\n  <img src="' + baseUrl + '/../plugins/cnx/assorted/img/external-link-02.png" />\n<a href="' + href + '">' + href + '</a>\n  </span>\n</div>\n<br/>');
+      details = jQuery('<div class="link-popover-details">\n  <a class="edit-link" href="#">\n    <img src="' + baseUrl + '/../plugins/oerpub/assorted/img/edit-link-03.png" />\n  <span title="Change the link\'s text, location, or other properties">Edit link...</span>\n</a>\n&nbsp; | &nbsp;\n<a class="delete-link" href="#">\n  <img src="' + baseUrl + '/../plugins/oerpub/assorted/img/unlink-link-02.png" />\n  <span title="Remove the link, leaving just the text">Unlink</span>\n</a>\n&nbsp; | &nbsp;\n<a  class="visit-link" href="' + href + '" target="_blank">\n<img src="' + baseUrl + '/../plugins/oerpub/assorted/img/external-link-02.png" />\n<a href="' + href + '" target="_blank" title="Visit the link in a new window or tab">' + shortUrl(href, 30) + '</a>\n  </a>\n</div>\n<br/>');
       $bubble.append(details);
       $edit = details.find('.edit-link');
       $edit.on('click', function() {
@@ -120,39 +154,69 @@
       });
       return $bubble.contents();
     };
+    getContainerAnchor = function(a) {
+      var el;
+      el = a;
+      while (el) {
+        if (el.nodeName.toLowerCase() === "a") {
+          return el;
+        }
+        el = el.parentNode;
+      }
+      return false;
+    };
     UI.adopt('insertLink', null, {
       click: function() {
-        var dialog, newLink,
+        var $a, a, dialog, editable, linkText, range,
           _this = this;
-        newLink = jQuery('<a href="" class="aloha-new-link"></a>');
-        dialog = showModalDialog(newLink);
-        return dialog.on('hidden', function() {
-          var range;
-          if (!newLink.attr('href')) {
-            return;
-          }
-          range = Aloha.Selection.getRangeObject();
-          if (range.isCollapsed()) {
-            GENTICS.Utils.Dom.extendToWord(range);
-          }
-          if (range.isCollapsed()) {
-            GENTICS.Utils.Dom.insertIntoDOM(newLink, range, Aloha.activeEditable.obj);
-            range.startContainer = range.endContainer = newLink.contents()[0];
+        editable = Aloha.activeEditable;
+        range = Aloha.Selection.getRangeObject();
+        if (range.startContainer === range.endContainer) {
+          a = getContainerAnchor(range.startContainer);
+          if (a) {
+            $a = jQuery(a);
+            range.startContainer = range.endContainer = a;
             range.startOffset = 0;
-            range.endOffset = newLink.text().length;
+            range.endOffset = a.childNodes.length;
+            dialog = showModalDialog($a);
           } else {
-            GENTICS.Utils.Dom.addMarkup(range, newLink, false);
+            GENTICS.Utils.Dom.extendToWord(range);
+            range.select();
+            $a = jQuery('<a href="" class="aloha-new-link"></a>');
+            linkText = range.isCollapsed() ? "" : range.getText();
+            $a.append(linkText);
+            dialog = showModalDialog($a);
           }
-          newLink = Aloha.activeEditable.obj.find('.aloha-new-link');
-          return newLink.removeClass('aloha-new-link');
+        } else {
+          return;
+        }
+        return dialog.on('hidden', function() {
+          var newLink;
+          Aloha.activeEditable = editable;
+          if ($a.hasClass('aloha-new-link')) {
+            if (!$a.attr('href')) {
+              return;
+            }
+            range = Aloha.Selection.getRangeObject();
+            if (range.isCollapsed()) {
+              GENTICS.Utils.Dom.insertIntoDOM($a, range, Aloha.activeEditable.obj);
+              range.startContainer = range.endContainer = $a.contents()[0];
+              range.startOffset = 0;
+              range.endOffset = $a.text().length;
+            } else {
+              GENTICS.Utils.Dom.removeRange(range);
+              GENTICS.Utils.Dom.insertIntoDOM($a, range, Aloha.activeEditable.obj);
+            }
+            newLink = Aloha.activeEditable.obj.find('.aloha-new-link');
+            return newLink.removeClass('aloha-new-link');
+          }
         });
       }
     });
-    return Popover.register({
-      hover: true,
+    return {
       selector: selector,
       populator: populator
-    });
+    };
   });
 
 }).call(this);

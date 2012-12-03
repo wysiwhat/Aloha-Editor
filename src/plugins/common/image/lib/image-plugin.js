@@ -159,23 +159,19 @@ define([
 
 			/**
 			 * Upload callback is triggered after an image was uploaded
-             * to determine the server-side URI of the uploaded image.
-             * The default expects a json-formatted message.
+			 * to determine the server-side URI of the uploaded image.
+			 * The default expects a json-formatted message.
 			 */
-             onUploadSuccess: function(xhr) {
-                try {
-                    var msg = JSON.parse(xhr.response);
-                    return msg.url;
-                } catch(e) {}
-                return null;
-             },
+			onUploadSuccess: function(xhr) {
+				return xhr.response;
+			},
 
 			/**
 			 * Upload callback is triggered after an image failed to upload.
 			 */
-             onUploadFail: function(xhr) {
+			onUploadFail: function(xhr) {
 				Aloha.Log.info('Default onUploadFail invoked');
-             }
+			}
 		},
 		
 		/**
@@ -414,8 +410,20 @@ define([
                 // Get the server-side url from the response, set it
                 // as the src for the image.
                 var url = plugin.settings.onUploadSuccess(data.xhr);
-                if ( url !== null ) {
-                    $('#' + data.id).attr('src', url);
+                if ( url !== null && data.file.droptarget) {
+                    var $target = jQuery(data.file.droptarget);
+                    if ($target.is('img')){
+                        jQuery(data.file.droptarget).attr('src', url);
+                    } else {
+                        var $img = jQuery('<img/>');
+                        $img.css({
+                            "max-width": plugin.maxWidth,
+                            "max-height": plugin.maxHeight
+                        });
+                        $img.attr('src', url);
+                        var range = Aloha.Selection.getRangeObject();
+                        GENTICS.Utils.Dom.insertIntoDOM($img, range, $target);
+                    }
                 }
             });
 
@@ -433,7 +441,7 @@ define([
 					if (plugin.settings.ui.resizable && !jQuery(originalEvent.target).hasClass('ui-resizable-handle')) {
 						plugin.endResize();
 						plugin.imageObj = null;
-						Aloha.trigger('aloha-image-unselected');
+						Aloha.trigger('aloha-image-unselected', originalEvent.target);
 					}
 				}
 
@@ -814,7 +822,7 @@ define([
 			}
 			
 			Aloha.Selection.preventSelectionChangedFlag = false;
-			Aloha.trigger('aloha-image-selected');
+			Aloha.trigger('aloha-image-selected', e.target);
 		},
 
 		/**
@@ -1042,7 +1050,7 @@ define([
                     $input.on('change', function(evt){
                         // Turn this into a drop event and let the relevant
                         // plugin handle it
-                        Aloha.trigger('aloha-upload-file', evt.target);
+                        Aloha.trigger('aloha-upload-file', {target: uploadBox[0], files: evt.target.files});
                     });
 
 					GENTICS.Utils.Dom.insertIntoDOM(uploadBox, range, jQuery(Aloha.activeEditable.obj));
@@ -1298,7 +1306,7 @@ define([
 			// however I could not manage to hide them completely
 			jQuery('.ui-wrapper')
 				.attr('contentEditable', false)
-				.addClass('aloha-image-box-active Aloha_Image_Resize aloha')
+				.addClass('aloha-ephemera-wrapper aloha-image-box-active Aloha_Image_Resize aloha')
 				.css({
 					position: 'relative',
 					display: 'inline-block',
