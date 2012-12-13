@@ -56,7 +56,7 @@ function(Aloha, plugin, $, Ui, Button, PubSub) {
                 // Delegate the mouseup event (resizes, clicks)
                 editable.obj.delegate('img', 'mouseup', function(event){
                     plugin.clickImage(event);
-                }
+                });
             });
             PubSub.sub('aloha.selection.context-change', function(m){
                 if ($(m.range.markupEffectiveAtStart).parent('img')
