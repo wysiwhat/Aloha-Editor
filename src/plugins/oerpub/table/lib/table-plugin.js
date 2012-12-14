@@ -133,6 +133,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                 editable.obj.find('table').each(function(){
                     prepareTable(plugin, jQuery(this));
                 });
+                plugin.renumberCaptions(editable.obj);
                 editable.obj.bind('keydown', 'tab shift+tab', function(e){
                     var $cell = jQuery(
                         getSelection().focusNode).closest('td,th');
@@ -273,6 +274,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     if(that.currentTable.find("td,th").length==0){
                         that.currentTable.remove();
                         that.currentTable = jQuery();
+                        that.renumberCaptions(Aloha.activeEditable.obj);
                     }
                 },
                 preview: function(){
@@ -296,6 +298,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     if(that.currentTable.find("td,th").length==0){
                         that.currentTable.remove();
                         that.currentTable = jQuery();
+                        that.renumberCaptions(Aloha.activeEditable.obj);
                     }
                 },
                 preview: function(){
@@ -308,6 +311,22 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                 unpreview: function(){
                     that.currentTable.find('td,th')
                         .removeClass('delete-column');
+                }
+            });
+            this._deleteTableButton = Ui.adopt("deletetable", Button, {
+                tooltip: "Delete table",
+                icon: "aloha-icon aloha-icon-deletetable",
+                scope: this.name,
+                click: function(){
+                    that.currentTable.remove();
+                    that.currentTable = jQuery();
+                    that.renumberCaptions(Aloha.activeEditable.obj);
+                },
+                preview: function(){
+                    that.currentTable.addClass("delete-table");
+                },
+                unpreview: function(){
+                    that.currentTable.removeClass('delete-table');
                 }
             });
             this._addColumnBefore = Ui.adopt("addcolumnbefore", Button, {
@@ -391,7 +410,8 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 
                 // Create caption
                 var caption = document.createElement('caption');
-                var captiontext = document.createTextNode('Table ' + (jQuery('.aloha-editable table').length+1));
+                jQuery(caption).attr('contentEditable', 'false');
+                var captiontext = document.createTextNode('Table 0');
                 caption.appendChild(captiontext);
                 table.appendChild(caption);
 
@@ -431,12 +451,23 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 
                 cleanupAfterInsertion();
                 prepareTable(this, jQuery(table));
+                this.renumberCaptions(Aloha.activeEditable.obj);
                 var ev = jQuery.Event();
                 ev.type = 'blur';
                 Aloha.activeEditable.smartContentChange(ev);
             } else {
                 this.error('There is no active Editable where the table can be inserted!');
             }
+        },
+        renumberCaptions: function(editor){
+            editor.find('table').each(function(idx, el){
+                var caption = jQuery(el).find('caption');
+                if(caption.length){
+                    caption.html('Table ' + (idx + 1));
+                } else {
+                    jQuery(el).prepend('<caption>Table ' + (idx+1) + '</caption>');
+                }
+            });
         },
         clickTable: function(e){
             this.currentCell.length && this.currentCell.removeClass('aloha-current-cell');

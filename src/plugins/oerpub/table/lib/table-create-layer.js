@@ -14,8 +14,8 @@ function (jQuery) {
 	CreateLayer.prototype.parameters = {
 		elemId: 'aloha-table-createLayer', // id of the create-table panel
 		className: 'aloha-table-createdialog',   // class-name of the create-table panel
-		numX: 10,	         // Number of cols in the create-layer
-		numY: 10,            // Number of rows in the create-layer vertically
+		numX: 6,	         // Number of cols in the create-layer
+		numY: 6,            // Number of rows in the create-layer vertically
 		layer: undefined,    // Attribute holding the create-layer
 		target: undefined    // the clicktarget which was clicked on (mostly the button of the floatingmenu)
 	};
@@ -73,6 +73,7 @@ function (jQuery) {
 	CreateLayer.prototype.create = function () {
 		var that = this;
 		var layer = jQuery('<div></div>');
+        var measure = jQuery('<div class="table-size-info">0 x 0</div>');
 		layer.id = this.get('elemId');
 		layer.addClass(this.get('className'));
 
@@ -95,49 +96,89 @@ function (jQuery) {
         layer.append(options);
 
 		var table = jQuery('<table></table>');
-		table.css('width', (this.get('numX') + 6) * 15);
+		table.css('min-width', this.get('numX') * 25);
 		var tr;
 		var td;
 
 		for (var i = 0; i < this.get('numY'); i++) {
 			tr = jQuery('<tr></tr>');
-
 			for (var j = 0; j < this.get('numX'); j++) {
 				td = jQuery('<td>\u00a0</td>');
                 if (i == 0){
                     td.addClass("header");
                 }
-
 				if (i == 0 && j == 0) {
 					td.addClass('hover');
 				}
-
-				td.bind('mouseover', {rowId: i, colId: j}, function(e) {
-					that.handleMouseOver(e, table);
-				});
-
-				td.bind('click', {rowId: i, colId: j}, function(e){
-					var rows = e.data.rowId + 1;
-					var cols = e.data.colId + 1;
-
-                    var dialog = jQuery(e.target)
-                        .closest('div.aloha-table-createdialog');
-                    var headerrows = Number(dialog.find(
-                        '#include-row-header').is(':checked'));
-
-					that.TablePlugin.createTable(cols, rows - headerrows,
-                        headerrows);
-					that.hide();
-				});
-
 				tr.append(td);
 			}
 			table.append(tr);
 		}
 		layer.append(table);
+        layer.append(measure);
 
 		// set attributes
 		this.set('layer', layer);
+
+        table.on('mouseover', 'td', function(e){
+            var col = e.target.cellIndex;
+            var row = jQuery(e.target).parent().index();
+            measure.html((row+1) + " x " + (col+1));
+
+            // Check if we are close to the edge of the selector
+            var r = table.find('tr'),
+                rowcount = r.length;
+                colcount = r.eq(0).children().length;
+            tx = that.get('numX');
+            ty = that.get('numY');
+            if(col+2>colcount){
+                // Add a column
+                table.find('tr').each(function(idx, el){
+                    var td = jQuery('<td>\u00a0</td>');
+                    if(idx==0){ td.addClass('header'); }
+                    jQuery(el).append(td);
+                });
+                colcount++;
+            } else if (colcount > ty) {
+                console && console.log('oversized');
+                // Remove columns until we're just big enough
+                var ly = Math.max(ty-1, col+1);
+                table.find('tr').each(function(idx, el){
+                    jQuery(el).children().slice(ly+1).remove();
+                });
+                colcount = ly+1;
+            }
+            if(row+2>rowcount){
+                // Add a row
+                var tr = jQuery('<tr></tr>');
+                for(var i = 0; i < colcount; i++){
+                    tr.append('<td>\u00a0</td>');
+                }
+                table.append(tr);
+                rowcount++;
+            } else if (rowcount > tx){
+                // Remove rows until we're just big enough
+                var lx = Math.max(tx-1, row+1);
+                table.find('tr').slice(lx+1).remove();
+                rowcount = lx+1;
+            }
+
+            that.handleMouseOver(e, table, row, col);
+        });
+
+        table.on('click', 'td', function(e){
+            var rows = jQuery(e.target).parent().index() + 1;
+            var cols = e.target.cellIndex + 1;
+
+            var dialog = jQuery(e.target)
+                .closest('div.aloha-table-createdialog');
+            var headerrows = Number(dialog.find(
+                '#include-row-header').is(':checked'));
+
+            that.TablePlugin.createTable(cols, rows - headerrows,
+                headerrows);
+            that.hide();
+        });
 
 		// stop bubbling the click on the create-dialog up to the body event
 		layer.bind('click', function(e) {
@@ -164,9 +205,7 @@ function (jQuery) {
 	 * @param table the aeffected table
 	 * @return void
 	 */
-	CreateLayer.prototype.handleMouseOver = function(e, table) {
-		var rowId = e.data.rowId;
-		var colId = e.data.colId;
+	CreateLayer.prototype.handleMouseOver = function(e, table, rowId, colId) {
 		var innerRows = table.find('tr');
 
 		for (var n = 0; n <= innerRows.length; n++) {
