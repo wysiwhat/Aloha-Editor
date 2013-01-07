@@ -13,7 +13,7 @@
 }
 
 #statusmessage {
-    height: 3em;
+    height: 0;
 }
 
 #statusmessage div {
@@ -31,9 +31,29 @@
     -webkit-box-shadow: 3px 3px 2px 2px #ddd;
     box-shadow:         3px 3px 2px 2px #ddd;
     z-index: 4;
+    position: relative;
 }
 
 #statusmessage div.error {
     background-color: red;
 }
 
+#statusmessage .persistent-error i {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    margin-left: -9999px;
+    background-image: url("../images/remove-01.png");
+    height: 16px;
+    width: 16px;
+}
+
+.aloha-block.title,
+.aloha-block.title:focus,
+.aloha-block.title:hover {
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0;
+}

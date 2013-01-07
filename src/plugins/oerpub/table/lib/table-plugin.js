@@ -1,7 +1,7 @@
 define(
 ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub',
     'ui/dialog', 'aloha/ephemera', 'table/table-create-layer', 'css!table/css/table.css'],
-function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLayer) {
+function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, CreateLayer) {
     "use strict";
 
 	var GENTICS = window.GENTICS;
@@ -36,31 +36,27 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 				sNode.nodeType == 3 ? sNode.parentNode : sNode, table)){
 			
 			if(range.startOffset == 0){
-				jQuery( sNode.nodeType == 3 ? sNode.parentNode : sNode)
+				$( sNode.nodeType == 3 ? sNode.parentNode : sNode)
 					.addClass( 'aloha-table-cleanme');
 			}
 			
 			if(range.endOffset == eNodeLength){
-				jQuery( eNode.nodeType == 3 ? eNode.parentNode : eNode)
+				$( eNode.nodeType == 3 ? eNode.parentNode : eNode)
 					.addClass( 'aloha-table-cleanme');
 			}
 		}
 	}
 
 	function cleanupAfterInsertion(){
-		var dirty = jQuery('.aloha-table-cleanme').removeClass(
+		var dirty = $('.aloha-table-cleanme').removeClass(
 						'aloha-table-cleanme');
 		
 		for (var i=0; i<dirty.length; i++){
-			if (jQuery.trim(jQuery(dirty[i]).html()) == '' &&
+			if ($.trim($(dirty[i]).html()) == '' &&
 					!GENTICS.Utils.Dom.isEditingHost(dirty[i])){
-				jQuery(dirty[i]).remove();
+				$(dirty[i]).remove();
 			}
 		}
-	}
-
-	function isWithinTable(elem) {
-		return (jQuery(elem).parents('.aloha-editable table').length > 0);
 	}
 
     function createRow(cols, tagname){
@@ -88,9 +84,9 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 
     function prepareTable(plugin, table){
         // Wrap table in ui-wrappper
-        var w1 = jQuery('<div class="canvas-wrap aloha-ephemera-wrapper" />');
-        var w2 = jQuery('<div class="table canvas aloha-ephemera-wrapper" />');
-        var w3 = jQuery('<div class="canvas-inner aloha-ephemera-wrapper" />');
+        var w1 = $('<div class="canvas-wrap aloha-ephemera-wrapper" />');
+        var w2 = $('<div class="table canvas aloha-ephemera-wrapper" />');
+        var w3 = $('<div class="canvas-inner aloha-ephemera-wrapper" />');
 
         table.wrap(w1).wrap(w2).wrap(w3);
 
@@ -131,11 +127,11 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 
             Aloha.bind('aloha-editable-created', function(event, editable){
                 editable.obj.find('table').each(function(){
-                    prepareTable(plugin, jQuery(this));
+                    prepareTable(plugin, $(this));
                 });
                 plugin.renumberCaptions(editable.obj);
                 editable.obj.bind('keydown', 'tab shift+tab', function(e){
-                    var $cell = jQuery(
+                    var $cell = $(
                         getSelection().focusNode).closest('td,th');
                     if ($cell.length > 0){
                         var next = function(ob, filter){
@@ -153,7 +149,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                             var nextrow = next($cell.closest('tr'), 'tr');
                             if (nextrow.length > 0){
                                 var offset = e.shiftKey ? nextrow[0].cells.length-1 : 0;
-                                var nextcell = jQuery(nextrow[0].cells[offset]);
+                                var nextcell = $(nextrow[0].cells[offset]);
                                 plugin.focusCell(nextcell);
                             } else {
                                 // Last column, last row
@@ -181,10 +177,11 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                 placeCursor(editable.obj);
             });
             PubSub.sub('aloha.selection.context-change', function(m){
-                if ($(m.range.markupEffectiveAtStart).parent('table')
-                        .length > 0) {
-                    // We're inside a table, disable
-                    // table insertion, enable others
+                var table = $(m.range.markupEffectiveAtStart)
+                    .parent('table').eq(0);
+                if (table.length > 0) {
+                    // We're inside a table, disable table insertion, enable
+                    // others
                     plugin._createTableButton.enable(false);
                     plugin._addrowbeforeButton.enable(true);
                     plugin._addrowafterButton.enable(true);
@@ -192,6 +189,11 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     plugin._deleteColumnButton.enable(true);
                     plugin._addColumnBefore.enable(true);
                     plugin._addColumnAfter.enable(true);
+                    plugin._deleteTableButton.enable(true);
+                    if(!table.find('th').length){
+                        // only enable header insertion if we have no header
+                        plugin._addHeaderRow.enable(true);
+                    }
                 } else {
                     // Disable table functions, enable table insertion
                     plugin._createTableButton.enable(true);
@@ -201,17 +203,19 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     plugin._deleteColumnButton.enable(false);
                     plugin._addColumnBefore.enable(false);
                     plugin._addColumnAfter.enable(false);
+                    plugin._deleteTableButton.enable(false);
+                    plugin._addHeaderRow.enable(false);
                 }
             });
-            jQuery('body').on('click', function(e){
+            $('body').on('click', function(e){
                 // Click outside table deselects current row and cell
                 if(!e.isDefaultPrevented() &&
                         $(e.target).parents('.aloha-editable').length){
                     plugin.currentCell.length && plugin.currentCell.removeClass('aloha-current-cell');
                     plugin.currentRow.length && plugin.currentRow.removeClass('aloha-current-row');
-                    plugin.currentRow = jQuery();
-                    plugin.currentCell = jQuery();
-                    plugin.currentTable = jQuery();
+                    plugin.currentRow = $();
+                    plugin.currentCell = $();
+                    plugin.currentTable = $();
                 }
             });
         },
@@ -270,10 +274,10 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                 click: function(){
                     if(!that.currentRow.length){ return; }
                     that.currentRow.remove();
-                    that.currentRow = jQuery();
+                    that.currentRow = $();
                     if(that.currentTable.find("td,th").length==0){
                         that.currentTable.remove();
-                        that.currentTable = jQuery();
+                        that.currentTable = $();
                         that.renumberCaptions(Aloha.activeEditable.obj);
                     }
                 },
@@ -297,7 +301,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     // If the table is now devoid of any rows, delete it
                     if(that.currentTable.find("td,th").length==0){
                         that.currentTable.remove();
-                        that.currentTable = jQuery();
+                        that.currentTable = $();
                         that.renumberCaptions(Aloha.activeEditable.obj);
                     }
                 },
@@ -305,7 +309,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     if(!that.currentCell.length){ return; }
                     var idx = that.currentCell[0].cellIndex;
                     that.currentTable.find("tr").each(function(){
-                        jQuery(this.cells[idx]).addClass("delete-column");
+                        $(this.cells[idx]).addClass("delete-column");
                     });
                 },
                 unpreview: function(){
@@ -319,7 +323,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                 scope: this.name,
                 click: function(){
                     that.currentTable.remove();
-                    that.currentTable = jQuery();
+                    that.currentTable = $();
                     that.renumberCaptions(Aloha.activeEditable.obj);
                 },
                 preview: function(){
@@ -347,7 +351,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     if(!that.currentCell.length){ return; }
                     var idx = that.currentCell[0].cellIndex;
                     that.currentTable.find("tr").each(function(){
-                        jQuery(this.cells[idx]).addClass("add-column-before");
+                        $(this.cells[idx]).addClass("add-column-before");
                     });
                 },
                 unpreview: function(e){
@@ -372,12 +376,37 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     if(!that.currentCell.length){ return; }
                     var idx = that.currentCell[0].cellIndex;
                     that.currentTable.find("tr").each(function(){
-                        jQuery(this.cells[idx]).addClass("add-column-after");
+                        $(this.cells[idx]).addClass("add-column-after");
                     });
                 },
                 unpreview: function(e){
                     that.currentTable.find('td,th')
                         .removeClass('add-column-after');
+                }
+            });
+            this._addHeaderRow = Ui.adopt("addheaderrow", Button, {
+                tooltip: "Add header row",
+                icon: "aloha-icon aloha-icon-addheaderrow",
+                scope: this.name,
+                click: function(){
+                    if(!that.currentTable.length){ return; }
+                    var firstrow = that.currentTable.find('tr').eq(0),
+                        colcount = firstrow.find('td,th').length;
+                    var newrow = createRow(colcount, 'th');
+                    firstrow.before(newrow);
+                    // Disable function now to prevent adding another
+                    // header row. Also cleanup after preview.
+                    that.currentTable.find('tr').slice(0, 2).removeClass("add-row-before");
+                    that._addHeaderRow.enable(false);
+                },
+                preview: function(e){
+                    that.currentTable.length && that.currentTable.find('tr').eq(0).addClass("add-row-before");
+                },
+                unpreview: function(e){
+                    // use slice() to remove class from first two rows, cause
+                    // adding a new header row means the preview css is now on
+                    // the second row.
+                    that.currentTable.length && that.currentTable.find('tr').slice(0, 2).removeClass("add-row-before");
                 }
             });
             // Disable the table functions by default, they are enabled when
@@ -388,6 +417,8 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
             this._deleteColumnButton.enable(false);
             this._addColumnBefore.enable(false);
             this._addColumnAfter.enable(false);
+            this._addHeaderRow.enable(false);
+            this._deleteTableButton.enable(false);
         },
         addRowAfter: function(){
             // Factored out because we re-use this when tabbing through the
@@ -410,7 +441,7 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 
                 // Create caption
                 var caption = document.createElement('caption');
-                jQuery(caption).attr('contentEditable', 'false');
+                $(caption).attr('contentEditable', 'false');
                 var captiontext = document.createTextNode('Table 0');
                 caption.appendChild(captiontext);
                 table.appendChild(caption);
@@ -446,13 +477,13 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
                     Aloha.Selection.getRangeObject(), table);
                 
                 // insert the table at the current selection
-                GENTICS.Utils.Dom.insertIntoDOM(jQuery(table),
+                GENTICS.Utils.Dom.insertIntoDOM($(table),
                     Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj);
 
                 cleanupAfterInsertion();
-                prepareTable(this, jQuery(table));
+                prepareTable(this, $(table));
                 this.renumberCaptions(Aloha.activeEditable.obj);
-                var ev = jQuery.Event();
+                var ev = $.Event();
                 ev.type = 'blur';
                 Aloha.activeEditable.smartContentChange(ev);
             } else {
@@ -461,20 +492,20 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
         },
         renumberCaptions: function(editor){
             editor.find('table').each(function(idx, el){
-                var caption = jQuery(el).find('caption');
+                var caption = $(el).find('caption');
                 if(caption.length){
                     caption.html('Table ' + (idx + 1));
                 } else {
-                    jQuery(el).prepend('<caption>Table ' + (idx+1) + '</caption>');
+                    $(el).prepend('<caption>Table ' + (idx+1) + '</caption>');
                 }
             });
         },
         clickTable: function(e){
             this.currentCell.length && this.currentCell.removeClass('aloha-current-cell');
             this.currentRow.length && this.currentRow.removeClass('aloha-current-row');
-            this.currentCell = jQuery(e.target).closest('td,th');
-            this.currentRow = jQuery(e.target).closest('tr');
-            this.currentTable = jQuery(e.target).closest('table');
+            this.currentCell = $(e.target).closest('td,th');
+            this.currentRow = $(e.target).closest('tr');
+            this.currentTable = $(e.target).closest('table');
             this.currentCell.length && this.currentCell.addClass('aloha-current-cell');
             this.currentRow.length && this.currentRow.addClass('aloha-current-row');
             e.preventDefault();
@@ -486,9 +517,9 @@ function(Aloha, plugin, jQuery, Ui, Button, PubSub, Dialog, Ephemera, CreateLaye
 	    error: function(msg){
             Aloha.Log.error(this, msg);
         },
-        currentCell: jQuery(), // Defined when clicked
-        currentRow: jQuery(),  // Defined when clicked
-        currentTable: jQuery(), // Defined when clicked
+        currentCell: $(), // Defined when clicked
+        currentRow: $(),  // Defined when clicked
+        currentTable: $(), // Defined when clicked
         createLayer: undefined // Defined in init above.
     });
 });

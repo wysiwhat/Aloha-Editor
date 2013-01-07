@@ -61,7 +61,7 @@
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
                 data-aloha-plugins="common/ui,
                                     oer/toolbar,
-                                    cnx/popover,
+                                    oerpub/popover,
                                     common/format,
                                     common/paste,
                                     common/block,
@@ -71,18 +71,19 @@
                                     extra/draganddropfiles,
                                     common/image,
                                     oerpub/assorted,
+                                    oerpub/title,
                                     common/undo,
                                     oerpub/undobutton,
                                     oerpub/genericbutton,
                                     common/dom-to-xhtml"> <!-- xhtml workaround --></script>
 
-                <script type="text/javascript"
-                        tal:content="string:var body_url = '${body_url}';">
+            <script type="text/javascript"
+                    tal:content="string:var body_url = '${body_url}';">
                     var body_url = '/Aloha-Editor/oerpub/sandbox/index.html';</script>
-                <script type="text/javascript"
-                        tal:content="string:var save_url = '${request.route_url('preview_save')}';">
+            <script type="text/javascript"
+                    tal:content="string:var save_url = '${request.route_url('preview_save')}';">
                     var save_url = null;</script>
-                <script type="text/javascript">
+            <script type="text/javascript">
                 Aloha.ready(function(){
                     Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
                             function(PubSub, GenericButton){
@@ -120,7 +121,7 @@
                                     $.post(save_url,
                                             {html: html}, function(data, statustext){
                                         if(data.error){
-                                            $('#statusmessage').data('message')(data.error, 'error');
+                                            $('#statusmessage').data('message')(data.error, 'error', 0);
                                         } else {
                                             $('#statusmessage').data('message')('Saved');
                                             GenericButton.getButtons()["save"].enable(false);
@@ -144,11 +145,25 @@
 
                         // Set up status message area
                         var statusarea = $('#statusmessage');
-                        statusarea.data('message', function(message, type) {
+                        statusarea.data('message', function(message, type, delay) {
                             type = type || 'info';
-                            $("<div />", {'class': type, text: message}).hide()
-                                .appendTo(statusarea).center().fadeIn(700)
-                                .delay(1500).fadeOut(800, function() { $(this).remove(); });
+                            if(delay === undefined){
+                                delay = 1500;
+                            }
+                            var ob = $("<div />",
+                              {'class': type, text: message}).hide()
+                              .appendTo(statusarea).center().fadeIn(700);
+                            if(delay>0){
+                                ob.delay(delay).fadeOut(800, function() { $(this).remove(); });
+                            } else {
+                                ob.addClass('persistent-error');
+                                var close = $('<i> </i>');
+                                ob.append(close);
+                                close.on('click', function(e){
+                                    $(e.target).off('click');
+                                    ob.remove();
+                                });
+                            }
                         });
 
                         // Fetch the preview
@@ -211,10 +226,10 @@
                            is used to change one heading to another
                            -->
                           <li><a href="#" class="action changeHeading" data-tagname="p">Normal Text</a></li>
-                          <li><a href="#" class="action changeHeading" data-tagname="pre">Code</a></li>
                           <li><a href="#" class="action changeHeading" data-tagname="h1">Heading</a></li>
                           <li><a href="#" class="action changeHeading" data-tagname="h2">Subheading</a></li>
                           <li><a href="#" class="action changeHeading" data-tagname="h3">SubSubHeading</a></li>
+                          <li><a href="#" class="action changeHeading" data-tagname="pre">Code</a></li>
                         </ul>
                       </div>
                       <span class="separator"> </span>
@@ -249,6 +264,7 @@
                           <li><a href="#" class="action addrowafter">Add Row After</a></li>
                           <li><a href="#" class="action addcolumnbefore">Add Column Before</a></li>
                           <li><a href="#" class="action addcolumnafter">Add Column After</a></li>
+                          <li><a href="#" class="action addheaderrow">Add Header Row</a></li>
                           <li><a href="#" class="action deleterow">Delete Row</a></li>
                           <li><a href="#" class="action deletecolumn">Delete Column</a></li>
                           <li><a href="#" class="action deletetable">Delete Table</a></li>

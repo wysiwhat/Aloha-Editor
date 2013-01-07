@@ -2,8 +2,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
   EDITOR_HTML = '''
     <div class="math-editor-dialog">
-        <div>
-            <textarea type="text" class="formula" rows="1"></textarea>
+        <div class="math-container">
+            <pre><span></span><br></pre>
+            <textarea type="text" class="formula" rows="1"
+                      placeholder="Insert your math notation here"></textarea>
         </div>
         <span>This is:</span>
         <label class="radio inline">
@@ -17,7 +19,6 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         </label>
         <div class="footer">
             <button class="btn btn-primary done">Done</button>
-            <button class="btn btn-danger remove"><i class="icon-remove icon-white"></i> Remove</button>
         </div>
     </div>
   '''
@@ -31,33 +32,64 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     'TeX':       'math/tex'
     'ASCIIMath': 'math/asciimath'
 
+  TOOLTIP_TEMPLATE = '<div class="aloha-ephemera tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+
+  insertMath = () ->
+    $el = jQuery('<span class="math-element"></span>')
+    range = Aloha.Selection.getRangeObject()
+    if range.isCollapsed()
+      GENTICS.Utils.Dom.insertIntoDOM $el, range, Aloha.activeEditable.obj
+      triggerMathJax $el, ->
+        # Callback opens up the math editor by "clicking" on it
+        $el.trigger 'show'
+        makeCloseIcon($el)
+    else
+      $tail = jQuery('<span class="aloha-ephemera math-trailer" />')
+      $el.text('`' + range.getText() + '`')
+      GENTICS.Utils.Dom.removeRange range
+      GENTICS.Utils.Dom.insertIntoDOM $el.add($tail), range, Aloha.activeEditable.obj
+      triggerMathJax $el, ->
+        makeCloseIcon($el)
+
+        # This will likely break in IE
+        sel = window.getSelection()
+        r = sel.getRangeAt(0)
+        r.selectNodeContents($tail.parent().get(0))
+        r.setEndAfter($tail.get(0))
+        r.setStartAfter($tail.get(0))
+        sel.removeAllRanges()
+        sel.addRange(r)
+
+        # Let aloha know what we've done
+        r = new GENTICS.Utils.RangeObject()
+        r.update()
+        Aloha.Selection.rangeObject = r
+
   # Register the button with an action
   UI.adopt 'insertMath', null,
-    click: () ->
-        # Either insert a new span around the cursor and open the box or just open the box
-        $el = jQuery('<span class="math-element">`x^2`</span>')
-        GENTICS.Utils.Dom.insertIntoDOM $el,
-          Aloha.Selection.getRangeObject(),
-          Aloha.activeEditable.obj
-        triggerMathJax $el, ->
-          # Callback opens up the math editor by "clicking" on it
-          $el.trigger 'show'
+    click: () -> insertMath()
 
   triggerMathJax = ($el, cb) ->
-    MathJax.Hub.Typeset $el[0], cb
+    if MathJax?
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, $el[0], cb]
+    else
+      console.log 'MathJax was not loaded properly'
+
+  cleanupFormula = ($editor, $span, destroy=false) ->
+    # If math is empty, remove the box
+    if destroy or jQuery.trim($editor.find('.formula').val()).length == 0
+      $span.find('.math-element-destroy').tooltip('destroy')
+      $span.remove()
 
   # $span contains the span with LaTex/ASCIIMath
   buildEditor = ($span) ->
-    $editor = jQuery(EDITOR_HTML);
-
-
+    $editor = jQuery(EDITOR_HTML)
     # Bind some actions for the buttons
     $editor.find('.done').on 'click', =>
       $span.trigger 'hide'
     $editor.find('.remove').on 'click', =>
       $span.trigger 'hide'
-      $span.remove()
-
+      cleanupFormula($editor, $span, true)
 
     $formula = $editor.find('.formula')
 
@@ -84,6 +116,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     $editor.find("input[name=mime-type][value='#{mimeType}']").attr('checked', true)
     $formula.val(formula)
 
+    # Set the hidden pre that causes auto-sizing to the same value
+    $editor.find('.math-container pre span').text(formula)
+
     # If the language isn't MathML then hide the MathML radio
     $editor.find("label.mime-type-mathml").remove() if mimeType != 'math/mml'
 
@@ -106,18 +141,17 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
             $annotation = jQuery('<annotation></annotation>').prependTo($math)
           $annotation.attr('encoding', mimeType)
           $annotation.text(formula)
+          makeCloseIcon($span)
 
       # TODO: Async save the input when MathJax correctly parses and typesets the text
       $span.data('math-formula', formula)
       $formula.trigger('focus')
 
-    $formula.data('math-old', $formula.val())
-    $formula.on 'keyup', () ->
-        val = jQuery(@).val()
-        if $formula.data('math-old') != val
-          $formula.data('math-old', val)
-          clearTimeout(keyTimeout)
-          setTimeout(keyDelay.bind(@), 500)
+    $formula.on 'input', () ->
+        clearTimeout(keyTimeout)
+        setTimeout(keyDelay.bind(@), 500)
+        $editor.find('.math-container pre span').text(
+            $editor.find('.formula').val())
 
     # Grr, Bootstrap doesn't set the cheked value properly on radios
     radios = $editor.find('input[name=mime-type]')
@@ -127,7 +161,35 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         clearTimeout(keyTimeout)
         setTimeout(keyDelay.bind($formula), 500)
 
+    $span.off('shown-popover').on 'shown-popover', () ->
+      $el = jQuery(@)
+      tt = $el.data('tooltip')
+      tt.hide().disable() if tt
+      setTimeout( () ->
+        $popover = $el.data('popover')
+        $popover.$tip.find('.formula').trigger('focus') if $popover
+      , 10)
+
+    $span.off('hidden-popover').on 'hidden-popover', () ->
+      tt = jQuery(@).data('tooltip')
+      tt.enable() if tt
+      cleanupFormula($editor, jQuery(@))
+
     $editor
+
+  makeCloseIcon = ($el) ->
+      closer = jQuery('<a class="math-element-destroy aloha-ephemera" title="Delete math">&nbsp;</a>')
+      if jQuery.ui and jQuery.ui.tooltip
+        closer.tooltip()
+      else
+        closer.tooltip(placement: 'bottom', template: TOOLTIP_TEMPLATE)
+      $el.append(closer)
+
+  Aloha.bind 'aloha-editable-created', (e, editable) ->
+    # Bind ctrl+m to math insert/mathify
+    editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
+      insertMath()
+      evt.preventDefault()
 
   Aloha.bind 'aloha-editable-activated', (event, data) ->
     editable = data.editable
@@ -161,13 +223,38 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       # Don't handle the same event for each child
       evt.stopPropagation()
 
+    editable.obj.find('.math-element').each () ->
+      makeCloseIcon(jQuery(this))
+
+    editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
+      jQuery(e.target).tooltip('destroy')
+      $el = jQuery(e.target).closest('.math-element')
+      # Though the tooltip was bound to the editor and delegates
+      # to these items, you still have to clean it up youself
+      $el.trigger('hide').tooltip('destroy').remove()
+      e.preventDefault()
+    )
+
+    if jQuery.ui and jQuery.ui.tooltip
+      # Use jq.ui tooltip
+      editable.obj.tooltip(
+        items: ".math-element",
+        content: -> 'Click anywhere in math to edit it',
+        template: TOOLTIP_TEMPLATE)
+    else
+      # This requires a custom version of jquery-ui, to avoid the conflict
+      # between the two .toolbar plugins. This one assumes bootstrap
+      # tooltip
+      editable.obj.tooltip(
+        selector: '.math-element'
+        placement: 'top'
+        title: 'Click anywhere in math to edit it'
+        trigger: 'hover',
+        template: TOOLTIP_TEMPLATE)
+
   SELECTOR = '.math-element' # ,.MathJax[role="textbox"][aria-readonly="true"],.MathJax_Display[role="textbox"][aria-readonly="true"]'
   Popover.register
     selector: SELECTOR
     populator: buildEditor
     placement: 'top'
-    focus: ($popover) ->
-      # Give focus to the text box
-      setTimeout( () ->
-        $popover.find('.formula').trigger('focus')
-      , 10)
+    markerclass: 'math-popover'
