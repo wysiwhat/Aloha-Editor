@@ -105,20 +105,22 @@
 
   </script>
 
-  <script src="src/lib/aloha.js" data-aloha-plugins="
-    oer/toolbar,
-    common/ui,
-    common/format,
-    common/paste,
-    common/block,
-    common/list,
-    common/table,
-    extra/draganddropfiles,
-    common/image,
-    cnx/popover,
-    cnx/math,
-    cnx/assorted
-  "></script>
+	<script src="src/lib/aloha.js" data-aloha-plugins="
+	  extra/toolbar,
+	  common/ui,
+	  common/format,
+	  common/paste,
+	  common/block,
+	  user/blockdemo,
+	  common/list,
+	  common/table,
+	  extra/draganddropfiles,
+	  common/image,
+    oerpub/popover,
+    oerpub/math,
+    oerpub/assorted,
+    cnx/note
+	"></script>
 
 </head>
 <body>
@@ -127,6 +129,15 @@
 <!--  The Editable Content  -->
 <!-- ====================== -->
   <div class="document" id="document">
+
+    <h1>Blockish Examples (note)</h1>
+    <div class="note">
+      <h2 class="title">Note Title</h2>
+      <p>Some body text</p>
+      <p>Some more body text</p>
+    </div>
+
+
     <h1>Math Examples</h1>
     <p>These are examples of math in the text.</p>
     <p>MathML with ASCIIMath in it:
