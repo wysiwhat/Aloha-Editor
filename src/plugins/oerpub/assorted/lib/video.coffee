@@ -1,6 +1,6 @@
-# Aloha Image Plugin
+# Aloha Video Plugin
 # * -----------------
-# * This plugin handles when the insertImage button is clicked and provides a bubble next to an image when it is selected
+# * This plugin handles when the insertVideo button is clicked
 #
 define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
 
@@ -11,21 +11,15 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     <form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Insert image blah</h3>
+        <h3>Insert video blah</h3>
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose a file</a> OR <a class="upload-url-link">get file from the Web</a>
-            <div class="placeholder preview hide">
-              <h4>Preview</h4>
-              <img class="preview-image"/>
-            </div>
-            <input type="file" class="upload-image-input" />
-            <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
+            <input type="url" class="upload-url-input" placeholder="Enter URL of video ..."/>
         </div>
         <div class="image-alt">
           <div class="forminfo">
-            Please provide a description of this image for the visually impaired.
+            Please provide a description of this video for the visually impaired.
           </div>
           <div>
             <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>
@@ -45,7 +39,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       # Find the dynamic modal elements and bind events to the buttons
       $placeholder = dialog.find('.placeholder.preview')
-      $uploadImage = dialog.find('.upload-image-input').hide()
       $uploadUrl =   dialog.find('.upload-url-input').hide()
       $submit = dialog.find('.action.insert')
 
@@ -101,25 +94,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         evt.preventDefault()
         $placeholder.hide()
         $uploadUrl.hide()
-        $uploadImage.click()
-        $uploadImage.show()
 
       dialog.find('.upload-url-link').on 'click', (evt) ->
         evt.preventDefault()
         $placeholder.hide()
-        $uploadImage.hide()
         $uploadUrl.show()
-
-      $uploadImage.on 'change', () ->
-        files = $uploadImage[0].files
-        # Parse the file and if it's an image set the imageSource
-        if files.length > 0
-          if settings.image.preview
-            $previewImg = $placeholder.find('img')
-            loadLocalFile files[0], $previewImg
-            $placeholder.show()
-          else
-            loadLocalFile files[0]
 
       $uploadUrl.on 'change', () ->
         $previewImg = $placeholder.find('img')
@@ -143,7 +122,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
           img.attr 'alt', dialog.find('[name=alt]').val()
           $el.replaceWith(img)
           $el = img
-        deferred.resolve(target: $el[0], files: $uploadImage[0].files)
         dialog.modal('hide')
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
@@ -237,7 +215,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       $el.off('.bubble')
 
 
-  UI.adopt 'insertImage-oer', null,
+  UI.adopt 'insertVideo-oer', null,
     click: () ->
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
