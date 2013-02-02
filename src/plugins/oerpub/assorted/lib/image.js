@@ -13,7 +13,6 @@
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
       $placeholder = dialog.find('.placeholder.preview');
-      $uploadImage = dialog.find('.upload-image-input').hide();
       $uploadUrl = dialog.find('.upload-url-input');
       $submit = dialog.find('.action.insert');
       if ($el.is('img')) {
@@ -28,17 +27,6 @@
         $uploadUrl.val(imageSource);
         $uploadUrl.show();
       }
-      /*
-      (function(img, baseurl) {
-        return img.onerror = function() {
-          var errimg;
-          errimg = baseurl + WARNING_IMAGE_PATH;
-          if (img.src !== errimg) {
-            return img.src = errimg;
-          }
-        };
-      })(dialog.find('.placeholder.preview img')[0], Aloha.settings.baseUrl);
-      */
       setImageSource = function(href) {
         imageSource = href;
         return $submit.removeClass('disabled');
@@ -57,31 +45,10 @@
         };
         return reader.readAsDataURL(file);
       };
-      dialog.find('.upload-image-link').on('click', function(evt) {
-        evt.preventDefault();
-        $placeholder.hide();
-        $uploadUrl.hide();
-        $uploadImage.click();
-        return $uploadImage.show();
-      });
       dialog.find('.upload-url-link').on('click', function(evt) {
         evt.preventDefault();
         $placeholder.hide();
-        $uploadImage.hide();
         return $uploadUrl.show();
-      });
-      $uploadImage.on('change', function() {
-        var $previewImg, files;
-        files = $uploadImage[0].files;
-        if (files.length > 0) {
-          if (settings.image.preview) {
-            $previewImg = $placeholder.find('img');
-            loadLocalFile(files[0], $previewImg);
-            return $placeholder.show();
-          } else {
-            return loadLocalFile(files[0]);
-          }
-        }
       });
       $uploadUrl.on('change', function() {
         var $previewImg, url;
@@ -107,10 +74,6 @@
           $el.replaceWith(img);
           $el = img;
         }
-        deferred.resolve({
-          target: $el[0],
-          files: $uploadImage[0].files
-        });
         return dialog.modal('hide');
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
