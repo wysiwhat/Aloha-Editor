@@ -126,7 +126,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
           dialog.modal('hide')
 
         video = jQuery(embedder.embed_code_gen(url));
-          # video.attr 'src', "http://www.youtube.com/embed/_kbd6troMgA?feature=player_detailpage" #--May need to do this for some types of videos
         video.attr 'alt', dialog.find('[name=alt]').val()
         return video
       # Uses the File API to render a preview of the image
@@ -174,10 +173,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
           console.debug("Embedding the video")
           # Embeds the video into the page
           video = getEmbedEle(videoSource)
-          console.debug($el)
-          console.debug(video)
           $el.replaceWith(video)
-          # $el = video
+          # $el = video -- not sure why this is necessary
           dialog.modal('hide')
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
