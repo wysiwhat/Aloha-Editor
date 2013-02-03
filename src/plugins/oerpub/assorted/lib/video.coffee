@@ -8,10 +8,10 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png'
 
   DIALOG_HTML = '''
-    <form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
+    <form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Insert video blah</h3>
+        <h3>Insert video</h3>
       </div>
       <div class="modal-body">
         <div class="image-options">
@@ -39,7 +39,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       # Find the dynamic modal elements and bind events to the buttons
       $placeholder = dialog.find('.placeholder.preview')
-      $uploadUrl =   dialog.find('.upload-url-input').hide()
+      $uploadUrl =   dialog.find('.upload-url-input')
       $submit = dialog.find('.action.insert')
 
       # If we're editing an image pull in the src.
@@ -65,13 +65,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       if /^https?:\/\//.test(imageSource)
         $uploadUrl.val(imageSource)
         $uploadUrl.show()
-
-      # Set onerror of preview image
-      ((img, baseurl) ->
-        img.onerror = ->
-          errimg = baseurl + WARNING_IMAGE_PATH
-          img.src = errimg unless img.src is errimg
-      ) dialog.find('.placeholder.preview img')[0], Aloha.settings.baseUrl
 
       setImageSource = (href) ->
         imageSource = href
@@ -214,9 +207,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       $el.data('aloha-bubble-selected', true)
       $el.off('.bubble')
 
-
   UI.adopt 'insertVideo-oer', null,
     click: () ->
+      console.log("VIDEO GOT CLICK");
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
       promise = showModalDialog(newEl)

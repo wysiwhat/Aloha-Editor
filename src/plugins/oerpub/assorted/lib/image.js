@@ -1,4 +1,4 @@
-(function() {
+console.log('HOWDY '+(function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
     var DIALOG_HTML, WARNING_IMAGE_PATH, populator, selector, showModalDialog, uploadImage;
@@ -187,6 +187,7 @@
     UI.adopt('insertImage-oer', null, {
       click: function() {
         var newEl, promise;
+        console.log("IMAGE GOT CLICK");
         newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
         GENTICS.Utils.Dom.insertIntoDOM(newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj);
         promise = showModalDialog(newEl);
@@ -213,4 +214,4 @@
     };
   });
 
-}).call(this);
+}).call(this));
