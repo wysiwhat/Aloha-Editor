@@ -3,16 +3,15 @@
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
     var DIALOG_HTML, WARNING_IMAGE_PATH, populator, selector, showModalDialog, uploadImage;
     WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
-    DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image blah</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <a class="upload-image-link">Choose a file</a> OR <a class="upload-url-link">get file from the Web</a>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        Please provide a description of this image for the visually impaired.\n      </div>\n      <div>\n        <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <input type="url" class="upload-url-input" placeholder="Enter URL of video ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        Please provide a description of this video for the visually impaired.\n      </div>\n      <div>\n        <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
-      var $placeholder, $submit, $uploadImage, $uploadUrl, deferred, dialog, imageAltText, imageSource, loadLocalFile, root, setImageSource, settings,
+      var $placeholder, $submit, $uploadUrl, deferred, dialog, imageAltText, imageSource, loadLocalFile, root, setImageSource, settings,
         _this = this;
       settings = Aloha.require('assorted/assorted-plugin').settings;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
       $placeholder = dialog.find('.placeholder.preview');
-      $uploadImage = dialog.find('.upload-image-input').hide();
-      $uploadUrl = dialog.find('.upload-url-input').hide();
+      $uploadUrl = dialog.find('.upload-url-input');
       $submit = dialog.find('.action.insert');
       if ($el.is('img')) {
         imageSource = $el.attr('src');
@@ -26,13 +25,6 @@
         $uploadUrl.val(imageSource);
         $uploadUrl.show();
       }
-      (function(img, baseurl) {
-        return img.onerror = function() {
-          var errimg;
-          errimg = baseurl + WARNING_IMAGE_PATH;
-          if (img.src !== errimg) return img.src = errimg;
-        };
-      })(dialog.find('.placeholder.preview img')[0], Aloha.settings.baseUrl);
       setImageSource = function(href) {
         imageSource = href;
         return $submit.removeClass('disabled');
@@ -50,28 +42,12 @@
       dialog.find('.upload-image-link').on('click', function(evt) {
         evt.preventDefault();
         $placeholder.hide();
-        $uploadUrl.hide();
-        $uploadImage.click();
-        return $uploadImage.show();
+        return $uploadUrl.hide();
       });
       dialog.find('.upload-url-link').on('click', function(evt) {
         evt.preventDefault();
         $placeholder.hide();
-        $uploadImage.hide();
         return $uploadUrl.show();
-      });
-      $uploadImage.on('change', function() {
-        var $previewImg, files;
-        files = $uploadImage[0].files;
-        if (files.length > 0) {
-          if (settings.image.preview) {
-            $previewImg = $placeholder.find('img');
-            loadLocalFile(files[0], $previewImg);
-            return $placeholder.show();
-          } else {
-            return loadLocalFile(files[0]);
-          }
-        }
       });
       $uploadUrl.on('change', function() {
         var $previewImg, url;
@@ -97,10 +73,6 @@
           $el.replaceWith(img);
           $el = img;
         }
-        deferred.resolve({
-          target: $el[0],
-          files: $uploadImage[0].files
-        });
         return dialog.modal('hide');
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
@@ -184,10 +156,9 @@
       $el.data('aloha-bubble-selected', true);
       return $el.off('.bubble');
     });
-    UI.adopt('insertImage-oer', null, {
+    UI.adopt('insertVideo-oer', null, {
       click: function() {
         var newEl, promise;
-        console.log("IMAGE GOT CLICK");
         newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
         GENTICS.Utils.Dom.insertIntoDOM(newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj);
         promise = showModalDialog(newEl);

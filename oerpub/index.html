@@ -93,7 +93,6 @@
                 // Search through parent links in the DOM until we find an element whose enclosing tag
                 // is one of the section heading tags
                 function getClosestHeadingParent(ele) {
-                    console.log('starting');
                     while(ele != null) {
                         console.log(ele);
                         if(ele.tagName && possibleHeadings.indexOf(ele.tagName.toUpperCase()) != -1) {
@@ -105,7 +104,6 @@
                         }
                         ele = ele.parentNode;
                     }
-                    console.log('returning');
                     console.log(ele);
                     return ele;
                 }
