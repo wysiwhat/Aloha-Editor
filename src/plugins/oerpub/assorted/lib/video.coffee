@@ -209,7 +209,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   UI.adopt 'insertVideo-oer', null,
     click: () ->
-      console.log("VIDEO GOT CLICK");
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
       promise = showModalDialog(newEl)

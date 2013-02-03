@@ -1,4 +1,4 @@
-console.log('HOWDY '+(function() {
+(function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
     var DIALOG_HTML, WARNING_IMAGE_PATH, populator, selector, showModalDialog, uploadImage;
@@ -214,4 +214,4 @@ console.log('HOWDY '+(function() {
     };
   });
 
-}).call(this));
+}).call(this);

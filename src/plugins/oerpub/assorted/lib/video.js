@@ -159,7 +159,6 @@
     UI.adopt('insertVideo-oer', null, {
       click: function() {
         var newEl, promise;
-        console.log("VIDEO GOT CLICK");
         newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
         GENTICS.Utils.Dom.insertIntoDOM(newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj);
         promise = showModalDialog(newEl);
