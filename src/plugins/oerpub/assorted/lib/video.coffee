@@ -31,7 +31,43 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <button class="btn action cancel">Cancel</button>
       </div>
     </form>'''
+  # Defines a template for an embedder object which is responsible for generating embed html and validating a url
+  embedder = (url_validator, embed_code_generator) ->
+    this.embed_code_gen = embed_code_generator
+    this.url_validator = url_validator
+    embed_code_generator = (url) ->
+      # Generates embed html -- this function should be replaced
+      embed_html = '<p> Hello World </p>'
+      '''
+      Validates a URL. Returns video id if URL is valide. Else returns false.
+      Should be replaced with actual function. The default validates youtube URLs
+      '''
+    url_validator = (url) ->
+      regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
+      result = if(url.match(regexp)) then RegExp.$1 else false
+    set_embed_code_generator = (url) ->
+      this.embed_code_gen = embed_code_generator
+    set_url_validator = (url) ->
+      this.url_validator = url_validator
+    result = this
 
+  # Creates a youtube embedder
+  youtube_url_validator = (url) ->
+    regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
+    result = if(url.match(regexp)) then RegExp.$1 else false
+  
+  youtube_embed_code_generator = (url) ->
+    video_id = youtube_url_validator(url)
+    embed_html = ''
+    if (video_id)
+      embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe></div>'
+    return embed_html
+  youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator)
+
+  # Adds the youtube embedders to the list of embedders
+  embedders = []
+  embedders[0] = youtube_embedder
+  console.debug 'initializing'
   showModalDialog = ($el) ->
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
@@ -54,31 +90,54 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       if $el.is('img')
         # On submit $el.attr('src') will point to what is set in this variable
         # preserve the alt text if editing an image
-        imageSource = $el.attr('src')
+        videoSource = $el.attr('src')
         imageAltText = $el.attr('alt')
       else
-        imageSource = ''
+        videoSource = ''
         imageAltText = ''
 
       dialog.find('[name=alt]').val(imageAltText)
-
-      if /^https?:\/\//.test(imageSource)
-        $uploadUrl.val(imageSource)
+      # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
+      checkURL = (url) ->
+        for embedder in embedders
+          if (embedder.url_validator(url)) 
+            return true
+        return false
+      console.debug 'Checking'
+      # /^https?:\/\// - old regex
+      if checkURL(videoSource)
+        console.debug 'Checked'
+        $uploadUrl.val(videoSource)
         $uploadUrl.show()
-
-      setImageSource = (href) ->
-        imageSource = href
+      # Retrieves embedder which can matches the format of the URL
+      getEmbedder = (url) ->
+        for embedder in embedders
+          if (embedder.url_validator(url)) 
+            return embedder
+        return false
+      setvideoSource = (href) ->
+        videoSource = href
         $submit.removeClass('disabled')
+      getEmbedEle = (url) ->
+        # Retrieves the embedder for this type of video
+        if(!(embedder = getEmbedder(url)))
+          console.debug("Error: URL not supported")
+          # TODO - ADD HELPFUL MESSAGE TO USER
+          dialog.modal('hide')
 
+        video = jQuery(embedder.embed_code_gen(url));
+          # video.attr 'src', "http://www.youtube.com/embed/_kbd6troMgA?feature=player_detailpage" #--May need to do this for some types of videos
+        video.attr 'alt', dialog.find('[name=alt]').val()
+        return video
       # Uses the File API to render a preview of the image
-      # and updates the modal's imageSource
+      # and updates the modal's videoSource
       loadLocalFile = (file, $img, callback) ->
         reader = new FileReader()
         reader.onloadend = () ->
           if $img
             $img.attr('src', reader.result)
-          # If we get an image then update the modal's imageSource
-          setImageSource(reader.result)
+          # If we get an image then update the modal's videoSource
+          setvideoSource(reader.result)
           callback(reader.result) if callback
         reader.readAsDataURL(file)
 
@@ -87,6 +146,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         evt.preventDefault()
         $placeholder.hide()
         $uploadUrl.hide()
+        console.debug 'Hiding placeholder url'
 
       dialog.find('.upload-url-link').on 'click', (evt) ->
         evt.preventDefault()
@@ -96,26 +156,29 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       $uploadUrl.on 'change', () ->
         $previewImg = $placeholder.find('img')
         url = $uploadUrl.val()
-        setImageSource(url)
+        setvideoSource(url)
+        console.debug 'changing'
         if settings.image.preview
           $previewImg.attr 'src', url
           $placeholder.show()
 
-      # On save update the actual img tag. Use the submit event because this
+      # On save update the actual video element. Use the submit event because this
       # allows the use of html5 validation.
       deferred = $.Deferred()
       dialog.on 'submit', (evt) =>
         evt.preventDefault() # Don't submit the form
         if $el.is('img')
-          $el.attr 'src', imageSource
+          $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
         else
-          img = jQuery('<img/>')
-          img.attr 'src', imageSource
-          img.attr 'alt', dialog.find('[name=alt]').val()
-          $el.replaceWith(img)
-          $el = img
-        dialog.modal('hide')
+          console.debug("Embedding the video")
+          # Embeds the video into the page
+          video = getEmbedEle(videoSource)
+          console.debug($el)
+          console.debug(video)
+          $el.replaceWith(video)
+          # $el = video
+          dialog.modal('hide')
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form

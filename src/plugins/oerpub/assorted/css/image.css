@@ -24,6 +24,12 @@ form#linkModal:focus {
     outline: none;
 }
 
+.multimedia-video{
+    /*border: 10px solid #0000FF;*/
+    width: 500px;
+    height: 500px;
+}
+
 .placeholder.preview {
     border: 1px solid #dddddd;
     border-radius: 5px;
