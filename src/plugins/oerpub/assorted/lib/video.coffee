@@ -15,7 +15,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <input type="url" class="upload-url-input" placeholder="Enter URL of video ..."/>
+            <input type="text" onkeyup="validateURLInput" class="upload-url-input" placeholder="Enter URL of video ..."/>
         </div>
         <div class="image-alt">
           <div class="forminfo">
@@ -60,7 +60,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     video_id = youtube_url_validator(url)
     embed_html = ''
     if (video_id)
-      embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe></div>'
+      embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
     return embed_html
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator)
 
@@ -68,6 +68,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   embedders = []
   embedders[0] = youtube_embedder
   console.debug 'initializing'
+
+  checkURL = (url) ->
+    for embedder in embedders
+      if (embedder.url_validator(url)) 
+        return true
+    return false
+
+  validateURLInput = (ele) ->
+    console.log('In validateURLInput')
+
   showModalDialog = ($el) ->
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
@@ -98,11 +108,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.find('[name=alt]').val(imageAltText)
       # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
-      checkURL = (url) ->
-        for embedder in embedders
-          if (embedder.url_validator(url)) 
-            return true
-        return false
       console.debug 'Checking'
       # /^https?:\/\// - old regex
       if checkURL(videoSource)
