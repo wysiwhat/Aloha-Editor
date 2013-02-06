@@ -4,34 +4,6 @@
 #
 define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
 
-  # This will be prefixed with Aloha.settings.baseUrl
-  WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png'
-
-  DIALOG_HTML = '''
-    <form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Insert video</h3>
-      </div>
-      <div class="modal-body">
-        <div class="image-options">
-            <input type="text" onkeyup="validateURLInput" class="upload-url-input" placeholder="Enter URL of video ..."/>
-        </div>
-        <div class="image-alt">
-          <div class="forminfo">
-            Please provide a description of this video for the visually impaired.
-          </div>
-          <div>
-            <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary action insert">Save</button>
-        <button class="btn action cancel">Cancel</button>
-      </div>
-    </form>'''
-  # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   embedder = (url_validator, embed_code_generator) ->
     this.embed_code_gen = embed_code_generator
     this.url_validator = url_validator
@@ -75,9 +47,35 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         return true
     return false
 
-  validateURLInput = (ele) ->
-    console.log('In validateURLInput')
+  # This will be prefixed with Aloha.settings.baseUrl
+  WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png'
 
+  DIALOG_HTML = '''
+    <form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Insert video</h3>
+      </div>
+      <div class="modal-body">
+        <div class="image-options">
+            <input type="text" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/>
+        </div>
+        <div class="image-alt">
+          <div class="forminfo">
+            Please provide a description of this video for the visually impaired.
+          </div>
+          <div>
+            <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button class="btn action cancel">Cancel</button>
+      </div>
+    </form>'''
+
+  # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
@@ -87,6 +85,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       $placeholder = dialog.find('.placeholder.preview')
       $uploadUrl =   dialog.find('.upload-url-input')
       $submit = dialog.find('.action.insert')
+      dialog.find("#video-url-input")[0].onkeyup = (event) -> 
+        target = event.currentTarget
+        currentVal = target.value
+        valid = checkURL(currentVal)
+        if(valid) 
+            target.style.borderColor='green'
+            target.style.borderWidth='medium'
+        else
+            target.style.borderColor='red'
+            target.style.borderWidth='medium'
 
       # If we're editing an image pull in the src.
       # It will be undefined if this is a new image.
