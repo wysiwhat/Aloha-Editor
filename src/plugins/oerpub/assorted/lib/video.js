@@ -1,9 +1,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
-    var DIALOG_HTML, WARNING_IMAGE_PATH, embedder, embedders, populator, selector, showModalDialog, uploadImage, youtube_embed_code_generator, youtube_embedder, youtube_url_validator;
-    WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
-    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <input type="url" class="upload-url-input" placeholder="Enter URL of video ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        Please provide a description of this video for the visually impaired.\n      </div>\n      <div>\n        <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    var DIALOG_HTML, WARNING_IMAGE_PATH, checkURL, embedder, embedders, populator, selector, showModalDialog, uploadImage, youtube_embed_code_generator, youtube_embedder, youtube_url_validator;
     embedder = function(url_validator, embed_code_generator) {
       var result, set_embed_code_generator, set_url_validator;
       this.embed_code_gen = embed_code_generator;
@@ -36,7 +34,7 @@
       video_id = youtube_url_validator(url);
       embed_html = '';
       if (video_id) {
-        embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe></div>';
+        embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>';
       }
       return embed_html;
     };
@@ -44,8 +42,18 @@
     embedders = [];
     embedders[0] = youtube_embedder;
     console.debug('initializing');
+    checkURL = function(url) {
+      var embedder, _i, _len;
+      for (_i = 0, _len = embedders.length; _i < _len; _i++) {
+        embedder = embedders[_i];
+        if (embedder.url_validator(url)) return true;
+      }
+      return false;
+    };
+    WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
+    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <input type="text" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        Please provide a description of this video for the visually impaired.\n      </div>\n      <div>\n        <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
-      var $placeholder, $submit, $uploadUrl, checkURL, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
+      var $placeholder, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
         _this = this;
       settings = Aloha.require('assorted/assorted-plugin').settings;
       root = Aloha.activeEditable.obj;
@@ -53,6 +61,19 @@
       $placeholder = dialog.find('.placeholder.preview');
       $uploadUrl = dialog.find('.upload-url-input');
       $submit = dialog.find('.action.insert');
+      dialog.find("#video-url-input")[0].onkeyup = function(event) {
+        var currentVal, target, valid;
+        target = event.currentTarget;
+        currentVal = target.value;
+        valid = checkURL(currentVal);
+        if (valid) {
+          target.style.borderColor = 'green';
+          return target.style.borderWidth = 'medium';
+        } else {
+          target.style.borderColor = 'red';
+          return target.style.borderWidth = 'medium';
+        }
+      };
       if ($el.is('img')) {
         videoSource = $el.attr('src');
         imageAltText = $el.attr('alt');
@@ -61,14 +82,6 @@
         imageAltText = '';
       }
       dialog.find('[name=alt]').val(imageAltText);
-      checkURL = function(url) {
-        var embedder, _i, _len;
-        for (_i = 0, _len = embedders.length; _i < _len; _i++) {
-          embedder = embedders[_i];
-          if (embedder.url_validator(url)) return true;
-        }
-        return false;
-      };
       console.debug('Checking');
       if (checkURL(videoSource)) {
         console.debug('Checked');
