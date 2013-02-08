@@ -36,7 +36,7 @@
       video_id = youtube_url_validator(url);
       embed_html = '';
       if (video_id) {
-        embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe></div>';
+        embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>';
       }
       return embed_html;
     };
