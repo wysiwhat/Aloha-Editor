@@ -7,18 +7,18 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
             <textarea type="text" class="formula" rows="1"
                       placeholder="Insert your math notation here"></textarea>
         </div>
-        <span>This is:</span>
-        <label class="radio inline">
-            <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath
-        </label>
-        <label class="radio inline">
-            <input type="radio" name="mime-type" value="math/tex"> LaTeX
-        </label>
-        <label class="radio inline mime-type-mathml">
-            <input type="radio" name="mime-type" value="math/mml"> MathML
-        </label>
         <div class="footer">
-            <button class="btn btn-primary done">Done</button>
+          <span>This is:</span>
+          <label class="radio inline">
+              <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath
+          </label>
+          <label class="radio inline">
+              <input type="radio" name="mime-type" value="math/tex"> LaTeX
+          </label>
+          <label class="radio inline mime-type-mathml">
+              <input type="radio" name="mime-type" value="math/mml"> MathML
+          </label>
+          <button class="btn btn-primary done">Done</button>
         </div>
     </div>
   '''
@@ -37,16 +37,31 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
   # Wait until Aloha is started before loading MathJax
   # Also, wrap all math in a span/div. MathJax replaces the MathJax element
   # losing all jQuery data attached to it (like popover data, the original Math Formula, etc)
-  # add aloha-cleanme so this span is unwrapped
+  # add `aloha-ephemera-wrapper` so this span is unwrapped
   Aloha.ready ->
     MathJax.Hub.Configured() if MathJax?
 
-  Aloha.bind 'aloha-editable-activated', (evt, ed) ->
-    ed.editable.obj.find('math').wrap '<span class="math-element aloha-cleanme"></span>'
+  getMathFor = (id) ->
+    jax = MathJax?.Hub.getJaxFor id
+    if jax
+      mathStr = jax.root.toMathML()
+      jQuery(mathStr)
 
+  squirrelMath = ($el) ->
+    $el.parent().children('.MathJax_Preview, .MathJax, .MathJax_Display, script').addClass 'aloha-ephemera'
+    $mml = getMathFor $el.attr('id')
+    $el.parent().remove('math')
+    $el.parent().append($mml)
+
+  Aloha.bind 'aloha-editable-activated', (evt, ed) ->
+    ed.editable.obj.find('math').wrap '<span class="math-element aloha-ephemera-wrapper"></span>'
+    MathJax.Hub.Queue ->
+      jQuery.each MathJax.Hub.getAllJax(), (i, jax) ->
+        $el = jQuery "##{ jax.inputID }"
+        squirrelMath($el)
 
   insertMath = () ->
-    $el = jQuery('<span class="math-element aloha-cleanme"></span>')
+    $el = jQuery('<span class="math-element aloha-ephemera-wrapper">&#160;</span>') # nbsp
     range = Aloha.Selection.getRangeObject()
     if range.isCollapsed()
       GENTICS.Utils.Dom.insertIntoDOM $el, range, Aloha.activeEditable.obj
@@ -82,7 +97,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
   triggerMathJax = ($el, cb) ->
     if MathJax?
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, $el[0], cb]
+      # Be sure to squirrel away the MathML because the DOM only contains the HTML+CSS output
+      callback = () ->
+        $mathJaxEl = $el.children('.MathJax')
+        squirrelMath $mathJaxEl
+        cb()
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, $el[0], callback]
     else
       console.log 'MathJax was not loaded properly'
 
@@ -97,6 +117,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     $editor = jQuery(EDITOR_HTML)
     # Bind some actions for the buttons
     $editor.find('.done').on 'click', =>
+      if not $span.next().is '.aloha-ephemera-wrapper'
+        # a math meta-element needs to followed by a non-breaking space in a span
+        $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span)
       $span.trigger 'hide'
     $editor.find('.remove').on 'click', =>
       $span.trigger 'hide'
@@ -149,7 +172,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         if $math[0] # Webkit browsers don't natively support MathML
           $annotation = $math.find('annotation')
           if not $annotation[0]?
-            $annotation = jQuery('<annotation></annotation>').prependTo($math)
+            if $mathml.children().length > 1 # Wrap math equation in mrow if equation is more than one single child
+              $mathml.wrapInner('<mrow></mrow>')
+            $annotation = jQuery('<annotation></annotation>').appendTo($mathml)
+            $mathml.wrapInner('<semantics></semantics>')
           $annotation.attr('encoding', mimeType)
           $annotation.text(formula)
           makeCloseIcon($span)
@@ -173,7 +199,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         setTimeout(keyDelay.bind($formula), 500)
 
     $span.off('shown-popover').on 'shown-popover', () ->
-      $span.css 'background-color', '#E5EEF5'      
+      $span.css 'background-color', '#E5EEF5'
       $el = jQuery(@)
       tt = $el.data('tooltip')
       tt.hide().disable() if tt
@@ -183,7 +209,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       , 10)
 
     $span.off('hidden-popover').on 'hidden-popover', () ->
-      $span.css 'background-color', ''      
+      $span.css 'background-color', ''
       tt = jQuery(@).data('tooltip')
       tt.enable() if tt
       cleanupFormula($editor, jQuery(@))
@@ -191,7 +217,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     $editor
 
   makeCloseIcon = ($el) ->
-      closer = jQuery('<a class="math-element-destroy aloha-ephemera" title="Delete math">&nbsp;</a>')
+      closer = jQuery('<a class="math-element-destroy aloha-ephemera" title="Delete\u00A0math">&nbsp;</a>')
       if jQuery.ui and jQuery.ui.tooltip
         closer.tooltip()
       else
@@ -206,6 +232,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
   Aloha.bind 'aloha-editable-activated', (event, data) ->
     editable = data.editable
+
     jQuery(editable.obj).on 'click.matheditor', '.math-element, .math-element *', (evt) ->
       $el = jQuery(@)
 
@@ -238,6 +265,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
     editable.obj.find('.math-element').each () ->
       makeCloseIcon(jQuery(this))
+      $span = $(this)
+      if not $span.next().is '.aloha-ephemera-wrapper'
+        # a math meta-element needs to followed by a non-breaking space in a span
+        $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span)
 
     editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
       jQuery(e.target).tooltip('destroy')
