@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>OER Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>OER Editor</title>
 
 	<link rel="stylesheet" href="src/css/aloha.css" type="text/css"/>
   <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css"/>
@@ -49,13 +49,13 @@
   </script>
   -->
 
-	<script type="text/javascript">
-		Aloha = window.Aloha || {};
+  <script type="text/javascript">
+    Aloha = window.Aloha || {};
 
-		Aloha.settings = {
-			jQuery: window.jQuery,
-			logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
-			errorhandling : true,
+    Aloha.settings = {
+      jQuery: window.jQuery,
+      logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
+      errorhandling : true,
 
       requireConfig: {
         paths: {
@@ -113,7 +113,7 @@
 			}
 		};
 
-	</script>
+  </script>
 
   <script src="src/lib/aloha.js" data-aloha-plugins="
     oer/toolbar,
@@ -256,7 +256,7 @@
     <p>A signal's complexity is not related to how wiggly it is. Rather, a signal expert looks for ways of <a href="http://cnx.org/content/m9003">decomposing a given signal</a> into a <strong>sum of simpler signals</strong>, which we term the <strong>signal decomposition</strong>. Though we will never compute a signal's complexity, it essentially equals the number of terms in its decomposition. In writing a signal as a sum of component signals, we can change the component signal's gain by multiplying it by a constant and by delaying it.</p>
 
     <figure class="figure">
-    	<div class="title">A Title for a Figure</div>
+      <div class="title">A Title for a Figure</div>
       <img src="src/test/AlohaEditorLogo.png"/>
       <figcaption>This is a caption on a figure</figcaption>
     </figure>
@@ -293,6 +293,13 @@
     //});
     Aloha.ready( function() {
       Aloha.jQuery('.document').aloha().focus();
+    });
+  </script>
+</body>
+</html>
+ery('math').wrap('<span class="math-element aloha-cleanme"></span>')
+      MathJax.Hub.Configured();
+      //$('*[rel=tooltip]').tooltip();
     });
   </script>
 </body>
