@@ -46,12 +46,13 @@
       var $maths;
       $maths = ed.editable.obj.find('math');
       $maths.wrap('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>');
-      return jQuery.each($maths, function(i, el) {
+      jQuery.each($maths, function(i, el) {
         var $el, $mathElement;
         $el = jQuery(el);
         $mathElement = $el.parent().parent();
         return triggerMathJax($mathElement);
       });
+      return MathJax.Hub.Queue(["Typeset", MathJax.Hub, ed.editable.obj[0]]);
       /*
           MathJax.Hub.Queue ->
             jQuery.each MathJax.Hub.getAllJax(), (i, jax) ->

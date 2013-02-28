@@ -107,6 +107,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       $mathElement = $el.parent().parent()
       triggerMathJax $mathElement
 
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, ed.editable.obj[0]]
+
     ###
     MathJax.Hub.Queue ->
       jQuery.each MathJax.Hub.getAllJax(), (i, jax) ->
