@@ -2,13 +2,12 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cnx/angular/css/angular.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
-    var DIALOG_HTML, attachExpressionEvents, attachVariableEvents, insertNgVariable, showModalDialog, variablePopulator,
+    var DIALOG_HTML, attachExpressionEvents, attachVariableEvents, expressionPopulator, insertNgVariable, showModalDialog, updateExpression, variablePopulator,
       _this = this;
     DIALOG_HTML = '<form class="modal" id="angular-variable-modal" tabindex="-1" role="dialog" aria-labelledby="angular-variable-modalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="angular-variable-modalLabel">Add Variable</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <h4>Variable name</h4>\n      <div>\n        <input id="angular-variable-name" class="input-xlarge" type="text" placeholder="Enter a variable name here" required />\n      </div>\n    </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
     attachVariableEvents = function($el) {
-      var _this = this;
       $el.alohaBlock();
-      $el.each(function(i, node) {
+      return $el.each(function(i, node) {
         var $input, $node;
         $node = jQuery(node);
         $node.tooltip({
@@ -18,33 +17,24 @@
         $input.val($node.data('ng-value') || '0');
         return $node.children('.ng-model-value').text($input.val());
       });
-      $el.on('mousedown', function(evt) {
-        var $input;
-        $el = jQuery(evt.target);
-        $el.data('startX', evt.pageX);
-        $input = $el.children('.ng-model-input');
-        return $el.data('startValue', parseFloat($input.val() || 0));
-      });
-      $el.on('mousemove', function(evt) {
-        var $input, diff, startValue;
-        $el = jQuery(evt.target);
-        if (!$el.data('startX')) {
-          return;
-        }
-        $input = $el.children('.ng-model-input');
-        diff = evt.pageX - $el.data('startX');
-        startValue = $el.data('startValue');
-        $input.val(diff + startValue);
-        return $input.trigger('input');
-      });
-      return $el.on('mouseup', function(evt) {
-        var x;
-        $el = jQuery(evt.target);
-        return x = $el.data('startX', null);
-      });
     };
     attachExpressionEvents = function($el) {
       return $el.alohaBlock();
+    };
+    updateExpression = function($el, expression) {
+      var $allVariables, $editable, $rendered,
+        _this = this;
+      $el.data('ng-expression', expression);
+      $el.find('.ng-expression-rendered').remove();
+      $rendered = jQuery('<span></span>').addClass('ng-expression-rendered').attr('ng-bind', expression).appendTo($el);
+      $editable = $el.parents('.aloha-editable').last();
+      $allVariables = $editable.find('.ng-model-wrapper');
+      angular.bootstrap($editable);
+      return $allVariables.each(function(i, el) {
+        $el = jQuery(el);
+        $el.find('input').val($el.data('ng-value') || '0');
+        return $el.find('input').trigger('input');
+      });
     };
     Aloha.bind('aloha-editable-activated', function(evt, ed) {
       var $app;
@@ -52,38 +42,23 @@
       attachVariableEvents($app.find('.ng-model-wrapper'));
       attachExpressionEvents($app.find('.ng-expression-wrapper'));
       $app.on('input', '.ng-model-input', function(evt) {
-        var $el;
+        var $el, val;
         $el = jQuery(evt.target);
-        return $el.parent().children('.ng-model-value').text($el.val());
-      });
-      $app.on('input', '.ng-expression-input', function(evt) {
-        var $el, $rendered;
-        $el = jQuery(evt.target);
-        $el.parent().find('.ng-expression-rendered').remove();
-        $rendered = jQuery('<span></span>').addClass('ng-expression-rendered').attr('ng-bind', $el.val());
-        $el.parent().append($rendered);
-        $app.find('.ng-model-wrapper input').each(function(i, el) {
-          $el = jQuery(el);
-          return $el.data('ng-value', $el.val());
-        });
-        angular.bootstrap($app[0]);
-        return $app.find('.ng-model-wrapper input').each(function(i, el) {
-          $el = jQuery(el);
-          $el.val($el.data('ng-value') || '0');
-          return $el.trigger('input');
-        });
+        val = parseFloat($el.val());
+        $el.data('ng-value', val);
+        return $el.parent().children('.ng-model-value').text(val);
       });
       return angular.bootstrap($app[0]);
     });
     showModalDialog = function($el) {
-      var dialog, root,
+      var $input, dialog, root,
         _this = this;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
+      $input = dialog.find('#angular-variable-name');
       dialog.on('submit', function(evt) {
-        var $input, variableName;
+        var variableName;
         evt.preventDefault();
-        $input = dialog.find('#angular-variable-name');
         variableName = $input.val();
         $el.attr('data-variable', variableName);
         $el.children('input').attr('ng-model', variableName);
@@ -93,6 +68,9 @@
       dialog.on('hidden', function() {
         return dialog.remove();
       });
+      setTimeout((function() {
+        return $input.focus();
+      }), 100);
       return dialog;
     };
     insertNgVariable = function() {
@@ -146,9 +124,8 @@
     UI.adopt('insertNgExpression', null, {
       click: function() {
         var $newExpression, range, setExpression;
-        $newExpression = jQuery('<span contenteditable="false" class="aloha-new-link ng-expression-wrapper"><input class="ng-expression-input" value="x+y"/><span class="ng-expression-rendered">{{x+y}}</span></span>');
+        $newExpression = jQuery('<span contenteditable="false" class="aloha-new-link ng-expression-wrapper"><span class="ng-expression-rendered">{{x+y}}</span></span>');
         setExpression = function($expr, value) {
-          $expr.find('input').val(value);
           return $expr.find('.ng-expression-rendered').text("{{" + value + "}}");
         };
         range = Aloha.Selection.getRangeObject();
@@ -165,7 +142,8 @@
         }
         $newExpression = Aloha.activeEditable.obj.find('.aloha-new-link');
         $newExpression.removeClass('aloha-new-link');
-        return $newExpression.alohaBlock();
+        $newExpression.alohaBlock();
+        return $newExpression.trigger('show');
       }
     });
     variablePopulator = function($el) {
@@ -173,13 +151,13 @@
       $min = jQuery('<input style="width: 2em;"/>');
       $max = jQuery('<input style="width: 2em;"/>');
       $slider = jQuery('<span></span>');
-      $bubble = jQuery('<span></span>');
+      $bubble = jQuery('<span class="aloha-dialog"></span>');
       $bubble.append($min);
       $bubble.append($slider);
       $bubble.append($max);
-      min = $el.data('min') || 0;
-      max = $el.data('max') || 100;
-      val = Math.max(min, Math.min($el.data('value') || 0, max));
+      min = $el.data('ng-min') || 0;
+      max = $el.data('ng-max') || 100;
+      val = Math.max(min, Math.min($el.data('ng-value') || 0, max));
       $min.val(min);
       $max.val(max);
       $slider.slider({
@@ -192,7 +170,8 @@
           $input = $el.children('.ng-model-input');
           $input.val(val);
           $input.trigger('input');
-          return $el.children('.ng-model-value').text(val);
+          $el.children('.ng-model-value').text(val);
+          return $el.data('ng-value', val);
         }
       });
       $min.on('input', function() {
@@ -211,10 +190,31 @@
       });
       return $bubble;
     };
-    return Popover.register({
+    expressionPopulator = function($el) {
+      var $bubble, $done, $expression;
+      $expression = jQuery('<input style="width: 7em;"/>');
+      $done = jQuery('<button class="btn btn-primary">Done</button>');
+      $bubble = jQuery('<span class="aloha-dialog"></span>');
+      $bubble.append($expression);
+      $bubble.append($done);
+      $expression.val($el.data('ng-expression'));
+      $done.on('click', function() {
+        var expression;
+        expression = $expression.val();
+        updateExpression($el, expression);
+        return $el.trigger('hide');
+      });
+      return $bubble;
+    };
+    Popover.register({
       hover: false,
       selector: '.ng-model-wrapper',
       populator: variablePopulator
+    });
+    return Popover.register({
+      hover: false,
+      selector: '.ng-expression-wrapper',
+      populator: expressionPopulator
     });
   });
 

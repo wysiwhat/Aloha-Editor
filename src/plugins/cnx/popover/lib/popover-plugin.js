@@ -362,9 +362,14 @@ There are 3 variables that are stored on each element;
         }
       });
       BlockManager.bind('block-selection-change', function(activeBlocks) {
-        var $el, _ref;
+        var $el, _ref, _ref1, _ref2;
         if ((_ref = activeBlocks[0]) != null ? _ref.$element.is(helper.selector) : void 0) {
           $el = activeBlocks[0].$element;
+          if ((_ref1 = Aloha.activeEditable) != null) {
+            if ((_ref2 = _ref1.obj) != null) {
+              _ref2.find(helper.selector).not($el).trigger('hide');
+            }
+          }
           $el.trigger('show');
           $el.data('aloha-bubble-selected', true);
           $el.off('.bubble');

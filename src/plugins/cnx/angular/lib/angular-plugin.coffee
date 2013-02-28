@@ -29,30 +29,29 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       $node.children('.ng-model-value').text $input.val()
 
 
-    $el.on 'mousedown', (evt) =>
-      $el = jQuery(evt.target)
-      $el.data('startX', evt.pageX)
-      $input = $el.children('.ng-model-input')
-      $el.data('startValue', parseFloat($input.val() or 0))
-
-    $el.on 'mousemove', (evt) =>
-      $el = jQuery(evt.target)
-      return if not $el.data('startX')
-      $input = $el.children('.ng-model-input')
-
-      diff = evt.pageX - $el.data('startX')
-      startValue = $el.data('startValue')
-      $input.val(diff + startValue)
-      $input.trigger 'input'
-
-    $el.on 'mouseup', (evt) =>
-      $el = jQuery(evt.target)
-      x = $el.data('startX', null)
-
-
-
   attachExpressionEvents = ($el) ->
     $el.alohaBlock()
+
+  updateExpression = ($el, expression) ->
+    $el.data 'ng-expression', expression
+    $el.find('.ng-expression-rendered').remove()
+    $rendered = jQuery('<span></span>')
+    .addClass('ng-expression-rendered')
+    .attr('ng-bind', expression)
+    .appendTo($el)
+
+    # Squirrel away the input values since `anular.bootstrap` clears them for some reason
+    $editable = $el.parents('.aloha-editable').last()
+    $allVariables = $editable.find('.ng-model-wrapper')
+
+    angular.bootstrap($editable)
+
+    # UN-Squirrel away the input values since `anular.bootstrap` clears them for some reason
+    $allVariables.each (i, el) =>
+      $el = jQuery(el)
+      $el.find('input').val($el.data('ng-value') or '0')
+      # Trigger that the input changed
+      $el.find('input').trigger('input')
 
 
   Aloha.bind 'aloha-editable-activated', (evt, ed) =>
@@ -64,30 +63,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
     $app.on 'input', '.ng-model-input', (evt) =>
       $el = jQuery(evt.target)
-      $el.parent().children('.ng-model-value').text $el.val()
-
-    $app.on 'input', '.ng-expression-input', (evt) =>
-      $el = jQuery(evt.target)
-      $el.parent().find('.ng-expression-rendered').remove()
-      $rendered = jQuery('<span></span>')
-      .addClass('ng-expression-rendered')
-      .attr('ng-bind', $el.val())
-
-      $el.parent().append($rendered)
-
-      # Squirrel away the input values since `anular.bootstrap` clears them for some reason
-      $app.find('.ng-model-wrapper input').each (i, el) =>
-        $el = jQuery(el)
-        $el.data('ng-value', $el.val())
-
-      angular.bootstrap($app[0])
-
-      # UN-Squirrel away the input values since `anular.bootstrap` clears them for some reason
-      $app.find('.ng-model-wrapper input').each (i, el) =>
-        $el = jQuery(el)
-        $el.val($el.data('ng-value') or '0')
-        # Trigger that the input changed
-        $el.trigger('input')
+      val = parseFloat($el.val())
+      $el.data('ng-value', val)
+      $el.parent().children('.ng-model-value').text val
 
     angular.bootstrap($app[0])
 
@@ -98,11 +76,11 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       root = Aloha.activeEditable.obj
       dialog = jQuery(DIALOG_HTML)
 
+      $input = dialog.find('#angular-variable-name')
       dialog.on 'submit', (evt) =>
         evt.preventDefault()
 
         # Set the variable name
-        $input = dialog.find('#angular-variable-name')
         variableName = $input.val()
         $el.attr 'data-variable', variableName
         $el.children('input').attr('ng-model', variableName)
@@ -111,6 +89,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       dialog.modal('show')
       dialog.on 'hidden', () ->
         dialog.remove()
+
+      setTimeout (-> $input.focus()), 100
       dialog
 
 
@@ -177,9 +157,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
   # Register the button with an action
   UI.adopt 'insertNgExpression', null,
     click: () ->
-      $newExpression = jQuery('<span contenteditable="false" class="aloha-new-link ng-expression-wrapper"><input class="ng-expression-input" value="x+y"/><span class="ng-expression-rendered">{{x+y}}</span></span>')
+      $newExpression = jQuery('<span contenteditable="false" class="aloha-new-link ng-expression-wrapper"><span class="ng-expression-rendered">{{x+y}}</span></span>')
       setExpression = ($expr, value) ->
-        $expr.find('input').val(value)
         $expr.find('.ng-expression-rendered').text("{{#{value}}}")
 
 
@@ -208,6 +187,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       $newExpression.removeClass('aloha-new-link')
 
       $newExpression.alohaBlock()
+      $newExpression.trigger 'show'
 
 
   variablePopulator = ($el) ->
@@ -215,15 +195,15 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     $max = jQuery('<input style="width: 2em;"/>')
     $slider = jQuery('<span></span>')
 
-    $bubble = jQuery('<span></span>')
+    $bubble = jQuery('<span class="aloha-dialog"></span>')
     $bubble.append $min
     $bubble.append $slider
     $bubble.append $max
 
     # Set the values for min/max
-    min = $el.data('min') or 0
-    max = $el.data('max') or 100
-    val = Math.max(min, Math.min($el.data('value') or 0, max))
+    min = $el.data('ng-min') or 0
+    max = $el.data('ng-max') or 100
+    val = Math.max(min, Math.min($el.data('ng-value') or 0, max))
 
     $min.val(min)
     $max.val(max)
@@ -239,6 +219,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         $input.trigger 'input'
 
         $el.children('.ng-model-value').text(val)
+        $el.data 'ng-value', val
 
     $min.on 'input', ->
       val = $min.val()
@@ -252,6 +233,23 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       $slider.slider
         max: val
 
+    return $bubble
+
+
+  expressionPopulator = ($el) ->
+    $expression = jQuery('<input style="width: 7em;"/>')
+    $done = jQuery('<button class="btn btn-primary">Done</button>')
+
+    $bubble = jQuery('<span class="aloha-dialog"></span>')
+    $bubble.append $expression
+    $bubble.append $done
+
+
+    $expression.val($el.data 'ng-expression')
+    $done.on 'click', ->
+      expression = $expression.val()
+      updateExpression($el, expression)
+      $el.trigger 'hide'
 
     return $bubble
 
@@ -260,3 +258,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     hover: false
     selector: '.ng-model-wrapper'
     populator: variablePopulator
+
+  Popover.register
+    hover: false
+    selector: '.ng-expression-wrapper'
+    populator: expressionPopulator

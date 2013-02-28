@@ -347,6 +347,9 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
     BlockManager.bind 'block-selection-change', (activeBlocks) ->
       if activeBlocks[0]?.$element.is(helper.selector)
         $el = activeBlocks[0].$element
+
+        Aloha.activeEditable?.obj?.find(helper.selector).not($el).trigger 'hide'
+
         $el.trigger 'show'
         $el.data('aloha-bubble-selected', true)
         $el.off('.bubble')
