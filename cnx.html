@@ -13,6 +13,7 @@
 
 	<!-- Manually link to jQuery because bootstrap relies on this for loading -->
 	<script src="src/lib/vendor/jquery-1.7.2.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
   <script src="src/lib/require.js"></script>
 
@@ -65,6 +66,16 @@
       },
 
 			plugins: {
+        block: {
+          defaults: {
+            '.ng-model-wrapper': {
+                'aloha-block-type': 'DefaultBlock'
+            },
+            '.ng-expression-wrapper': {
+                'aloha-block-type': 'DefaultBlock'
+            }
+          }
+        },
 			  // This whole thing is what's needed to:
 			  // - set a custom URL to send files to
 			  // - register a callback that updates the IMG with the new src
@@ -125,6 +136,7 @@
     common/image,
     cnx/popover,
     cnx/math,
+    cnx/angular,
     oer/assorted,
     cnx/note
   "></script>

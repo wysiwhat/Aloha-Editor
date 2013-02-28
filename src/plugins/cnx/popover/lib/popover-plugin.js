@@ -70,7 +70,7 @@ There are 3 variables that are stored on each element;
 
 (function() {
 
-  define('popover', ['aloha', 'jquery'], function(Aloha, jQuery) {
+  define('popover', ['aloha', 'jquery', 'block/blockmanager'], function(Aloha, jQuery, BlockManager) {
     var Bootstrap_Popover__position, Bootstrap_Popover_destroy, Bootstrap_Popover_hide, Bootstrap_Popover_show, Helper, Popover, bindHelper, findMarkup, monkeyPatch, selectionChangeHandler;
     Bootstrap_Popover__position = function($tip) {
       var actualHeight, actualWidth, inside, placement, pos, tp;
@@ -359,6 +359,16 @@ There are 3 variables that are stored on each element;
               return event.stopPropagation();
             }
           }
+        }
+      });
+      BlockManager.bind('block-selection-change', function(activeBlocks) {
+        var $el, _ref;
+        if ((_ref = activeBlocks[0]) != null ? _ref.$element.is(helper.selector) : void 0) {
+          $el = activeBlocks[0].$element;
+          $el.trigger('show');
+          $el.data('aloha-bubble-selected', true);
+          $el.off('.bubble');
+          return event.stopPropagation();
         }
       });
       return helper;
