@@ -23,7 +23,11 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     $el.alohaBlock()
     $el.each (i, node) ->
       $node = jQuery(node)
-      $node.tooltip {title: "Variable #{$node.data 'variable'}.\nDrag to change."}
+      # Set the tooltip
+      $node.attr 'title', 'Click to change'
+      $node.attr 'data-placement', 'right'
+      $node.tooltip()
+
       $input = $node.children('.ng-model-input')
       $input.val($node.data('ng-value') or '0')
       $node.children('.ng-model-value').text $input.val()
@@ -31,6 +35,29 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
 
   attachExpressionEvents = ($el) ->
     $el.alohaBlock()
+    $el.each (i, node) ->
+      $node = jQuery(node)
+      # Set the tooltip
+      $node.attr 'title', 'Click to change'
+      $node.attr 'data-placement', 'right'
+      $node.tooltip()
+
+  startAngular = ($editable) ->
+    # Grab the outermost editable
+    $editable = $editable.last()
+
+    $allVariables = $editable.find('.ng-model-wrapper')
+
+    angular.bootstrap($editable)
+
+    # UN-Squirrel away the input values since `anular.bootstrap` clears them for some reason
+    $allVariables.each (i, el) =>
+      $el = jQuery(el)
+      $input = $el.find('input')
+      $input.val($el.data('ng-value') or '0')
+      # Trigger that the input changed
+      $input.trigger('input')
+
 
   updateExpression = ($el, expression) ->
     $el.data 'ng-expression', expression
@@ -40,19 +67,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
     .attr('ng-bind', expression)
     .appendTo($el)
 
-    # Squirrel away the input values since `anular.bootstrap` clears them for some reason
-    $editable = $el.parents('.aloha-editable').last()
-    $allVariables = $editable.find('.ng-model-wrapper')
-
-    angular.bootstrap($editable)
-
-    # UN-Squirrel away the input values since `anular.bootstrap` clears them for some reason
-    $allVariables.each (i, el) =>
-      $el = jQuery(el)
-      $el.find('input').val($el.data('ng-value') or '0')
-      # Trigger that the input changed
-      $el.find('input').trigger('input')
-
+    # Re-run angular on anything that is not bound yet
+    startAngular $el.parents('.aloha-editable')
 
   Aloha.bind 'aloha-editable-activated', (evt, ed) =>
     # Start angular on the editable area
@@ -67,31 +83,42 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
       $el.data('ng-value', val)
       $el.parent().children('.ng-model-value').text val
 
-    angular.bootstrap($app[0])
+    startAngular $app
 
 
 
 
-  showModalDialog = ($el) ->
-      root = Aloha.activeEditable.obj
-      dialog = jQuery(DIALOG_HTML)
+  showModalDialog = ($el, variableText) ->
+    root = Aloha.activeEditable.obj
+    dialog = jQuery(DIALOG_HTML)
 
-      $input = dialog.find('#angular-variable-name')
-      dialog.on 'submit', (evt) =>
-        evt.preventDefault()
+    # Try and prepopulate either the variable name or value
+    variableValue = parseFloat(variableText)
+    variableName = ''
+    variableName = variableText if isNaN(variableValue) and /[a-zA-Z]+/.test(variableText)
+    variableValue = 0 if isNaN(variableValue)
 
-        # Set the variable name
-        variableName = $input.val()
-        $el.attr 'data-variable', variableName
-        $el.children('input').attr('ng-model', variableName)
-        dialog.modal('hide')
+    $el.data 'ng-value', variableValue
 
-      dialog.modal('show')
-      dialog.on 'hidden', () ->
-        dialog.remove()
+    $input = dialog.find('#angular-variable-name')
 
-      setTimeout (-> $input.focus()), 100
-      dialog
+    $input.val(variableName)
+
+    dialog.on 'submit', (evt) =>
+      evt.preventDefault()
+
+      # Set the variable name
+      variableName = $input.val()
+      $el.attr 'data-variable', variableName
+      $el.children('input').attr('ng-model', variableName)
+      dialog.modal('hide')
+
+    dialog.modal('show')
+    dialog.on 'hidden', () ->
+      dialog.remove()
+
+    setTimeout (-> $input.focus()), 100
+    dialog
 
 
   insertNgVariable = () ->
@@ -119,7 +146,11 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
   UI.adopt 'insertNgVariable', null,
     click: () ->
       newVariable = jQuery('<span class="ng-model-wrapper aloha-new-link"><span class="ng-model-value"></span><input class="ng-model-input" type="number"/></span>')
-      dialog = showModalDialog(newVariable)
+
+      # If the user selected a piece of text try to use it either as the variable name or value
+      range = Aloha.Selection.getRangeObject()
+      variableText = if range.isCollapsed() then "" else range.getText()
+      dialog = showModalDialog(newVariable, variableText)
 
       # Wait until the dialog is closed before inserting it into the DOM
       # That way if it is cancelled nothing is inserted
@@ -153,6 +184,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../cn
         newVariable.removeClass('aloha-new-link')
 
         attachVariableEvents(newVariable)
+        startAngular Aloha.activeEditable.obj
 
   # Register the button with an action
   UI.adopt 'insertNgExpression', null,
