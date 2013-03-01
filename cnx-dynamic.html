@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>OER Editor</title>
+
+	<link rel="stylesheet" href="src/css/aloha.css" type="text/css"/>
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css"/>
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" type="text/css"/>
+  <link rel="stylesheet" href="http://fortawesome.github.com/Font-Awesome/assets/css/font-awesome.css"/>
+	<link rel="stylesheet" type="text/css" href="cnx.css"/>
+
+  <!-- OERPUB Overrides -->
+  <link rel="stylesheet" type="text/css" href="./oerpub/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="./oerpub/css/aloha.css"/>
+  <link rel="stylesheet" type="text/css" href="./oerpub/css/html5_content_in_oerpub.css"/>
+  <link rel="stylesheet" type="text/css" href="./oerpub/css/html5_metacontent.css"/>
+
+
+	<!-- Manually link to jQuery because bootstrap relies on this for loading -->
+	<script src="src/lib/vendor/jquery-1.7.2.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+  <script src="src/lib/require.js"></script>
+
+  <script src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"></script>
+
+
+  <!-- ============================= -->
+  <!--  Configure MathJax and Aloha  -->
+  <!-- ============================= -->
+  <script type="text/x-mathjax-config">MathJax.Hub.Config({
+    jax: ["input/MathML", "input/TeX", "input/AsciiMath", "output/NativeMML", "output/HTML-CSS"],
+    extensions: ["asciimath2jax.js", "tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+    tex2jax: { inlineMath: [["[TEX_START]","[TEX_END]"], ["\\(", "\\)"]] },
+    // Apparently we can't change the escape sequence for ASCIIMath (MathJax doesn't find it)
+    // asciimath2jax: { inlineMath: [["[ASCIIMATH_START]", "[ASCIIMATH_END]"]], },
+
+    TeX: {
+      extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], noErrors: { disabled: true }
+    },
+    AsciiMath: { noErrors: { disabled: true } }
+        });
+  </script>
+  <!--
+  <script>
+    /* These are here for debugging MathJax. Uncomment them to use them */
+    MathJax.Hub.Startup.signal.Interest(function (message) {
+      console.log("MathJax Startup: ",message);
+    });
+    MathJax.Hub.signal.Interest(function (message) {
+      console.log("MathJax Hub: ",message);
+    });
+  </script>
+  -->
+
+	<script type="text/javascript">
+		Aloha = window.Aloha || {};
+
+		Aloha.settings = {
+			jQuery: window.jQuery,
+			logLevels: {'error': true, 'warn': true, 'info': false, 'debug': false},
+			errorhandling : true,
+
+      requireConfig: {
+        paths: {
+            // Override location of jquery-ui and use our own. Because
+            // jquery-ui and bootstrap conflict in a few cases (buttons,
+            // tooltip) our copy has those removed.
+            jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
+        }
+      },
+
+			plugins: {
+        block: {
+          defaults: {
+            '.ng-model-wrapper': {
+                'aloha-block-type': 'DefaultBlock'
+            },
+            '.ng-expression-wrapper': {
+                'aloha-block-type': 'DefaultBlock'
+            }
+          }
+        },
+			  // This whole thing is what's needed to:
+			  // - set a custom URL to send files to
+			  // - register a callback that updates the IMG with the new src
+			  draganddropfiles: {
+          upload: {
+            config: {
+              method: 'POST',
+              url: '/resources',
+              fieldName: 'data',
+              send_multipart_form: true,
+              callback: function(resp) {
+                //TODO: add xhr to Aloha.trigger('aloha-upload-*') in dropfilesrepository.js
+                // dropfilesrepository.js triggers 'aloha-upload-success'
+                // and 'aloha-upload-failure' but does not provide the
+                // response text (URL).
+                // We should probably change dropfilesrepository.js to be
+                //  Aloha.trigger('aloha-upload-success', that, xhr);
+
+                // Then, instead of configuring a callback we could just listen to that event
+
+                // If the response is a URL then change the Image source to it
+                // The URL could be absolute (/^http/) or relative (/\// or [a-z])
+                if (resp.match(/^http/) || resp.match(/^\//) || resp.match(/^[a-z]/) ) {
+                } else {
+                  alert('You dropped a file and we sent a message to the server to do something with it.\nIt responded with some gibberish so we are showing you some other file to show it worked');
+                  resp = "src/test/AlohaEditorLogo.png";
+                }
+
+                /* Drag and Drop creates an <img id="{this.id}"> element but the
+                 * "New Image" plugin doesn't have access to the UploadFile object (this)
+                 * so all it can do is add a class.
+                 * If I combine both then we can set the attribute consistently.
+                 * FIXME: Don't assume only 1 image can be uploaded at a time
+                 */
+                $img = Aloha.jQuery('.aloha-image-uploading').add('#' + this.id);
+                $img.attr('src', resp);
+                $img.removeClass('aloha-image-uploading');
+
+                console.log('Updated Image src as a result of upload');
+              }
+            }
+          }
+			  }
+			}
+		};
+
+	</script>
+
+  <script src="src/lib/aloha.js" data-aloha-plugins="
+    oer/toolbar,
+    common/ui,
+    common/format,
+    common/paste,
+    common/block,
+    common/list,
+    common/table,
+    extra/draganddropfiles,
+    common/image,
+    cnx/popover,
+    cnx/math,
+    cnx/angular,
+    oer/assorted,
+    cnx/note
+  "></script>
+
+</head>
+<body>
+
+<!-- ====================== -->
+<!--  The Editable Content  -->
+<!-- ====================== -->
+  <div class="document" id="canvas">
+
+
+<div class="title" id="468771ec-3c8f-0882-b78d-41d181278ed7">Electric Circuits: Ohm's Law (Grade 11)</div>
+
+    <h1 class="title" id="cid2">Introduction</h1>
+
+      <p class="para" id="id62184">The study of electrical circuits is essential to understand the technology that uses electricity in the real-world. This includes electricity being used for the operation of electronic devices like computers.</p>
+
+    <h1 class="title" id="cid3">Ohm's Law</h1>
+
+      <h2 class="title" id="uid1">Definition of Ohm's Law</h2>
+
+<h3 class="title" id="secfhsst_id75"> Experiment : Ohm's Law </h3>
+        <p class="para" id="id62552">
+          <strong>Aim:</strong>
+        </p>
+        <p class="para" id="id62561">In this experiment we will look at the relationship between the current going through a resistor and the potential difference (voltage) across the same resistor.</p>
+        <p class="para" id="id62567">
+          </p><figure id="id62570">
+
+              <img src="http://cnx.org/content/m38883/1.1/PG11C9_001.png" data-mime-type="image/png" id="id62570_onlineimage" width="154" data-original-title=""><!-- NOTE: attribute width changes image size online (pixels). original width is 154. -->
+
+          </figure>
+        <p></p>
+        <p class="para" id="id62576">
+          <strong>Method:</strong>
+        </p>
+        <ol class="list" data-id="id62585" data-display="block" data-list-type="enumerated">
+          <li class="item" id="uid2">Set up the circuit according to the circuit diagram, starting with just one cell.
+</li>
+          <li class="item" id="uid3">Draw the following table in your lab book.
+<table><caption>Table 1</caption><tbody><tr><td>Voltage, <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>V</mi>
+</math>&nbsp;&nbsp; (V)</td><td>Current, <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>I</mi>
+</math>&nbsp;&nbsp; (A)</td></tr><tr><td>1,5</td><td></td></tr><tr><td>3,0</td><td></td></tr><tr><td>4,5</td><td></td></tr><tr><td>6,0</td><td></td></tr></tbody></table></li>
+          <li class="item" id="uid4">Get your teacher to check the circuit before turning the power on.
+</li>
+          <li class="item" id="uid5">Measure the current.
+</li>
+          <li class="item" id="uid6">Add one more 1,5&nbsp;V cell to the circuit and measure the current again.
+</li>
+          <li class="item" id="uid7">Repeat until you have four cells and you have completed your table.
+</li>
+          <li class="item" id="uid8">Draw a graph of voltage versus current.
+</li>
+        </ol>
+        <p class="para" id="id62792">
+          <strong>Results:</strong>
+        </p>
+        <ol class="list" data-id="id62800" data-display="block" data-list-type="enumerated">
+          <li class="item" id="uid9">Does your experimental results verify Ohm's Law? Explain.
+</li>
+          <li class="item" id="uid10">How would you go about finding the resistance of an unknown resistor using only a power supply, a voltmeter and a known resistor <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <msub>
+    <mi>R</mi>
+    <mn>0</mn>
+  </msub>
+</math>&nbsp;&nbsp;?
+</li>
+        </ol>
+
+
+<h3 class="title" id="secfhsst_id118"> Activity : Ohm's Law </h3>
+        <p class="para" id="id62858">If you do not have access to the equipment necessary for the Ohm's Law experiment, you can do this activity.</p>
+        <table><caption>Table 2</caption><tbody>
+              <tr>
+                <td>Voltage, <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>V</mi>
+</math>&nbsp;&nbsp; (V)</td>
+                <td>Current, <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>I</mi>
+</math>&nbsp;&nbsp; (A)</td>
+              </tr>
+              <tr>
+                <td>3,0</td>
+                <td>0,4</td>
+              </tr>
+              <tr>
+                <td>6,0</td>
+                <td>0,8</td>
+              </tr>
+              <tr>
+                <td>9,0</td>
+                <td>1,2</td>
+              </tr>
+              <tr>
+                <td>12,0</td>
+                <td>1,6</td>
+              </tr>
+            </tbody></table>
+        <!--empty paragraphs get left behind.-->
+        <ol class="list" data-id="id62986" data-display="block" data-list-type="enumerated">
+          <li class="item" id="uid11">Plot a graph of voltage (on the <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>x</mi>
+</math>&nbsp;-axis) and current (on the <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>y</mi>
+</math>&nbsp;&nbsp;-axis).
+</li>
+        </ol>
+        <p class="para" id="id63017">
+          <strong>Conclusions:</strong>
+        </p>
+        <ol class="list" data-id="id63026" data-display="block" data-list-type="enumerated">
+          <li class="item" id="uid12">What type of graph do you obtain (straight line, parabola, other curve)
+</li>
+          <li class="item" id="uid13">Calculate the gradient of the graph.
+</li>
+          <li class="item" id="uid14">Do your experimental results verify Ohm's Law? Explain.
+</li>
+          <li class="item" id="uid15">How would you go about finding the resistance of an unknown resistor using only a power supply, a voltmeter and a known resistor <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <msub>
+    <mi>R</mi>
+    <mn>0</mn>
+  </msub>
+</math>&nbsp;&nbsp;?
+</li>
+        </ol>
+
+
+        <p class="para" id="id63099">An important relationship between the current, voltage and resistance in a circuit was discovered by Georg Simon Ohm and is called <strong>Ohm's Law</strong>.</p>
+<div class="definition" id="fhsst_id167"><span class="term" id="termfhsst_id167"> Ohm's Law </span> <div class="meaning" id="meaningfhsst_id167">
+        <p class="para" id="id62110">The amount of electric current through a metal conductor, at a constant temperature, in a circuit is proportional to the voltage across the conductor. Mathematically, Ohm's Law is written:</p>
+        <div class="equation" id="id62117">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll" display="block">
+  <mrow>
+    <mi>V</mi>
+    <mo>=</mo>
+    <mi>R</mi>
+    <mo>·</mo>
+    <mi>I</mi>
+    <mo>.</mo>
+  </mrow>
+</math>&nbsp;&nbsp;
+        </div>
+
+        </div></div>
+        <p class="para" id="id63334">Ohm's Law tells us that if a conductor is at a constant temperature, the current flowing through the conductor is proportional to the voltage across it. This means that if we plot voltage on the <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>x</mi>
+</math>&nbsp;-axis of a graph and current on the <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>y</mi>
+</math>&nbsp;&nbsp;-axis of the graph, we will get a straight-line. The gradient of the straight-line graph is related to the resistance of the conductor.</p>
+        <p class="para" id="id63355">
+          </p><figure id="id63358">
+              <img src="http://cnx.org/content/m38883/1.1/PG11C9_002.png" data-mime-type="image/png" id="id63358_onlineimage" width="109" data-original-title=""><!-- NOTE: attribute width changes image size online (pixels). original width is 169. -->
+
+          </figure>
+        <p></p>
+
+      <p class="para" id="eip-304"></p><figure id="Ohms-Law" class="phetsim">
+
+    <media xmlns="http://cnx.rice.edu/cnxml" id="phet_sim" display="block" alt="ohm's law phet simulation">
+    <flash id="phet-simulation" mime-type="application/x-shockwave-flash" src="ohms-law.swf" width="425" height="344">
+    </flash>
+    </media>
+    <figcaption><div class="title" id="f96978dd-2275-261e-a94a-ca9c7e7e0219">Phet simulation for Ohm's Law</div></figcaption></figure><p></p><h2 class="title" id="uid16">Ohmic and non-ohmic conductors</h2>
+
+        <p class="para" id="id63373">As you have seen, there is a mention of <em>constant temperature</em> when we talk about Ohm's Law. This is because the resistance of some conductors changes as their temperature changes. These types of conductors are called <em>non-ohmic</em> conductors, because they do not obey Ohm's Law. As can be expected, the conductors that obey Ohm's Law are called <em>ohmic</em> conductors. A light bulb is a common example of a non-ohmic conductor. Nichrome wire is an ohmic conductor.</p>
+        <p class="para" id="id63396">In a light bulb, the resistance of the filament wire will increase dramatically as it warms from room temperature to operating temperature. If we increase the supply voltage in a real lamp circuit, the resulting increase in current causes the filament to increase in temperature, which increases its resistance. This effectively limits the increase in current. In this case, voltage and current do not obey Ohm's Law.</p>
+        <p class="para" id="id63403">The phenomenon of resistance changing with variations in temperature is one shared by almost all metals, of which most wires are made. For most applications, these changes in resistance are small enough to be ignored. In the application of metal lamp filaments, which increase a lot in temperature (up to about 1000<math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <msup>
+    <mrow></mrow>
+    <mo>∘</mo>
+  </msup>
+</math>&nbsp;&nbsp;C, and starting from room temperature) the change is quite large.</p>
+        <p class="para" id="id63422">In general non-ohmic conductors have plots of voltage against current that are curved, indicating that the resistance is not constant over all values of voltage and current.</p>
+        <p class="para" id="id63427">
+          </p><figure id="id63430">
+
+              <img src="http://cnx.org/content/m38883/1.1/PG11C9_003.png" data-mime-type="image/png" id="id63430_onlineimage" width="413" data-original-title=""><!-- NOTE: attribute width changes image size online (pixels). original width is 413. -->
+
+          </figure>
+        <p></p>
+<h3 class="title" id="secfhsst_id207"> Experiment : Ohmic and non-ohmic conductors </h3>
+        <p class="para" id="id63443">Repeat the experiment as decribed in the previous section. In this case use a light bulb as a resistor. Compare your results to the ohmic resistor. </p>
+
+
+      <h2 class="title" id="uid17">Using Ohm's Law</h2>
+
+        <p class="para" id="id63464">We are now ready to see how Ohm's Law is used to analyse circuits.</p>
+        <p class="para" id="id63468">Consider the circuit with an ohmic resistor, <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>R</mi>
+</math>&nbsp;. If the resistor has a resistance of 5&nbsp;<math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>Ω</mi>
+</math>&nbsp;&nbsp; and voltage across the resistor is 5 V, then we can use Ohm's law to calculate the current flowing through the resistor.</p>
+        <p class="para" id="id63490">
+          </p><figure id="id63493">
+
+              <img src="http://cnx.org/content/m38883/1.1/PG11C9_004.png" data-mime-type="image/png" id="id63493_onlineimage" width="166" data-original-title=""><!-- NOTE: attribute width changes image size online (pixels). original width is 166. -->
+
+          </figure>
+        <p></p>
+        <p class="para" id="id63499">Ohm's law is:</p>
+        <div class="equation" id="id63502">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll" display="block">
+  <mrow>
+    <mi>V</mi>
+    <mo>=</mo>
+    <mi>R</mi>
+    <mo>·</mo>
+    <mi>I</mi>
+  </mrow>
+</math>&nbsp;&nbsp;
+        </div>
+        <p class="para" id="id63522">which can be rearranged to:</p>
+        <div class="equation" id="id63527">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll" display="block">
+  <mrow>
+    <mi>I</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mi>V</mi>
+      <mi>R</mi>
+    </mfrac>
+  </mrow>
+</math>&nbsp;&nbsp;
+        </div>
+        <p class="para" id="id63546">The current flowing through the resistor is:</p>
+        <div class="equation" id="id63550">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll" display="block">
+  <mtable displaystyle="true">
+    <mtr>
+      <mtd columnalign="right">
+        <mi>I</mi>
+      </mtd>
+      <mtd>
+        <mo>=</mo>
+      </mtd>
+      <mtd columnalign="left">
+        <mfrac>
+          <mi>V</mi>
+          <mi>R</mi>
+        </mfrac>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd></mtd>
+      <mtd>
+        <mo>=</mo>
+      </mtd>
+      <mtd columnalign="left">
+        <mfrac>
+          <mrow>
+            <mn>5</mn>
+            <mspace width="0.277778em"></mspace>
+            <mi mathvariant="normal">V</mi>
+          </mrow>
+          <mrow>
+            <mn>5</mn>
+            <mspace width="0.277778em"></mspace>
+            <mspace width="0.166667em"></mspace>
+            <mi>Ω</mi>
+          </mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd></mtd>
+      <mtd>
+        <mo>=</mo>
+      </mtd>
+      <mtd columnalign="left">
+        <mrow>
+          <mn>1</mn>
+          <mspace width="0.277778em"></mspace>
+          <mi mathvariant="normal">A</mi>
+        </mrow>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>&nbsp;&nbsp;
+        </div>
+<div class="exercise" id="secfhsst_id303"><div class="title" id="8487529c-9fed-7fc4-58a4-317c42dfeb73"> Ohm's Law </div>
+        <div class="problem" id="probfhsst_id304">
+        <p class="para" id="id63643">
+          </p><figure id="id63646">
+
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="180"
+   height="200"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="_ohms-law.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="-170.90274"
+     inkscape:cy="116.00822"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1346"
+     inkscape:window-height="731"
+     inkscape:window-x="4"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-852.36218)">
+    <g
+       id="g3790"
+       transform="translate(18.182747,856.60936)">
+      <rect
+         y="17.768898"
+         x="10.986128"
+         height="143.57146"
+         width="128.11081"
+         id="rect2996"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.95904624px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         y="7.7688985"
+         x="50.271835"
+         height="23.571442"
+         width="49.285725"
+         id="rect3766"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3768"
+         d="m 64.736133,138.12079 0,45.71428"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3770"
+         d="m 76.608513,147.61571 0,27.14285"
+         style="fill:none;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <rect
+         y="156.60939"
+         x="66.67009"
+         height="9.0913439"
+         width="5.8798189"
+         id="rect3772"
+         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:3.01838994;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3778"
+         y="57.361916"
+         x="63.639603"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Serif;-inkscape-font-specification:Serif"
+         xml:space="preserve"><tspan
+           y="57.361916"
+           x="63.639603"
+           id="tspan3780"
+           sodipodi:role="line" ng-bind="R||'R'">R</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Serif;-inkscape-font-specification:Serif"
+       x="109.09648"
+       y="1049.3318"
+       id="text3836"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3838"
+         x="109.09648"
+         y="1049.3318" ng-bind="R*I||'V'">V</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Serif;-inkscape-font-specification:Serif"
+       x="133.34015"
+       y="961.44843"
+       id="text3840"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3842"
+         x="133.34015"
+         y="961.44843" ng-bind="I||'I'">I</tspan></text>
+  </g>
+</svg>
+
+
+          </figure>
+        <p>
+
+
+
+        </p>
+        <p class="para" id="id63652">The resistance of the above resistor is 10&nbsp;<math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>Ω</mi>
+</math>&nbsp;&nbsp; and the current going through the resistor is 4&nbsp;A. What is the potential difference (voltage) across the resistor? </p>
+        </div>
+        <div class="solution" id="solfhsst_id315"> <ol class="stepwise list" data-id="listfhsst_id315" data-list-type="enumerated" data-number-style="arabic" data-class="stepwise">
+        <li class="item"> <label xmlns="http://cnx.rice.edu/cnxml" class="label"> Determine how to approach the problem </label>
+    <p>It's an Ohm's Law problem. So we use the equation: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>⋅</mo>
+        <mi>I</mi>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=R*I</annotation></semantics></math>&nbsp;</p>
+    <p><strong>Step 2:</strong> Solve the Problem:</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>⋅</mo>
+        <mi>I</mi>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=R*I</annotation></semantics></math>&nbsp;</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=</annotation></semantics></math>&nbsp;(10)(4)</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=</annotation></semantics></math>&nbsp;40</p>
+    <p><strong>Step 3:</strong> Write the final answer:</p>
+    <p>The voltage across the resistor is 40 V</p>
+  </div>
+        </li> </ol> </div>
+</div>
+<h3 class="title" id="secfhsst_id384"> Ohm's Law </h3>
+        <ol class="list" data-id="id63806" data-display="block" data-list-type="enumerated">
+          <li class="item" id="uid18">Calculate the resistance of a resistor that has a potential difference of 8&nbsp;V across it when a current of 2&nbsp;A flows through it.
+</li>
+          <li class="item" id="uid19">What current will flow through a resistor of 6&nbsp;<math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>Ω</mi>
+</math>&nbsp;&nbsp; when there is a potential difference of 18&nbsp;V across its ends?
+</li>
+          <li class="item" id="uid20">What is the voltage across a 10&nbsp;<math xmlns="http://www.w3.org/1998/Math/MathML" overflow="scroll">
+  <mi>Ω</mi>
+</math>&nbsp;&nbsp; resistor when a current of 1,5&nbsp;A flows though it?
+</li>
+        </ol>
+
+
+
+
+
+
+
+<hr/>
+
+    <h1>Using Ohm's Law</h1>
+    <p>We are now ready to see how Ohm's Law is used to analyse circuits.</p>
+    <p>Consider the circuit with an ohmic resistor, R. If the resistor has a resistance of 5Ω and voltage across the resistor is 5V, then we can use Ohm's law to calculate the current flowing through the resistor.</p>
+    <p>Ohm's law is:</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>⋅</mo>
+        <mi>I</mi>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=R*I</annotation></semantics></math>&nbsp;</p>
+    <p>which can be rearranged to:</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>I</mi>
+        <mo>=</mo>
+        <mfrac>
+          <mi>V</mi>
+          <mi>R</mi>
+        </mfrac>
+      </mstyle>
+    <annotation encoding="math/asciimath">I=V/R</annotation></semantics></math>&nbsp;</p>
+    <p>The current flowing through the resistor is:</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>I</mi>
+        <mo>=</mo>
+        <mfrac>
+          <mi>V</mi>
+          <mi>R</mi>
+        </mfrac>
+      </mstyle>
+    <annotation encoding="math/asciimath">I=V/R</annotation></semantics></math>&nbsp;</p>
+
+    <h2>Exercise 1: Ohm's Law</h2>
+
+    <p>The resistance of the above resistor is 10Ω and the current going through the resistor is 4A. What is the potential difference (voltage) across the resistor?</p>
+
+    <h3>Solution</h3>
+    <p><strong>Step 1:</strong> Determine how to approach the problem.</p>
+    <p>It's an Ohm's Law problem. So we use the equation: <math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>⋅</mo>
+        <mi>I</mi>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=R*I</annotation></semantics></math>&nbsp;</p>
+    <p><strong>Step 2:</strong> Solve the Problem:</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>⋅</mo>
+        <mi>I</mi>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=R*I</annotation></semantics></math>&nbsp;</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=</annotation></semantics></math>&nbsp;(10)(4)</p>
+    <p><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics>
+      <mstyle displaystyle="true">
+        <mi>V</mi>
+        <mo>=</mo>
+      </mstyle>
+    <annotation encoding="math/asciimath">V=</annotation></semantics></math>&nbsp;40</p>
+    <p><strong>Step 3:</strong> Write the final answer:</p>
+    <p>The voltage across the resistor is 40 V</p>
+  </div>
+
+<!-- =============== -->
+<!--  Aloha Startup  -->
+<!-- =============== -->
+  <script type="text/javascript">
+    // I'm running the load immediately (not in jQuery.ready) because the
+    // Toolbar immediately tries to find the right elements to attach listeners
+    // and updaters.
+
+    //Aloha.jQuery.ready(function() {
+      // Load the toolbar from the HTML file and put it right before the document
+      // This doesn't need to be in Aloha.ready... it could be in jQuery().ready
+      jQuery('<div></div>').insertBefore('.document').load('cnx-toolbar.html').children().unwrap();
+    //});
+    Aloha.ready( function() {
+      Aloha.jQuery('.document').aloha().focus();
+    });
+  </script>
+</body>
+</html>
