@@ -1,6 +1,6 @@
 define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../contrib/angular/css/angular.css' ], (Aloha, Plugin, jQuery, Popover, UI) ->
 
-  DIALOG_HTML = '''
+  VARIABLE_DIALOG_HTML = '''
     <form class="modal" id="angular-variable-modal" tabindex="-1" role="dialog" aria-labelledby="angular-variable-modalLabel" aria-hidden="true">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
@@ -11,6 +11,25 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
           <h4>Variable name</h4>
           <div>
             <input id="angular-variable-name" class="input-xlarge" type="text" placeholder="Enter a variable name here" required />
+          </div>
+        </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary link-save">Submit</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+    </form>'''
+
+  EXPRESSION_DIALOG_HTML = '''
+    <form class="modal" id="angular-expression-modal" tabindex="-1" role="dialog" aria-labelledby="angular-expression-modalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h3 id="angular-expression-modalLabel">Add Variable</h3>
+      </div>
+      <div class="modal-body">
+        <div id="link-text">
+          <h4>Expression</h4>
+          <div>
+            <input id="angular-expression-name" class="input-xlarge" type="text" placeholder="Enter an expression here" required />
           </div>
         </div>
       <div class="modal-footer">
@@ -53,10 +72,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
 
   updateExpression = ($el, expression) ->
     $el.data 'ng-expression', expression
+
+    # Clone the old rendered element so we keep the namespace and other attributes (ie in SVG)
+    $rendered = $el.find('.ng-expression-rendered').clone(true)
     $el.find('.ng-expression-rendered').remove()
-    $rendered = jQuery('<span></span>')
-    .addClass('ng-expression-rendered')
-    .attr('ng-bind', expression)
+
+    $rendered.attr('ng-bind', expression)
     .appendTo($el)
 
     # Re-run angular on anything that is not bound yet
@@ -80,9 +101,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
 
 
 
-  showModalDialog = ($el, variableText) ->
+  showVariableDialog = ($el, variableText) ->
     root = Aloha.activeEditable.obj
-    dialog = jQuery(DIALOG_HTML)
+    dialog = jQuery(VARIABLE_DIALOG_HTML)
 
     # Try and prepopulate either the variable name or value
     variableValue = parseFloat(variableText)
@@ -103,6 +124,31 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
       variableName = $input.val()
       $el.attr 'data-variable', variableName
       $el.children('input').attr('ng-model', variableName)
+      dialog.modal('hide')
+
+    dialog.modal('show')
+    dialog.on 'hidden', () ->
+      dialog.remove()
+
+    setTimeout (-> $input.focus()), 100
+    dialog
+
+
+  showExpressionDialog = ($el, expressionText) ->
+    root = Aloha.activeEditable.obj
+    dialog = jQuery(EXPRESSION_DIALOG_HTML)
+
+    $input = dialog.find('#angular-expression-name')
+
+    $input.val(expressionText)
+
+    dialog.on 'submit', (evt) =>
+      evt.preventDefault()
+
+      # Set the variable name
+      expression = $input.val()
+      $el.attr 'data-expression', expression
+      $el.children().attr('ng-bind', expression)
       dialog.modal('hide')
 
     dialog.modal('show')
@@ -142,7 +188,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
       # If the user selected a piece of text try to use it either as the variable name or value
       range = Aloha.Selection.getRangeObject()
       variableText = if range.isCollapsed() then "" else range.getText()
-      dialog = showModalDialog(newVariable, variableText)
+      dialog = showVariableDialog(newVariable, variableText)
 
       # Wait until the dialog is closed before inserting it into the DOM
       # That way if it is cancelled nothing is inserted
@@ -181,37 +227,56 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
   # Register the button with an action
   UI.adopt 'insertNgExpression', null,
     click: () ->
-      $newExpression = jQuery('<span class="aloha-new-link ng-expression-wrapper"><span class="ng-expression-rendered"></span></span>')
-      setExpression = ($expr, value) ->
-        $expr.find('.ng-expression-rendered').text("{{#{value}}}")
-
-
-      # Either insert a new span around the cursor and open the box or just open the box
+      # If the user selected a piece of text try to use it either as the variable name or value
       range = Aloha.Selection.getRangeObject()
 
-      # Extend to the whole word 1st
-      if range.isCollapsed()
-        # if selection is collapsed then extend to the word.
-        GENTICS.Utils.Dom.extendToWord(range)
-
-      if range.isCollapsed()
-        # insert a link with text here
-        GENTICS.Utils.Dom.insertIntoDOM $newExpression,
-          range,
-          Aloha.activeEditable.obj
-        range.startContainer = range.endContainer = $newExpression.contents()[0]
-        range.startOffset = 0
-        range.endOffset = $newExpression.text().length
+      if range.startContainer == range.endContainer and range.startOffset == 0 and range.endOffset == range.startContainer.length
+        $rendered = jQuery(range.getCommonAncestorContainer())
+        $newExpression = $rendered.parent()
       else
-        GENTICS.Utils.Dom.addMarkup(range, $newExpression, false)
+        $newExpression = jQuery('<span class="aloha-new-link ng-expression-wrapper"><span class="ng-expression-rendered"></span></span>')
 
-      # addMarkup takes a template so we need to look up the inserted object
-      #   and remove the marker class
-      $newExpression = Aloha.activeEditable.obj.find('.aloha-new-link')
-      $newExpression.removeClass('aloha-new-link')
 
-      $newExpression.alohaBlock()
-      $newExpression.trigger 'show'
+      expressionText = if range.isCollapsed() then "" else range.getText()
+      dialog = showExpressionDialog($newExpression, expressionText)
+
+      # Wait until the dialog is closed before inserting it into the DOM
+      # That way if it is cancelled nothing is inserted
+      dialog.on 'hidden', =>
+        # The user did not hit cancel then a `ng-bind` attribute is set
+        if $newExpression.children('[ng-bind]')[0]
+          # If it's a new element and has not been added to the DOM then add it.
+          if not $newExpression.parent()[0]
+            # Extend to the whole word 1st
+            if range.isCollapsed()
+              # if selection is collapsed then extend to the word.
+              GENTICS.Utils.Dom.extendToWord(range)
+
+            $newExpression.addClass('aloha-new-element')
+            if range.isCollapsed()
+              # insert a link with text here
+              GENTICS.Utils.Dom.insertIntoDOM $newExpression,
+                range,
+                Aloha.activeEditable.obj
+              range.startContainer = range.endContainer = $newExpression.contents()[0]
+              range.startOffset = 0
+              range.endOffset = $newExpression.text().length
+            else
+              GENTICS.Utils.Dom.addMarkup(range, $newExpression, false)
+
+            # addMarkup takes a template so we need to look up the inserted object
+            #   and remove the marker class
+            $newExpression = Aloha.activeEditable.obj.find('.aloha-new-element')
+            $newExpression.removeClass('aloha-new-element')
+
+            $newExpression.alohaBlock()
+          # always startAngular when `ng-bind` attribute was added
+          startAngular Aloha.activeEditable.obj
+
+
+
+
+
 
 
   variablePopulator = ($el) ->
@@ -269,7 +334,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $bubble.append $done
 
 
-    $expression.val($el.data 'ng-expression')
+    $expression.val($el.children('[ng-bind]').attr 'ng-bind')
     $done.on 'click', ->
       expression = $expression.val()
       updateExpression($el, expression)
