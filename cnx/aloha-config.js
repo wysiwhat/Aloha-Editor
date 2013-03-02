@@ -42,10 +42,7 @@
       },
       block: {
         defaults: {
-          '.default-block': {},
-          figure: {
-            'aloha-block-type': 'EditableImageBlock'
-          }
+          '.default-block': {}
         }
       }
     }

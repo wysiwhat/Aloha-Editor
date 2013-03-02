@@ -385,7 +385,8 @@ define([
 	 */
 	function pruneElem(elem, emap) {
 		var className = elem.className;
-		if (className && -1 !== className.indexOf(commonClsSubstr)) {
+		// Ignore if `elem.className` returns something other than a string (like SVG)
+		if (className && className instanceof String && -1 !== className.indexOf(commonClsSubstr)) {
 			var classes = Strings.words(className);
 
 			// Ephemera.markElement()

@@ -83,8 +83,6 @@
     block:
       defaults:
         '.default-block': {}
-        figure:
-          'aloha-block-type': 'EditableImageBlock'
 
 # In case some module wants the config object return it.
 return @Aloha

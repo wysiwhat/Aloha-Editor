@@ -88,7 +88,7 @@ There are 3 variables that are stored on each element;
 
 ###
 
-define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
+define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, BlockManager) ->
 
 
   # This position code was refactored out because it is also used to move the
@@ -343,6 +343,17 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
             $el.data('aloha-bubble-selected', true)
             $el.off('.bubble')
             event.stopPropagation()
+
+    BlockManager.bind 'block-selection-change', (activeBlocks) ->
+      if activeBlocks[0]?.$element.is(helper.selector)
+        $el = activeBlocks[0].$element
+
+        Aloha.activeEditable?.obj?.find(helper.selector).not($el).trigger 'hide'
+
+        $el.trigger 'show'
+        $el.data('aloha-bubble-selected', true)
+        $el.off('.bubble')
+        event.stopPropagation()
 
     return helper
 
