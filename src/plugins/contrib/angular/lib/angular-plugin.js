@@ -232,14 +232,14 @@
       });
       $min.on('input', function() {
         val = $min.val();
-        $el.data('min', val);
+        $el.data('ng-min', val);
         return $slider.slider({
           min: val
         });
       });
       $max.on('input', function() {
         val = $max.val();
-        $el.data('max', val);
+        $el.data('ng-max', val);
         return $slider.slider({
           max: val
         });

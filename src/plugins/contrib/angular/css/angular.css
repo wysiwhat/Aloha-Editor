@@ -1,10 +1,10 @@
 .ng-model-wrapper, .ng-expression-wrapper {
-  border: 1px solid #00f;
-  background-color: #ccc;
+  background-color: #eee;
   padding: 5px;
 }
-.ng-model-wrapper:before {
-  content: attr(data-variable) ': ';
+.ng-model-wrapper:after {
+  content: ' [' attr(data-variable) ']';
+  color: #aaa;
 }
 
 .ng-model-wrapper .ng-model-input {

@@ -312,13 +312,13 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
 
     $min.on 'input', ->
       val = $min.val()
-      $el.data 'min', val
+      $el.data 'ng-min', val
       $slider.slider
         min: val
 
     $max.on 'input', ->
       val = $max.val()
-      $el.data 'max', val
+      $el.data 'ng-max', val
       $slider.slider
         max: val
 
