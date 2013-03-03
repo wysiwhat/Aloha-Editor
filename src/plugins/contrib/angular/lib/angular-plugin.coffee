@@ -96,6 +96,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     # Find everything with a `[ng-model]` and wrap it in a `.ng-model-wrapper`
     $app.find('[ng-model]').each (i, el) ->
       $el = jQuery(el)
+      # Skip if the input has already been wrapped
+      return if $el.parent().hasClass('ng-expression-wrapper')
+
       $wrapper = jQuery('<span></span>').addClass 'ng-model-wrapper'
       $el.replaceWith $wrapper
       $wrapper.append $el
@@ -104,6 +107,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     # Find everything with a `[ng-bind]` and wrap it in a `.ng-expression-wrapper`
     $app.find('[ng-bind]').each (i, el) ->
       $el = jQuery(el)
+      # Skip if the expression has already been wrapped
+      return if $el.parent().hasClass('ng-expression-wrapper')
+
       $wrapper = jQuery('<span></span>').addClass 'ng-expression-wrapper'
       $el.replaceWith $wrapper
       $wrapper.append $el
@@ -356,7 +362,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $done.on 'click', ->
       expression = $expression.val()
       updateExpression($el, expression)
-      $el.trigger 'hide'
+      $el.popover 'hide'
 
     return $bubble
 

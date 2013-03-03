@@ -56,6 +56,9 @@
       $app.find('[ng-model]').each(function(i, el) {
         var $el, $wrapper;
         $el = jQuery(el);
+        if ($el.parent().hasClass('ng-expression-wrapper')) {
+          return;
+        }
         $wrapper = jQuery('<span></span>').addClass('ng-model-wrapper');
         $el.replaceWith($wrapper);
         $wrapper.append($el);
@@ -64,6 +67,9 @@
       $app.find('[ng-bind]').each(function(i, el) {
         var $el, $wrapper;
         $el = jQuery(el);
+        if ($el.parent().hasClass('ng-expression-wrapper')) {
+          return;
+        }
         $wrapper = jQuery('<span></span>').addClass('ng-expression-wrapper');
         $el.replaceWith($wrapper);
         $wrapper.append($el);
@@ -270,7 +276,7 @@
         var expression;
         expression = $expression.val();
         updateExpression($el, expression);
-        return $el.trigger('hide');
+        return $el.popover('hide');
       });
       return $bubble;
     };
