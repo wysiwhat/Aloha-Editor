@@ -201,6 +201,7 @@ There are 3 variables that are stored on each element;
                 html: true,
                 placement: _this.placement || 'bottom',
                 trigger: 'manual',
+                template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>',
                 content: function() {
                   return _this.populator.bind($node)($node, _this);
                 }
@@ -230,18 +231,6 @@ There are 3 variables that are stored on each element;
           }
           clearInterval($node.data('aloha-bubble-move-timer'));
           return $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL));
-        });
-        $el.on('hide', this.selector, function(evt) {
-          var $node;
-          $node = jQuery(evt.target);
-          clearTimeout($node.data('aloha-bubble-timer'));
-          clearInterval($node.data('aloha-bubble-move-timer'));
-          $node.removeData('aloha-bubble-timer');
-          $node.data('aloha-bubble-selected', false);
-          if ($node.data('aloha-bubble-visible')) {
-            $node.popover('hide');
-            return $node.removeData('aloha-bubble-visible');
-          }
         });
         return $el.on('mouseenter.bubble', this.selector, function(evt) {
           var $node;
@@ -361,20 +350,33 @@ There are 3 variables that are stored on each element;
           }
         }
       });
-      BlockManager.bind('block-selection-change', function(activeBlocks) {
-        var $el, _ref, _ref1, _ref2;
-        if ((_ref = activeBlocks[0]) != null ? _ref.$element.is(helper.selector) : void 0) {
+      BlockManager.bind('block-activate', function(activeBlocks) {
+        var $el,
+          _this = this;
+        if (activeBlocks[0].$element.is(helper.selector)) {
           $el = activeBlocks[0].$element;
-          if ((_ref1 = Aloha.activeEditable) != null) {
-            if ((_ref2 = _ref1.obj) != null) {
-              _ref2.find(helper.selector).not($el).trigger('hide');
+          $el.popover({
+            html: true,
+            placement: helper.placement || 'bottom',
+            trigger: 'manual',
+            template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>',
+            content: function() {
+              return helper.populator.bind($el)($el, _this);
             }
-          }
-          $el.trigger('show');
+          });
+          $el.popover('show');
           $el.data('aloha-bubble-selected', true);
-          $el.off('.bubble');
-          return event.stopPropagation();
+          return $el.off('.bubble');
         }
+      });
+      BlockManager.bind('block-deactivate', function(deactivatedBlocks) {
+        var block, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = deactivatedBlocks.length; _i < _len; _i++) {
+          block = deactivatedBlocks[_i];
+          _results.push(block.$element.popover('hide'));
+        }
+        return _results;
       });
       return helper;
     };

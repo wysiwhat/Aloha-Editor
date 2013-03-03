@@ -213,6 +213,8 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
               html: true # bootstrap changed the default for this config option so set it to HTML
               placement: @placement or 'bottom'
               trigger: 'manual'
+              # add an `aloha-ui` class so aloha does not lose focus
+              template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>'
               content: =>
                 @populator.bind($node)($node, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 
@@ -235,15 +237,6 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
         # As long as the popover is open  move it around if the document changes ($el updates)
         clearInterval($node.data('aloha-bubble-move-timer'))
         $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL))
-      $el.on 'hide', @selector, (evt) =>
-        $node = jQuery(evt.target)
-        clearTimeout($node.data('aloha-bubble-timer'))
-        clearInterval($node.data('aloha-bubble-move-timer'))
-        $node.removeData('aloha-bubble-timer')
-        $node.data('aloha-bubble-selected', false)
-        if $node.data('aloha-bubble-visible')
-          $node.popover 'hide'
-          $node.removeData('aloha-bubble-visible')
 
       # The only reason I map mouseenter is so I can catch new elements that are added to the DOM
       $el.on 'mouseenter.bubble', @selector, (evt) =>
@@ -344,16 +337,26 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
             $el.off('.bubble')
             event.stopPropagation()
 
-    BlockManager.bind 'block-selection-change', (activeBlocks) ->
-      if activeBlocks[0]?.$element.is(helper.selector)
+    BlockManager.bind 'block-activate', (activeBlocks) ->
+      if activeBlocks[0].$element.is(helper.selector)
         $el = activeBlocks[0].$element
 
-        Aloha.activeEditable?.obj?.find(helper.selector).not($el).trigger 'hide'
+        $el.popover
+          html: true # bootstrap changed the default for this config option so set it to HTML
+          placement: helper.placement or 'bottom'
+          trigger: 'manual'
+          # add an `aloha-ui` class so aloha does not lose focus
+          template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>'
+          content: =>
+            helper.populator.bind($el)($el, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 
-        $el.trigger 'show'
+        $el.popover 'show'
         $el.data('aloha-bubble-selected', true)
         $el.off('.bubble')
-        event.stopPropagation()
+
+    BlockManager.bind 'block-deactivate', (deactivatedBlocks) ->
+      for block in deactivatedBlocks
+        block.$element.popover 'hide'
 
     return helper
 
