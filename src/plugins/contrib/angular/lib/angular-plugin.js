@@ -11,9 +11,14 @@
       return $el.each(function(i, node) {
         var $input, $node;
         $node = jQuery(node);
-        $input = $node.children('.ng-model-input');
-        $input.val($node.data('ng-value') || '0');
-        return $node.children('.ng-model-value').text($input.val());
+        $input = $node.children('[ng-model]');
+        $node.attr('data-ng-model', $input.attr('ng-model'));
+        $node.attr('data-ng-value', $input.val());
+        return $input.on('input', function() {
+          var val;
+          val = parseFloat($input.val());
+          return $node.attr('data-ng-value', val);
+        });
       });
     };
     attachExpressionEvents = function($el) {
@@ -33,7 +38,7 @@
         var $el, $input;
         $el = jQuery(el);
         $input = $el.find('input');
-        $input.val($el.data('ng-value') || '0');
+        $input.val($el.attr('data-ng-value') || '0');
         return $input.trigger('input');
       });
     };
@@ -48,15 +53,24 @@
     Aloha.bind('aloha-editable-activated', function(evt, ed) {
       var $app;
       $app = ed.editable.obj;
-      attachVariableEvents($app.find('.ng-model-wrapper'));
-      attachExpressionEvents($app.find('.ng-expression-wrapper'));
-      $app.on('input', '.ng-model-input', function(evt) {
-        var $el, val;
-        $el = jQuery(evt.target);
-        val = parseFloat($el.val());
-        $el.data('ng-value', val);
-        return $el.parent().children('.ng-model-value').text(val);
+      $app.find('[ng-model]').each(function(i, el) {
+        var $el, $wrapper;
+        $el = jQuery(el);
+        $wrapper = jQuery('<span></span>').addClass('ng-model-wrapper');
+        $el.replaceWith($wrapper);
+        $wrapper.append($el);
+        return attachVariableEvents($wrapper);
       });
+      $app.find('[ng-bind]').each(function(i, el) {
+        var $el, $wrapper;
+        $el = jQuery(el);
+        $wrapper = jQuery('<span></span>').addClass('ng-expression-wrapper');
+        $el.replaceWith($wrapper);
+        $wrapper.append($el);
+        $wrapper.data('ng-expression', $el.attr('ng-bind'));
+        return attachExpressionEvents($wrapper);
+      });
+      attachExpressionEvents($app.find('.ng-expression-wrapper'));
       return startAngular($app);
     });
     showVariableDialog = function($el, variableText) {
@@ -72,7 +86,7 @@
       if (isNaN(variableValue)) {
         variableValue = 0;
       }
-      $el.data('ng-value', variableValue);
+      $el.attr('data-ng-value', variableValue);
       $input = dialog.find('#angular-variable-name');
       $input.val(variableName);
       dialog.on('submit', function(evt) {
@@ -117,7 +131,7 @@
     };
     insertNgVariable = function() {
       var $el, $input, $tail, range, variable;
-      $el = jQuery('<span class="ng-model-wrapper"><span class="ng-model-value"></span><input class="ng-model-input" type="number"/></span>');
+      $el = jQuery('<span class="ng-model-wrapper aloha-ephemera-wrapper"><input type="number"/></span>');
       range = Aloha.Selection.getRangeObject();
       if (range.isCollapsed()) {
         GENTICS.Utils.Dom.insertIntoDOM($el, range, Aloha.activeEditable.obj);
@@ -138,7 +152,7 @@
       click: function() {
         var dialog, newVariable, range, variableText,
           _this = this;
-        newVariable = jQuery('<span class="ng-model-wrapper aloha-new-link"><span class="ng-model-value"></span><input class="ng-model-input" type="number"/></span>');
+        newVariable = jQuery('<span class="ng-model-wrapper aloha-new-link"><input class="ng-model-input" type="number"/></span>');
         range = Aloha.Selection.getRangeObject();
         variableText = range.isCollapsed() ? "" : range.getText();
         dialog = showVariableDialog(newVariable, variableText);
@@ -203,7 +217,7 @@
       }
     });
     variablePopulator = function($el) {
-      var $bubble, $max, $min, $slider, max, min, val;
+      var $bubble, $input, $max, $min, $slider, max, min, val;
       $min = jQuery('<input style="width: 2em;"/>');
       $max = jQuery('<input style="width: 2em;"/>');
       $slider = jQuery('<span></span>');
@@ -211,9 +225,10 @@
       $bubble.append($min);
       $bubble.append($slider);
       $bubble.append($max);
-      min = $el.data('ng-min') || 0;
-      max = $el.data('ng-max') || 100;
-      val = Math.max(min, Math.min($el.data('ng-value') || 0, max));
+      $input = $el.children('[ng-model]');
+      min = $input.data('ng-min') || 0;
+      max = $input.data('ng-max') || 100;
+      val = Math.max(min, Math.min($el.attr('data-ng-value') || 0, max));
       $min.val(min);
       $max.val(max);
       $slider.slider({
@@ -221,13 +236,10 @@
         max: max,
         value: val,
         slide: function(event, ui) {
-          var $input;
           val = ui.value;
-          $input = $el.children('.ng-model-input');
           $input.val(val);
           $input.trigger('input');
-          $el.children('.ng-model-value').text(val);
-          return $el.data('ng-value', val);
+          return $el.attr('data-ng-value', val);
         }
       });
       $min.on('input', function() {

@@ -214,7 +214,7 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
               placement: @placement or 'bottom'
               trigger: 'manual'
               # add an `aloha-ui` class so aloha does not lose focus
-              template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>'
+              template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"><div class="hack-for-different-bootstrap-versions"></div></div></div>'
               content: =>
                 @populator.bind($node)($node, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 
@@ -346,7 +346,7 @@ define 'popover', [ 'aloha', 'jquery', 'block/blockmanager' ], (Aloha, jQuery, B
           placement: helper.placement or 'bottom'
           trigger: 'manual'
           # add an `aloha-ui` class so aloha does not lose focus
-          template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>'
+          template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"><div class="hack-for-different-bootstrap-versions"></div></div></div>'
           content: =>
             helper.populator.bind($el)($el, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 

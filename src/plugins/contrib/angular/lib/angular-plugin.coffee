@@ -39,13 +39,19 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     </form>'''
 
   attachVariableEvents = ($el) ->
+
     $el.alohaBlock()
     $el.each (i, node) ->
       $node = jQuery(node)
+      # Set the variable name and value to the wrapper element
+      # (so the CSS can render it)
+      $input = $node.children('[ng-model]')
+      $node.attr 'data-ng-model', $input.attr('ng-model')
+      $node.attr 'data-ng-value', $input.val()
 
-      $input = $node.children('.ng-model-input')
-      $input.val($node.data('ng-value') or '0')
-      $node.children('.ng-model-value').text $input.val()
+      $input.on 'input', ->
+        val = parseFloat($input.val())
+        $node.attr 'data-ng-value', val
 
 
   attachExpressionEvents = ($el) ->
@@ -65,7 +71,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $allVariables.each (i, el) =>
       $el = jQuery(el)
       $input = $el.find('input')
-      $input.val($el.data('ng-value') or '0')
+      $input.val($el.attr('data-ng-value') or '0')
       # Trigger that the input changed
       $input.trigger('input')
 
@@ -87,14 +93,26 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     # Start angular on the editable area
     $app = ed.editable.obj
 
-    attachVariableEvents $app.find('.ng-model-wrapper')
-    attachExpressionEvents $app.find('.ng-expression-wrapper')
+    # Find everything with a `[ng-model]` and wrap it in a `.ng-model-wrapper`
+    $app.find('[ng-model]').each (i, el) ->
+      $el = jQuery(el)
+      $wrapper = jQuery('<span></span>').addClass 'ng-model-wrapper'
+      $el.replaceWith $wrapper
+      $wrapper.append $el
+      attachVariableEvents $wrapper
 
-    $app.on 'input', '.ng-model-input', (evt) =>
-      $el = jQuery(evt.target)
-      val = parseFloat($el.val())
-      $el.data('ng-value', val)
-      $el.parent().children('.ng-model-value').text val
+    # Find everything with a `[ng-bind]` and wrap it in a `.ng-expression-wrapper`
+    $app.find('[ng-bind]').each (i, el) ->
+      $el = jQuery(el)
+      $wrapper = jQuery('<span></span>').addClass 'ng-expression-wrapper'
+      $el.replaceWith $wrapper
+      $wrapper.append $el
+      $wrapper.data 'ng-expression', $el.attr('ng-bind')
+      attachExpressionEvents $wrapper
+
+
+    # attachVariableEvents $app.find('.ng-model-wrapper')
+    attachExpressionEvents $app.find('.ng-expression-wrapper')
 
     startAngular $app
 
@@ -111,7 +129,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     variableName = variableText if isNaN(variableValue) and /[a-zA-Z]+/.test(variableText)
     variableValue = 0 if isNaN(variableValue)
 
-    $el.data 'ng-value', variableValue
+    $el.attr 'data-ng-value', variableValue
 
     $input = dialog.find('#angular-variable-name')
 
@@ -160,7 +178,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
 
 
   insertNgVariable = () ->
-    $el = jQuery('<span class="ng-model-wrapper"><span class="ng-model-value"></span><input class="ng-model-input" type="number"/></span>')
+    $el = jQuery('<span class="ng-model-wrapper aloha-ephemera-wrapper"><input type="number"/></span>')
     range = Aloha.Selection.getRangeObject()
     if range.isCollapsed()
       GENTICS.Utils.Dom.insertIntoDOM $el, range, Aloha.activeEditable.obj
@@ -183,7 +201,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
   # Register the button with an action
   UI.adopt 'insertNgVariable', null,
     click: () ->
-      newVariable = jQuery('<span class="ng-model-wrapper aloha-new-link"><span class="ng-model-value"></span><input class="ng-model-input" type="number"/></span>')
+      newVariable = jQuery('<span class="ng-model-wrapper aloha-new-link"><input class="ng-model-input" type="number"/></span>')
 
       # If the user selected a piece of text try to use it either as the variable name or value
       range = Aloha.Selection.getRangeObject()
@@ -289,10 +307,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $bubble.append $slider
     $bubble.append $max
 
+    $input = $el.children('[ng-model]')
+
     # Set the values for min/max
-    min = $el.data('ng-min') or 0
-    max = $el.data('ng-max') or 100
-    val = Math.max(min, Math.min($el.data('ng-value') or 0, max))
+    min = $input.data('ng-min') or 0
+    max = $input.data('ng-max') or 100
+    val = Math.max(min, Math.min($el.attr('data-ng-value') or 0, max))
 
     $min.val(min)
     $max.val(max)
@@ -303,12 +323,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
       value: val
       slide: (event, ui) ->
         val = ui.value
-        $input = $el.children('.ng-model-input')
         $input.val(val)
         $input.trigger 'input'
 
-        $el.children('.ng-model-value').text(val)
-        $el.data 'ng-value', val
+        $el.attr 'data-ng-value', val
 
     $min.on 'input', ->
       val = $min.val()

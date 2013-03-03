@@ -201,7 +201,7 @@ There are 3 variables that are stored on each element;
                 html: true,
                 placement: _this.placement || 'bottom',
                 trigger: 'manual',
-                template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>',
+                template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"><div class="hack-for-different-bootstrap-versions"></div></div></div>',
                 content: function() {
                   return _this.populator.bind($node)($node, _this);
                 }
@@ -359,7 +359,7 @@ There are 3 variables that are stored on each element;
             html: true,
             placement: helper.placement || 'bottom',
             trigger: 'manual',
-            template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"></div></div>',
+            template: '<div class="aloha-ui popover"><div class="arrow"></div><h3 …e"></h3><div class="popover-content"><div class="hack-for-different-bootstrap-versions"></div></div></div>',
             content: function() {
               return helper.populator.bind($el)($el, _this);
             }

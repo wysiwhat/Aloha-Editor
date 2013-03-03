@@ -1,13 +1,17 @@
 .ng-model-wrapper, .ng-expression-wrapper {
-  background-color: #eee;
+  background-color: #f3f3f3;
   padding: 5px;
 }
+.ng-model-wrapper:before {
+  content: attr(data-ng-value);
+  color: inherit;
+}
 .ng-model-wrapper:after {
-  content: ' [' attr(data-variable) ']';
+  content: ' [' attr(data-ng-model) ']';
   color: #aaa;
 }
 
-.ng-model-wrapper .ng-model-input {
+.ng-model-wrapper [ng-model] {
   display: none;
 }
 
