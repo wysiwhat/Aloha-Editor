@@ -4,7 +4,7 @@
   define(['aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../contrib/angular/css/angular.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
     var EXPRESSION_DIALOG_HTML, VARIABLE_DIALOG_HTML, attachExpressionEvents, attachVariableEvents, expressionPopulator, insertNgVariable, showExpressionDialog, showVariableDialog, startAngular, updateExpression, variablePopulator,
       _this = this;
-    VARIABLE_DIALOG_HTML = '<form class="modal" id="angular-variable-modal" tabindex="-1" role="dialog" aria-labelledby="angular-variable-modalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="angular-variable-modalLabel">Add Variable</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <h4>Variable name</h4>\n      <div>\n        <input id="angular-variable-name" class="input-xlarge" type="text" placeholder="Enter a variable name here" required />\n      </div>\n    </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
+    VARIABLE_DIALOG_HTML = '<form class="modal" id="angular-variable-modal" tabindex="-1" role="dialog" aria-labelledby="angular-variable-modalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="angular-variable-modalLabel">Add Variable</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <h4>Variable name</h4>\n      <div>\n        <input id="angular-variable-name" class="input-xlarge" type="text" placeholder="Enter a variable name here" required />\n      </div>\n      <h4>Initial Value</h4>\n      <div>\n        <input id="angular-variable-value" class="input-xlarge" type="number" placeholder="Enter an initial value for the variable" required />\n      </div>\n    </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
     EXPRESSION_DIALOG_HTML = '<form class="modal" id="angular-expression-modal" tabindex="-1" role="dialog" aria-labelledby="angular-expression-modalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>\n    <h3 id="angular-expression-modalLabel">Add Variable</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <h4>Expression</h4>\n      <div>\n        <input id="angular-expression-name" class="input-xlarge" type="text" placeholder="Enter an expression here" required />\n      </div>\n    </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
     attachVariableEvents = function($el) {
       $el.alohaBlock();
@@ -80,7 +80,7 @@
       return startAngular($app);
     });
     showVariableDialog = function($el, variableText) {
-      var $input, dialog, root, variableName, variableValue,
+      var $input, $inputValue, dialog, root, variableName, variableValue,
         _this = this;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(VARIABLE_DIALOG_HTML);
@@ -94,11 +94,15 @@
       }
       $el.attr('data-ng-value', variableValue);
       $input = dialog.find('#angular-variable-name');
+      $inputValue = dialog.find('#angular-variable-value');
       $input.val(variableName);
+      $inputValue.val(variableValue);
       dialog.on('submit', function(evt) {
         evt.preventDefault();
         variableName = $input.val();
+        variableValue = parseFloat($inputValue.val());
         $el.attr('data-variable', variableName);
+        $el.children('input').val(variableValue);
         $el.children('input').attr('ng-model', variableName);
         return dialog.modal('hide');
       });

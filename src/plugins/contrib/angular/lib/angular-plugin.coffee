@@ -12,6 +12,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
           <div>
             <input id="angular-variable-name" class="input-xlarge" type="text" placeholder="Enter a variable name here" required />
           </div>
+          <h4>Initial Value</h4>
+          <div>
+            <input id="angular-variable-value" class="input-xlarge" type="number" placeholder="Enter an initial value for the variable" required />
+          </div>
         </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
@@ -138,15 +142,19 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $el.attr 'data-ng-value', variableValue
 
     $input = dialog.find('#angular-variable-name')
+    $inputValue = dialog.find('#angular-variable-value')
 
     $input.val(variableName)
+    $inputValue.val(variableValue)
 
     dialog.on 'submit', (evt) =>
       evt.preventDefault()
 
       # Set the variable name
       variableName = $input.val()
+      variableValue = parseFloat($inputValue.val())
       $el.attr 'data-variable', variableName
+      $el.children('input').val(variableValue)
       $el.children('input').attr('ng-model', variableName)
       dialog.modal('hide')
 
