@@ -233,7 +233,7 @@
       $bubble.append($max);
       $input = $el.children('[ng-model]');
       min = $input.data('ng-min') || 0;
-      max = $input.data('ng-max') || 100;
+      max = $input.data('ng-max') || 10;
       val = Math.max(min, Math.min($el.attr('data-ng-value') || 0, max));
       $min.val(min);
       $max.val(max);

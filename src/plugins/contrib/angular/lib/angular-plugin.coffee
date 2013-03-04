@@ -317,7 +317,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
 
     # Set the values for min/max
     min = $input.data('ng-min') or 0
-    max = $input.data('ng-max') or 100
+    max = $input.data('ng-max') or 10
     val = Math.max(min, Math.min($el.attr('data-ng-value') or 0, max))
 
     $min.val(min)
