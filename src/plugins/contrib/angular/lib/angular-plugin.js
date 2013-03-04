@@ -56,7 +56,7 @@
       $app.find('[ng-model]').each(function(i, el) {
         var $el, $wrapper;
         $el = jQuery(el);
-        if ($el.parent().hasClass('ng-expression-wrapper')) {
+        if ($el.parent().hasClass('ng-model-wrapper')) {
           return;
         }
         $wrapper = jQuery('<span></span>').addClass('ng-model-wrapper');

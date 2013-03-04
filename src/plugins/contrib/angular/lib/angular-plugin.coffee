@@ -97,7 +97,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../co
     $app.find('[ng-model]').each (i, el) ->
       $el = jQuery(el)
       # Skip if the input has already been wrapped
-      return if $el.parent().hasClass('ng-expression-wrapper')
+      return if $el.parent().hasClass('ng-model-wrapper')
 
       $wrapper = jQuery('<span></span>').addClass 'ng-model-wrapper'
       $el.replaceWith $wrapper
