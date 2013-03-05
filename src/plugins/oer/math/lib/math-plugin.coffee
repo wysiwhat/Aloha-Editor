@@ -108,12 +108,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
       # replace the MathML with ASCII/LaTeX formula if possible
       mathParts = findFormula $mml
       if mathParts.mimeType is "math/asciimath"
-        $mathElement.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open + 
-                                                   mathParts.formula + 
+        $mathElement.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open +
+                                                   mathParts.formula +
                                                    LANGUAGES['math/asciimath'].close)
       else if mathParts.mimeType is "math/tex"
-        $mathElement.find('.mathjax-wrapper').text(LANGUAGES['math/tex'].open + 
-                                                   mathParts.formula + 
+        $mathElement.find('.mathjax-wrapper').text(LANGUAGES['math/tex'].open +
+                                                   mathParts.formula +
                                                    LANGUAGES['math/tex'].close)
       triggerMathJax $mathElement, ->
         if mathParts.mimeType is "math/asciimath" or mathParts.mimeType is "math/tex"
@@ -144,8 +144,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
       $tail = $('<span class="aloha-ephemera-wrapper">&#160;</span>')
       # Assume the user highlighted ASCIIMath (by putting the text in backticks)
       formula = range.getText()
-      $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open + 
-                                        formula + 
+      $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open +
+                                        formula +
                                         LANGUAGES['math/asciimath'].close)
       GENTICS.Utils.Dom.removeRange range
       GENTICS.Utils.Dom.insertIntoDOM $el.add($tail), range, Aloha.activeEditable.obj
@@ -246,7 +246,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
         $span.prepend $mathPoint
 
       if LANGUAGES[mimeType].raw
-        $mathPoint.innerHTML = formula
+        $formula = $(formula)
+        $mathPoint.text('').append($formula)
       else
         formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close
         $mathPoint.text(formulaWrapped)
@@ -254,7 +255,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
         # Save the Edited text into the math annotation element
         $mathml = $span.find('math')
         if $mathml[0]
-          addAnnotation $span, formula, mimeType
+          if mimeType is "math/asciimath" or mimeType is "math/tex"
+            addAnnotation $span, formula, mimeType
           makeCloseIcon($span)
         Aloha.activeEditable.smartContentChange {type: 'block-change'}
 
@@ -308,7 +310,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
   addAnnotation = ($span, formula, mimeType) ->
       # $span is <span class="math-element">
     $mml = $span.find('math')
-    if $mml[0] 
+    if $mml[0]
       $annotation = $mml.find('annotation')
       # ## Finicky MathML structure
       #
@@ -351,7 +353,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
             $annotation = $secondChild
             encoding = $annotation.attr 'encoding'
             formula = $annotation.text()
-            if encoding is 'math/asciimath' or encoding is 'math/tex'
+            if encoding of LANGUAGES
               return { 'mimeType': encoding, 'formula': formula }
     return { 'mimeType': mimeType, 'formula': formula }
 

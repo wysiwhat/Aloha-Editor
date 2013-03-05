@@ -179,7 +179,8 @@
           $span.prepend($mathPoint);
         }
         if (LANGUAGES[mimeType].raw) {
-          $mathPoint.innerHTML = formula;
+          $formula = $(formula);
+          $mathPoint.text('').append($formula);
         } else {
           formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close;
           $mathPoint.text(formulaWrapped);
@@ -188,7 +189,9 @@
           var $mathml;
           $mathml = $span.find('math');
           if ($mathml[0]) {
-            addAnnotation($span, formula, mimeType);
+            if (mimeType === "math/asciimath" || mimeType === "math/tex") {
+              addAnnotation($span, formula, mimeType);
+            }
             makeCloseIcon($span);
           }
           return Aloha.activeEditable.smartContentChange({
@@ -287,7 +290,7 @@
               $annotation = $secondChild;
               encoding = $annotation.attr('encoding');
               formula = $annotation.text();
-              if (encoding === 'math/asciimath' || encoding === 'math/tex') {
+              if (encoding in LANGUAGES) {
                 return {
                   'mimeType': encoding,
                   'formula': formula
