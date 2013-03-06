@@ -35,13 +35,29 @@
 
 	<script type="text/javascript" src="aloha-config.js"></script>
   <script type="text/javascript" src="../src/lib/aloha.js"></script>
+  <script type="text/javascript" src="drag-and-add.js"></script>
 
+  <style type="text/css">
+    .sidebar .add-block { cursor: ponter; display: block; }
+  </style>
 </head>
 <body>
+
+<div class="row">
+
+  <div class="span2 sidebar">
+    <p>&#160;</p>
+    <p>&#160;</p>
+    <p>&#160;</p>
+    <div class="btn add-block add-note">Note</div>
+    <div class="btn add-block add-example">Example</div>
+    <div class="btn add-block add-exercise">Exercise</div>
+  </div>
 
 <!-- ====================== -->
 <!--  The Editable Content  -->
 <!-- ====================== -->
+<div class="span10">
   <div class="document" id="document">
 
     <h1>Blockish Examples (note)</h1>
@@ -183,6 +199,9 @@
     <p>That's it so far!</p>
   </div>
 
+</div>
+</div>
+
 <!-- =============== -->
 <!--  Aloha Startup  -->
 <!-- =============== -->
@@ -200,5 +219,7 @@
       Aloha.jQuery('.document').aloha().focus();
     });
   </script>
+
+
 </body>
 </html>
