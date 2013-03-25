@@ -55,6 +55,11 @@
                     tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
             <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
                     tal:attributes="src string:${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
+                    
+            <!--Google Picker Includes -->
+            <script src="http://www.google.com/jsapi"></script> 
+            <script src="/Aloha-Editor/src/plugins/oer/assorted/lib/gpickerdialog.js"> </script>
+
             <script type="text/javascript" src="/Aloha-Editor/src/lib/aloha.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
                 data-aloha-plugins="common/ui,
@@ -73,7 +78,6 @@
                                     common/undo,
                                     oer/undobutton,
                                     oer/genericbutton"> <!-- xhtml workaround --></script>
-
             <script type="text/javascript"
                     tal:content="string:var body_url = '${body_url}';">
                     var body_url = '/Aloha-Editor/oerpub/sandbox/index.html';</script>

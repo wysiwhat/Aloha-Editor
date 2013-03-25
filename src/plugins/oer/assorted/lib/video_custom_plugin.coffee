@@ -1,4 +1,4 @@
-# Aloha Video Plugin
+ # Aloha Video Plugin
 # * -----------------
 # * This plugin handles when the insertVideo button is clicked
 #
