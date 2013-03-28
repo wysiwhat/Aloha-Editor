@@ -55,10 +55,6 @@
                     tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
             <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
                     tal:attributes="src string:${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
-                    
-            <!--Google Picker Includes -->
-            <script src="http://www.google.com/jsapi"></script> 
-            <script src="/Aloha-Editor/src/plugins/oer/assorted/lib/gpickerdialog.js"> </script>
 
             <script type="text/javascript" src="/Aloha-Editor/src/lib/aloha.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
@@ -84,7 +80,13 @@
             <script type="text/javascript"
                     tal:content="string:var save_url = '${request.route_url('preview_save')}';">
                     var save_url = null;</script>
+            <!--Google Picker Includes -->
+            <script src="http://www.google.com/jsapi"></script> 
+            <script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/image-dialog.js" tal:attributes="src string:${request.application_url}/aloha/src/plugins/oer/assorted/lib/image-dialog.js"></script>
+            <script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/aloha-helper.js" tal:attributes="src string:${request.application_url}/aloha/src/plugins/oer/assorted/lib/aloha-helper.js"></script>
+            <!--<script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/gpickerdialog.js"></script>-->
             <script type="text/javascript">
+
 
                 // HTML elements which are the options in the heading drop down
                 var headingChoices = null;
