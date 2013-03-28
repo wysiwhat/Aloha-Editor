@@ -96,7 +96,6 @@
                 // Search through parent links in the DOM until we find an element whose enclosing tag
                 // is one of the section heading tags
                 function getClosestHeadingParent(ele) {
-                    console.log('starting');
                     while(ele != null) {
                         console.log(ele);
                         if(ele.tagName && possibleHeadings.indexOf(ele.tagName.toUpperCase()) != -1) {
@@ -108,7 +107,6 @@
                         }
                         ele = ele.parentNode;
                     }
-                    console.log('returning');
                     console.log(ele);
                     return ele;
                 }
@@ -206,6 +204,13 @@
                                         }
                                         PubSub.pub('swordpushweb.saved');
                                     });
+                                } else {
+                                    $('#statusmessage').data('message')('Saved');
+                                    GenericButton.getButtons()["save"].enable(false);
+                                    $('.btn.save').html('Saved');
+                                    if (callback_function) {
+                                        callback_function();
+                                    }
                                 }
                             }
                         }
@@ -257,15 +262,14 @@
                             // editor.isModified().
                             window.setInterval(savePreview, 30000);
 
-
-                            // Bind a handler for the changed event
-                            var editor = Aloha.getEditableById('canvas');
-                            Aloha.bind('aloha-smart-content-changed', function(){
-                                if(editor.isModified()){
+                            setInterval(function() {
+                                var editor = Aloha.getEditableById('canvas');
+                                if (editor.isModified()) {
                                     $('.btn.save').html('Save');
                                     GenericButton.getButtons()["save"].enable(true);
                                 }
-                            });
+                            }, 250);
+
                             // Binds the function to all headers, paragraphs, and pre tags
                             Aloha.jQuery(":header, p, pre").bind('click', headingFunc);
                             Aloha.jQuery('#canvas').bind('keyup', recursiveHeadingFunc);
