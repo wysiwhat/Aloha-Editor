@@ -127,8 +127,7 @@ function (
 				}
 			});
 		},
-	
-		
+
         /**
          * Adds the ui meta fields (search, title) to the floating menu. 
          */
