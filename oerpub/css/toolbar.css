@@ -113,6 +113,9 @@ figure figcaption::before {
 .toolbar .icon-image-insert {
   background-position: -122px 0;
 }
+.toolbar .icon-video-insert {
+  background-position: -617px 0;
+}
 .toolbar .icon-link-insert {
   background-position: -188px 0;
 }
@@ -204,6 +207,13 @@ figure figcaption::before {
 .toolbar .btn-group > .btn.active .icon-image-insert {
   background-position: -122px -66px;
 }
+.toolbar .btn-group > .btn:hover .icon-video-insert,
+.toolbar .btn-group > .btn:focus .icon-video-insert,
+.toolbar .btn-group > .btn:active .icon-video-insert,
+.toolbar .btn-group > .btn.active .icon-video-insert {
+  background-position: -617px -66px;
+}
+
 .toolbar .btn-group > .btn:hover .icon-link-insert,
 .toolbar .btn-group > .btn:focus .icon-link-insert,
 .toolbar .btn-group > .btn:active .icon-link-insert,
