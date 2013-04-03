@@ -240,7 +240,6 @@
     UI.adopt('insertVideo-oer', null, {
       click: function() {
         var newEl;
-        console.debug('Inserting video..');
         newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
         return newVideoPicker();
       }

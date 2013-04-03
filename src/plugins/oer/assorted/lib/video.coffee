@@ -281,6 +281,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   UI.adopt 'insertVideo-oer', null,
     click: () ->
+      console.debug 'Inserting video..'
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       # Inserts Google Picker into the DOM
       newVideoPicker()        
