@@ -59,7 +59,7 @@ figure figcaption::before {
   width: 100%;
   padding-left: 1em;
   box-shadow: 0 2px 3px 0 #CCC;
-  z-index: 1010;
+  z-index: 900;
 }
 .toolbar [class^="icon-"] {
   margin: 0;
@@ -266,3 +266,4 @@ figure figcaption::before {
   word-spacing: normal;
   vertical-align: middle;
 }
+
