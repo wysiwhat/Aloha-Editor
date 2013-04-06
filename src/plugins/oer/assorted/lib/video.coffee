@@ -1,4 +1,4 @@
- # Aloha Video Plugin
+# Aloha Video Plugin
 # * -----------------
 # * This plugin handles when the insertVideo button is clicked
 #
@@ -32,7 +32,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     video_id = youtube_url_validator(url)
     embed_html = ''
     if (video_id)
-      embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
+#embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
+      embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
     return embed_html
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator)
 
@@ -77,6 +78,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
+      console.debug 'Inside showModalDialog'
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
       dialog = jQuery(DIALOG_HTML)
@@ -178,15 +180,19 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # allows the use of html5 validation.
       deferred = $.Deferred()
       dialog.on 'submit', (evt) =>
+        console.debug 'Submit pressed'
+        console.debug $el.is('img')
         evt.preventDefault() # Don't submit the form
         if $el.is('img')
           $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
         else
-          console.debug("Embedding the video")
+          console.debug "Embedding the video"
           # Embeds the video into the page
           video = getEmbedEle(videoSource)
-          $el.replaceWith(video)
+          console.debug video
+          AlohaInsertIntoDom(video);
+          #$el.replaceWith(video)
           dialog.modal('hide')
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
@@ -284,26 +290,26 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       console.debug 'Inserting video..'
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       # Inserts Google Picker into the DOM
-      newVideoPicker()        
+# newVideoPicker()        
       # GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
-      # promise = showModalDialog(newEl)
+      promise = showModalDialog(newEl)
 
-      # promise.done (data)->
-      #   # Uploading if a local file was chosen
-      #   if data.files.length
-      #     newEl.addClass('aloha-image-uploading')
-      #     uploadImage data.files[0], (url) ->
-      #       jQuery(data.target).attr('src', url)
-      #       newEl.removeClass('aloha-image-uploading')
+      promise.done (data)->
+        # Uploading if a local file was chosen
+        if data.files.length
+          newEl.addClass('aloha-image-uploading')
+          uploadImage data.files[0], (url) ->
+            jQuery(data.target).attr('src', url)
+            newEl.removeClass('aloha-image-uploading')
 
-      # promise.fail (data) ->
-      #   # Clean up placeholder if needed
-      #   $target = jQuery(data.target)
-      #   if not $target.is('img')
-      #     $target.remove()
+      promise.fail (data) ->
+        # Clean up placeholder if needed
+        $target = jQuery(data.target)
+        if not $target.is('img')
+          $target.remove()
 
-      # # Finally show the dialog
-      # promise.show()
+      # Finally show the dialog
+      promise.show()
 
   # Return config
   selector: selector
