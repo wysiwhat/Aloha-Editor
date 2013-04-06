@@ -59,15 +59,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <input type="text" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/>
+            <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>
         </div>
-        <div class="image-alt">
-          <div class="forminfo">
-            Please provide a description of this video for the visually impaired.
-          </div>
-          <div>
-            <textarea name="alt" type="text" required="required" placeholder="Enter description ..."></textarea>
-          </div>
+        <center>OR</center>
+        <div class="modal-body" >
+            <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
+            <center><button type="search" class="btn btn-primary action insert">Search</button></center>
+        </div>
+        <div class="modal-body" >
+            <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;">
+            </div>
         </div>
       </div>
       <div class="modal-footer">
