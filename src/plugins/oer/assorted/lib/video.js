@@ -54,9 +54,9 @@
       return false;
     };
     WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
-    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><button type="search" class="btn btn-primary action insert">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><button type="search" class="btn btn-primary action search">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Insert</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
-      var $placeholder, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
+      var $placeholder, $searchResults, $searchTerms, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
         _this = this;
       console.debug('Inside showModalDialog');
       settings = Aloha.require('assorted/assorted-plugin').settings;
@@ -64,6 +64,8 @@
       dialog = jQuery(DIALOG_HTML);
       $placeholder = dialog.find('.placeholder.preview');
       $uploadUrl = dialog.find('.upload-url-input');
+      $searchTerms = dialog.find('#video-search-input');
+      $searchResults = dialog.find('#search-results');
       $submit = dialog.find('.action.insert');
       dialog.find("#video-url-input")[0].onkeyup = function(event) {
         var currentVal, target, valid;
@@ -153,21 +155,70 @@
         }
       });
       deferred = $.Deferred();
-      dialog.on('submit', function(evt) {
-        var video;
+      dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
+        var child, embedHtml, video, video_id, _i, _len, _ref;
         console.debug('Submit pressed');
-        console.debug($el.is('img'));
         evt.preventDefault();
         if ($el.is('img')) {
           $el.attr('src', videoSource);
           return $el.attr('alt', dialog.find('[name=alt]').val());
         } else {
-          console.debug("Embedding the video");
-          video = getEmbedEle(videoSource);
-          console.debug(video);
-          AlohaInsertIntoDom(video);
+          if (videoSource.length === 0) {
+            _ref = $searchResults.children();
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              child = _ref[_i];
+              if (child.className === 'search-result-selected') {
+                video_id = child.id;
+                embedHtml = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>';
+                AlohaInsertIntoDom(jQuery(embedHtml));
+              }
+            }
+          } else {
+            video = getEmbedEle(videoSource);
+            AlohaInsertIntoDom(video);
+          }
           return dialog.modal('hide');
         }
+      });
+      dialog.on('click', '.btn.btn-primary.action.search', function(evt) {
+        var queryUrl, terms;
+        evt.preventDefault();
+        console.debug('Search pressed');
+        terms = $searchTerms[0].value.split(' ');
+        console.debug(terms);
+        queryUrl = 'https://gdata.youtube.com/feeds/api/videos?q=' + terms.join('+') + '&alt=json&v=2';
+        console.debug(queryUrl);
+        return jQuery.get(queryUrl, function(data) {
+          var idTokens, newEntry, responseObj, video, videoId, videoList, videoTitle, _i, _len, _results;
+          responseObj = jQuery.parseJSON(data);
+          videoList = responseObj.feed.entry;
+          $searchResults.empty();
+          _results = [];
+          for (_i = 0, _len = videoList.length; _i < _len; _i++) {
+            video = videoList[_i];
+            videoTitle = video.title.$t;
+            idTokens = video.id.$t.split(':');
+            videoId = idTokens[idTokens.length - 1];
+            newEntry = jQuery('<div style="width:100%" class="search-result" id=' + videoId + '>' + videoTitle + '</div>');
+            newEntry[0].onclick = function(evt) {
+              var child, targetId, _j, _len1, _ref, _results1;
+              targetId = evt.target.id;
+              _ref = $searchResults.children();
+              _results1 = [];
+              for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                child = _ref[_j];
+                if (child.id === targetId) {
+                  _results1.push(child.className = 'search-result-selected');
+                } else {
+                  _results1.push(child.className = 'search-result');
+                }
+              }
+              return _results1;
+            };
+            _results.push($searchResults.append(newEntry));
+          }
+          return _results;
+        });
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();

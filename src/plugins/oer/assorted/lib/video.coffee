@@ -64,15 +64,15 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <center>OR</center>
         <div class="modal-body" >
             <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
-            <center><button type="search" class="btn btn-primary action insert">Search</button></center>
+            <center><button type="search" class="btn btn-primary action search">Search</button></center>
         </div>
         <div class="modal-body" >
-            <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;">
+            <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">
             </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button type="submit" class="btn btn-primary action insert">Insert</button>
         <button class="btn action cancel">Cancel</button>
       </div>
     </form>'''
@@ -87,6 +87,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # Find the dynamic modal elements and bind events to the buttons
       $placeholder = dialog.find('.placeholder.preview')
       $uploadUrl =   dialog.find('.upload-url-input')
+      $searchTerms = dialog.find('#video-search-input')
+      $searchResults = dialog.find('#search-results')
       $submit = dialog.find('.action.insert')
       dialog.find("#video-url-input")[0].onkeyup = (event) -> 
         target = event.currentTarget
@@ -180,21 +182,55 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # On save update the actual video element. Use the submit event because this
       # allows the use of html5 validation.
       deferred = $.Deferred()
-      dialog.on 'submit', (evt) =>
+
+      dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
         console.debug 'Submit pressed'
-        console.debug $el.is('img')
         evt.preventDefault() # Don't submit the form
         if $el.is('img')
           $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
         else
-          console.debug "Embedding the video"
           # Embeds the video into the page
-          video = getEmbedEle(videoSource)
-          console.debug video
-          AlohaInsertIntoDom(video);
-          #$el.replaceWith(video)
+          if videoSource.length == 0
+            # Use search results
+            for child in $searchResults.children()
+              if child.className == 'search-result-selected'
+                video_id = child.id
+                embedHtml = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
+                AlohaInsertIntoDom(jQuery(embedHtml))
+          else
+            # Use url
+            video = getEmbedEle(videoSource)
+            AlohaInsertIntoDom(video);
           dialog.modal('hide')
+
+      dialog.on 'click', '.btn.btn-primary.action.search', (evt) =>
+        evt.preventDefault() # Don't submit the form
+        console.debug 'Search pressed'
+        terms = $searchTerms[0].value.split(' ')
+        console.debug terms
+        queryUrl='https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
+        console.debug queryUrl
+        jQuery.get(queryUrl, (data) => 
+                responseObj = jQuery.parseJSON(data)
+                videoList = responseObj.feed.entry
+                $searchResults.empty()
+                for video in videoList
+                  videoTitle = video.title.$t
+                  idTokens = video.id.$t.split(':')
+                  videoId = idTokens[idTokens.length-1]
+                  newEntry = jQuery('<div style="width:100%" class="search-result" id='+videoId+'>'+videoTitle+'</div>')
+                  newEntry[0].onclick = (evt) => 
+                    targetId = evt.target.id
+                    for child in $searchResults.children()
+                      if child.id == targetId
+                        child.className = 'search-result-selected'
+                      else
+                        child.className = 'search-result'
+                        
+                  $searchResults.append(newEntry)
+                )
+#response = jQuery.parseXML(text)
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
