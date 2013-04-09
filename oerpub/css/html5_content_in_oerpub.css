@@ -525,14 +525,24 @@ math{
 
 div.note{
   padding: .75em;
-  margin: .5em 3em .75em;
+  margin: 1em 3em .75em;
   border: 1px solid #333;
   border-top-color: #ccc;
   border-left-color: #ccc;
 }
 
-.note-header{
-  display: inline;
+div.note .title:before {
+    content: "\25A0  Note";
+    margin: 0 10px 0 5px;
+    color: #369;
+}
+
+div.note .title {
+  font-size: 1em;
+}
+
+div.note .body {
+  padding: 20px 10px 15px 10px;
 }
 
 .footnote-reference{
