@@ -8,8 +8,8 @@ define [
 
 	NEW_NOTE_TEMPLATE = '''
 		<div class="note">
-			<h2 class="title">Note Title</h2>
-			<p>Replace this with the body of the note</p>
+			<div class="title"></div>
+			<div class="body">Replace this with the body of the note</div>
 		</div>
 	'''
 
