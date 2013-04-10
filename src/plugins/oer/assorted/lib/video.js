@@ -50,9 +50,11 @@
       return '<p></p>';
     };
     vimeo_query_generator = function(queryTerms) {
-      var terms;
+      var terms, url;
       terms = queryTerms.split(' ');
-      return 'http://vimeo.com/api/rest/v2?format=json&method=vimeo.videos.search&user_id=jmaxg3&page=0&per_page=50&query=' + terms.join('+');
+      url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query=' + terms.join('+') + '&user_id=jmaxg3';
+      console.debug(url);
+      return url;
     };
     vimeo_search_results_generator = function(responseObj) {
       var eleList;
