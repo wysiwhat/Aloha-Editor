@@ -77,6 +77,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       </div>
     </form>'''
 
+  getTimeString = (timeInSeconds) ->
+    return timeInSeconds+' secs'
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
       console.debug 'Inside showModalDialog'
@@ -184,7 +186,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       deferred = $.Deferred()
 
       dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
-        console.debug 'Submit pressed'
         evt.preventDefault() # Don't submit the form
         if $el.is('img')
           $el.attr 'src', videoSource
@@ -206,22 +207,29 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.on 'click', '.btn.btn-primary.action.search', (evt) =>
         evt.preventDefault() # Don't submit the form
-        console.debug 'Search pressed'
         terms = $searchTerms[0].value.split(' ')
-        console.debug terms
         queryUrl='https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
-        console.debug queryUrl
+        $searchResults.empty()
+        $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'))
         jQuery.get(queryUrl, (data) => 
                 responseObj = jQuery.parseJSON(data)
                 videoList = responseObj.feed.entry
                 $searchResults.empty()
                 for video in videoList
+                  thumbnailUrl = video.media$group.media$thumbnail[0].url
+                  thumbnailHeight = video.media$group.media$thumbnail[0].height
+                  thumbnailWidth = video.media$group.media$thumbnail[0].width
                   videoTitle = video.title.$t
+                  videoDescription = video.media$group.media$description.$t
+                  videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
                   idTokens = video.id.$t.split(':')
                   videoId = idTokens[idTokens.length-1]
-                  newEntry = jQuery('<div style="width:100%" class="search-result" id='+videoId+'>'+videoTitle+'</div>')
+                  newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
                   newEntry[0].onclick = (evt) => 
-                    targetId = evt.target.id
+                    target = evt.target
+                    while target.tagName != 'DIV'
+                      target = target.parentNode
+                    targetId = target.id
                     for child in $searchResults.children()
                       if child.id == targetId
                         child.className = 'search-result-selected'

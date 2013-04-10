@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
-    var DIALOG_HTML, WARNING_IMAGE_PATH, checkURL, embedder, embedders, populator, selector, showModalDialog, uploadImage, youtube_embed_code_generator, youtube_embedder, youtube_url_validator;
+    var DIALOG_HTML, WARNING_IMAGE_PATH, checkURL, embedder, embedders, getTimeString, populator, selector, showModalDialog, uploadImage, youtube_embed_code_generator, youtube_embedder, youtube_url_validator;
     embedder = function(url_validator, embed_code_generator) {
       var result, set_embed_code_generator, set_url_validator;
       this.embed_code_gen = embed_code_generator;
@@ -55,6 +55,9 @@
     };
     WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
     DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><button type="search" class="btn btn-primary action search">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Insert</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    getTimeString = function(timeInSeconds) {
+      return timeInSeconds + ' secs';
+    };
     showModalDialog = function($el) {
       var $placeholder, $searchResults, $searchTerms, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
         _this = this;
@@ -157,7 +160,6 @@
       deferred = $.Deferred();
       dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
         var child, embedHtml, video, video_id, _i, _len, _ref;
-        console.debug('Submit pressed');
         evt.preventDefault();
         if ($el.is('img')) {
           $el.attr('src', videoSource);
@@ -183,26 +185,34 @@
       dialog.on('click', '.btn.btn-primary.action.search', function(evt) {
         var queryUrl, terms;
         evt.preventDefault();
-        console.debug('Search pressed');
         terms = $searchTerms[0].value.split(' ');
-        console.debug(terms);
         queryUrl = 'https://gdata.youtube.com/feeds/api/videos?q=' + terms.join('+') + '&alt=json&v=2';
-        console.debug(queryUrl);
+        $searchResults.empty();
+        $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'));
         return jQuery.get(queryUrl, function(data) {
-          var idTokens, newEntry, responseObj, video, videoId, videoList, videoTitle, _i, _len, _results;
+          var idTokens, newEntry, responseObj, thumbnailHeight, thumbnailUrl, thumbnailWidth, video, videoDescription, videoId, videoLengthString, videoList, videoTitle, _i, _len, _results;
           responseObj = jQuery.parseJSON(data);
           videoList = responseObj.feed.entry;
           $searchResults.empty();
           _results = [];
           for (_i = 0, _len = videoList.length; _i < _len; _i++) {
             video = videoList[_i];
+            thumbnailUrl = video.media$group.media$thumbnail[0].url;
+            thumbnailHeight = video.media$group.media$thumbnail[0].height;
+            thumbnailWidth = video.media$group.media$thumbnail[0].width;
             videoTitle = video.title.$t;
+            videoDescription = video.media$group.media$description.$t;
+            videoLengthString = getTimeString(video.media$group.yt$duration.seconds);
             idTokens = video.id.$t.split(':');
             videoId = idTokens[idTokens.length - 1];
-            newEntry = jQuery('<div style="width:100%" class="search-result" id=' + videoId + '>' + videoTitle + '</div>');
+            newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=' + videoId + '><table><tr><td rowspan=3><img src=' + thumbnailUrl + ' /></td><td><b>' + videoTitle + '</b></td></tr><tr><td>' + videoDescription + '</td></tr><tr><td>Duration: ' + videoLengthString + '</td></tr></table></div>');
             newEntry[0].onclick = function(evt) {
-              var child, targetId, _j, _len1, _ref, _results1;
-              targetId = evt.target.id;
+              var child, target, targetId, _j, _len1, _ref, _results1;
+              target = evt.target;
+              while (target.tagName !== 'DIV') {
+                target = target.parentNode;
+              }
+              targetId = target.id;
               _ref = $searchResults.children();
               _results1 = [];
               for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
