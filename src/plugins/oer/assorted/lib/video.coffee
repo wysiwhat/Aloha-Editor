@@ -4,9 +4,11 @@
 #
 define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
 
-  embedder = (url_validator, embed_code_generator) ->
+  embedder = (url_validator, embed_code_generator, query_generator, search_results_generator) ->
     this.embed_code_gen = embed_code_generator
     this.url_validator = url_validator
+    this.query_generator = query_generator
+    this.search_results_generator = search_results_generator
     embed_code_generator = (url) ->
       # Generates embed html -- this function should be replaced
       embed_html = '<p> Hello World </p>'
@@ -35,13 +37,60 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 #embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
       embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
     return embed_html
-  youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator)
+
+  youtube_query_generator = (queryTerms) -> 
+    terms = queryTerms.split(' ')
+    return 'https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
+
+  youtube_search_results_generator = (responseObj) ->
+    eleList = [ ]
+    videoList = responseObj.feed.entry
+    for video in videoList
+      thumbnailUrl = video.media$group.media$thumbnail[0].url
+      thumbnailHeight = video.media$group.media$thumbnail[0].height
+      thumbnailWidth = video.media$group.media$thumbnail[0].width
+      videoTitle = video.title.$t
+      videoDescription = video.media$group.media$description.$t
+      videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
+      idTokens = video.id.$t.split(':')
+      videoId = idTokens[idTokens.length-1]
+      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      eleList.push(newEntry)
+    return eleList
+
+  vimeo_url_validator = (url) ->
+    true
+  
+  vimeo_embed_code_generator = (url) ->
+    return '<p></p>'
+#video_id = youtube_url_validator(url)
+#    embed_html = ''
+#    if (video_id)
+#embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
+#      embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
+#    return embed_html
+
+  vimeo_query_generator = (queryTerms) -> 
+    terms = queryTerms.split(' ')
+    return 'http://vimeo.com/api/rest/v2?format=json&method=vimeo.videos.search&user_id=jmaxg3&page=0&per_page=50&query='+terms.join('+')
+
+  vimeo_search_results_generator = (responseObj) ->
+    eleList = [ ]
+    console.debug responseObj
+    return [ ]
+
+
+  youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
+  vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator)
 
   # Adds the youtube embedders to the list of embedders
   embedders = []
   embedders[0] = youtube_embedder
-  console.debug 'initializing'
+  embedders[1] = vimeo_embedder
 
+  active_embedder = youtube_embedder
+  active_embedder_value = 'youtube'
+  
   checkURL = (url) ->
     for embedder in embedders
       if (embedder.url_validator(url)) 
@@ -64,6 +113,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <center>OR</center>
         <div class="modal-body" >
             <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
+            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo</input></td></tr></table></center>
             <center><button type="search" class="btn btn-primary action search">Search</button></center>
         </div>
         <div class="modal-body" >
@@ -77,6 +127,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       </div>
     </form>'''
 
+ 
   getTimeString = (timeInSeconds) ->
     nHours = 0
     nMinutes = 0
@@ -128,6 +179,20 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             target.style.borderColor='red'
             target.style.borderWidth='medium'
 
+      for radio in dialog.find('#media-sites')
+        radio.onclick = (event) ->
+          console.debug 'Radio button clicked'
+          val = event.target.value
+          if active_embedder_value != val
+            index = 0
+            for radio in dialog.find('#media-sites')
+              if radio.value == val
+                console.debug 'Setting '+radio.value
+                active_embedder_value = radio.value
+                active_embedder = embedders[index]
+                break
+              index = index + 1
+              
       # If we're editing an image pull in the src.
       # It will be undefined if this is a new image.
       #
@@ -232,25 +297,15 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.on 'click', '.btn.btn-primary.action.search', (evt) =>
         evt.preventDefault() # Don't submit the form
-        terms = $searchTerms[0].value.split(' ')
-        queryUrl='https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
+        queryUrl = active_embedder.query_generator($searchTerms[0].value)
         $searchResults.empty()
         $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'))
         jQuery.get(queryUrl, (data) => 
-                responseObj = jQuery.parseJSON(data)
-                videoList = responseObj.feed.entry
                 $searchResults.empty()
-                for video in videoList
-                  thumbnailUrl = video.media$group.media$thumbnail[0].url
-                  thumbnailHeight = video.media$group.media$thumbnail[0].height
-                  thumbnailWidth = video.media$group.media$thumbnail[0].width
-                  videoTitle = video.title.$t
-                  videoDescription = video.media$group.media$description.$t
-                  videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
-                  idTokens = video.id.$t.split(':')
-                  videoId = idTokens[idTokens.length-1]
-                  newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
-                  newEntry[0].onclick = (evt) => 
+                responseObj = jQuery.parseJSON(data)
+                searchElements = active_embedder.search_results_generator(responseObj)
+                for ele in searchElements
+                   ele.onclick = (evt) => 
                     target = evt.target
                     while target.tagName != 'DIV'
                       target = target.parentNode
@@ -260,10 +315,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                         child.className = 'search-result-selected'
                       else
                         child.className = 'search-result'
-                        
-                  $searchResults.append(newEntry)
+                   $searchResults.append(ele)
                 )
-#response = jQuery.parseXML(text)
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form

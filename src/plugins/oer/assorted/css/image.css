@@ -46,6 +46,7 @@ form#linkModal:focus {
     width:100%;
     border-bottom: 2px solid white;
     cursor:pointer;
+    font-size:90%;
 }
 
 .search-result:hover {
