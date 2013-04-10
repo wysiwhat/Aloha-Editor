@@ -78,7 +78,32 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     </form>'''
 
   getTimeString = (timeInSeconds) ->
-    return timeInSeconds+' secs'
+    nHours = 0
+    nMinutes = 0
+    nSeconds = 0
+    ivalue = parseInt(timeInSeconds)
+
+    if ivalue > 3600
+      nHours = Math.floor(ivalue / 3600)
+      ivalue = ivalue - (3600 * nHours)
+    if ivalue > 60
+      nMinutes = Math.floor(ivalue / 60)
+      ivalue = ivalue - (60 * nMinutes)
+    nSeconds = ivalue
+
+    str = ''
+    if nHours > 0
+      str = str + nHours.toString()+' hours'
+    if nMinutes > 0
+      if str.length != 0
+        str = str + ', '
+      str = str + nMinutes.toString() + ' mins'
+    if nSeconds > 0
+      if str.length != 0
+        str = str + ', '
+      str = str + nSeconds.toString() + ' secs'
+    return str
+
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
       console.debug 'Inside showModalDialog'

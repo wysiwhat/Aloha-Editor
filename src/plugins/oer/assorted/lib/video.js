@@ -56,7 +56,37 @@
     WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
     DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><button type="search" class="btn btn-primary action search">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Insert</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     getTimeString = function(timeInSeconds) {
-      return timeInSeconds + ' secs';
+      var ivalue, nHours, nMinutes, nSeconds, str;
+      nHours = 0;
+      nMinutes = 0;
+      nSeconds = 0;
+      ivalue = parseInt(timeInSeconds);
+      if (ivalue > 3600) {
+        nHours = Math.floor(ivalue / 3600);
+        ivalue = ivalue - (3600 * nHours);
+      }
+      if (ivalue > 60) {
+        nMinutes = Math.floor(ivalue / 60);
+        ivalue = ivalue - (60 * nMinutes);
+      }
+      nSeconds = ivalue;
+      str = '';
+      if (nHours > 0) {
+        str = str + nHours.toString() + ' hours';
+      }
+      if (nMinutes > 0) {
+        if (str.length !== 0) {
+          str = str + ', ';
+        }
+        str = str + nMinutes.toString() + ' mins';
+      }
+      if (nSeconds > 0) {
+        if (str.length !== 0) {
+          str = str + ', ';
+        }
+        str = str + nSeconds.toString() + ' secs';
+      }
+      return str;
     };
     showModalDialog = function($el) {
       var $placeholder, $searchResults, $searchTerms, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
