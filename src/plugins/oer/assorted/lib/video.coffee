@@ -9,20 +9,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     this.url_validator = url_validator
     this.query_generator = query_generator
     this.search_results_generator = search_results_generator
-    embed_code_generator = (url) ->
-      # Generates embed html -- this function should be replaced
-      embed_html = '<p> Hello World </p>'
-      '''
-      Validates a URL. Returns video id if URL is valide. Else returns false.
-      Should be replaced with actual function. The default validates youtube URLs
-      '''
-    url_validator = (url) ->
-      regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
-      result = if(url.match(regexp)) then RegExp.$1 else false
-    set_embed_code_generator = (url) ->
-      this.embed_code_gen = embed_code_generator
-    set_url_validator = (url) ->
-      this.url_validator = url_validator
     result = this
 
   # Creates a youtube embedder
@@ -30,13 +16,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
     result = if(url.match(regexp)) then RegExp.$1 else false
   
-  youtube_embed_code_generator = (url) ->
-    video_id = youtube_url_validator(url)
-    embed_html = ''
-    if (video_id)
-#embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
-      embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
-    return embed_html
+  youtube_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>')
 
   youtube_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
@@ -220,24 +201,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         $uploadUrl.val(videoSource)
         $uploadUrl.show()
       # Retrieves embedder which can matches the format of the URL
-      getEmbedder = (url) ->
-        for embedder in embedders
-          if (embedder.url_validator(url)) 
-            return embedder
-        return false
+
       setvideoSource = (href) ->
         videoSource = href
         $submit.removeClass('disabled')
-      getEmbedEle = (url) ->
-        # Retrieves the embedder for this type of video
-        if(!(embedder = getEmbedder(url)))
-          console.debug("Error: URL not supported")
-          # TODO - ADD HELPFUL MESSAGE TO USER
-          dialog.modal('hide')
 
-        video = jQuery(embedder.embed_code_gen(url));
-        video.attr 'alt', dialog.find('[name=alt]').val()
-        return video
       # Uses the File API to render a preview of the image
       # and updates the modal's videoSource
       loadLocalFile = (file, $img, callback) ->
@@ -287,11 +255,10 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             for child in $searchResults.children()
               if child.className == 'search-result-selected'
                 video_id = child.id
-                embedHtml = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
-                AlohaInsertIntoDom(jQuery(embedHtml))
+                AlohaInsertIntoDom(active_embedder.embed_code_gen(video_id))
           else
             # Use url
-            video = getEmbedEle(videoSource)
+            video = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource))
             AlohaInsertIntoDom(video);
           dialog.modal('hide')
 
@@ -305,17 +272,19 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 responseObj = jQuery.parseJSON(data)
                 searchElements = active_embedder.search_results_generator(responseObj)
                 for ele in searchElements
-                   ele.onclick = (evt) => 
-                    target = evt.target
-                    while target.tagName != 'DIV'
-                      target = target.parentNode
-                    targetId = target.id
-                    for child in $searchResults.children()
-                      if child.id == targetId
-                        child.className = 'search-result-selected'
-                      else
-                        child.className = 'search-result'
-                   $searchResults.append(ele)
+                  console.debug ele
+                  ele[0].onclick = (evt) => 
+                   console.debug evt
+                   target = evt.target
+                   while target.tagName != 'DIV'
+                     target = target.parentNode
+                   targetId = target.id
+                   for child in $searchResults.children()
+                     if child.id == targetId
+                       child.className = 'search-result-selected'
+                     else
+                       child.className = 'search-result'
+                  $searchResults.append(ele)
                 )
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>

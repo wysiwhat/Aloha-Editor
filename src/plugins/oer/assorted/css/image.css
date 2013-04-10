@@ -55,4 +55,9 @@ form#linkModal:focus {
 
 .search-result-selected {
     background:#888;
+    width:100%;
+    border-bottom: 2px solid white;
+    cursor:pointer;
+    font-size:90%;
+
 }
