@@ -7,10 +7,12 @@ define [
 	'ui/button'], (Aloha, Plugin, jQuery, Ephemera, UI, Button) ->
 
 	NEW_NOTE_TEMPLATE = '''
-		<div class="note">
-			<div class="title"></div>
-			<div class="body">Replace this with the body of the note</div>
-		</div>
+        <div class="note-container">
+            <div class="note">
+                <div class="title"></div>
+                <div class="body">Replace this with the body of the note</div>
+            </div>
+        </div>
 	'''
 
 	UI.adopt 'insertNote', Button,
@@ -35,9 +37,11 @@ define [
   # 3. Enables aloha on the title
   # 4. Enables aloha on the body (all the other children)
   # 5. Register the note with the block plugin (so it can be moved around)
-	enable = ($note) ->
+	enable = ($noteContainer) ->
+		# get the note from the container 
+		$note = $noteContainer.children('.note')
 		# Pull out the title (as long as it's the 1st element)
-		$title = $note.children(':not(.aloha-block-handle)').first()
+		$title = $note.children('.title')
 		# If there is no title, prepend one
 		$title = jQuery('<h1 class="title"></h1>').prependTo $note if not $title.is('.title')
 
@@ -55,8 +59,14 @@ define [
 		$title.aloha()
 		$body.aloha()
 
+		$noteContainer
+			.bind 'mouseover', (e) ->
+				$noteContainer.addClass('active') if !$note.find('.note-container.active').length
+			.bind 'mouseout', (e) ->
+				$noteContainer.removeClass('active')
+
 		# After setting up the editable children, enable the block
-		$note.alohaBlock()
+		$noteContainer.alohaBlock()
 
 
 	Aloha.bind 'aloha-editable-activated', (evt, props) ->

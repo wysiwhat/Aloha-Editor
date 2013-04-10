@@ -2,7 +2,7 @@
 
 define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
   var NEW_NOTE_TEMPLATE, enable;
-  NEW_NOTE_TEMPLATE = '<div class="note">\n	<div class="title"></div>\n	<div class="body">Replace this with the body of the note</div>\n</div>';
+  NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
   UI.adopt('insertNote', Button, {
     click: function(a, b, c) {
       var $newNote, range;
@@ -15,9 +15,10 @@ define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button
       return enable($newNote);
     }
   });
-  enable = function($note) {
-    var $body, $title;
-    $title = $note.children(':not(.aloha-block-handle)').first();
+  enable = function($noteContainer) {
+    var $body, $note, $title;
+    $note = $noteContainer.children('.note');
+    $title = $note.children('.title');
     if (!$title.is('.title')) {
       $title = jQuery('<h1 class="title"></h1>').prependTo($note);
     }
@@ -29,7 +30,14 @@ define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button
     $body.appendTo($note);
     $title.aloha();
     $body.aloha();
-    return $note.alohaBlock();
+    $noteContainer.bind('mouseover', function(e) {
+      if (!$note.find('.note-container.active').length) {
+        return $noteContainer.addClass('active');
+      }
+    }).bind('mouseout', function(e) {
+      return $noteContainer.removeClass('active');
+    });
+    return $noteContainer.alohaBlock();
   };
   return Aloha.bind('aloha-editable-activated', function(evt, props) {
     return props.editable.obj.find('.note').each(function(i, note) {

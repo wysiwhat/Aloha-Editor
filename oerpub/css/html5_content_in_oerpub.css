@@ -531,9 +531,17 @@ div.note{
   border-left-color: #ccc;
 }
 
+div.note-container.active {
+    border: 1px solid #ccc;
+}
+div.note-container {
+    padding: 10px 0 10px;
+    margin-top: 10px;
+}
+
 div.note .title:before {
     content: "\25A0  Note";
-    margin: 0 10px 0 5px;
+    margin: 5px 10px 0 5px;
     color: #369;
 }
 
