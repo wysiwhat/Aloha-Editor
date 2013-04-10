@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
     var NEW_NOTE_TEMPLATE, enable;
-    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
+    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href=""><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
     $(document).on('mouseenter', '.aloha-block-draghandle', function() {
       return $(this).parents('.note-container').addClass('drag-active');
     }).on('mouseleave', '.aloha-block-draghandle', function() {

@@ -8,6 +8,10 @@ define [
 
 	NEW_NOTE_TEMPLATE = '''
         <div class="note-container">
+            <div class="note-controlls">
+               <a href=""><i class="icon-remove"></i></a> 
+               <a href=""><i class="icon-cog"></i></a> 
+            </div> 
             <div class="note">
                 <div class="title"></div>
                 <div class="body">Replace this with the body of the note</div>

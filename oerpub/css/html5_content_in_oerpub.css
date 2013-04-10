@@ -523,15 +523,18 @@ math{
 
 /* ========== note ========== */
 
-div.note {
-  padding: .75em;
-  margin: 1em 3em .75em;
-  border: 1px solid #333;
-  border-top-color: #ccc;
-  border-left-color: #ccc;
+.note-container.drag-active {
+    background: #FAFAFA;
+}
+.note-container.active {
+    border: 1px solid #ccc;
+}
+.note-container {
+    padding: 10px 0 10px;
+    margin-top: 10px;
 }
 
-div.note-container .aloha-block-handle {
+.note-container .aloha-block-handle {
     background-image: 
         linear-gradient(45deg, #C0C0C0 25%, transparent 25%, transparent 75%, #C0C0C0 75%), 
         linear-gradient(45deg, #C0C0C0 25%, transparent 25%, transparent 75%, #C0C0C0 75%);
@@ -546,32 +549,47 @@ div.note-container .aloha-block-handle {
     position: absolute;
     left: 50%;
 }
-div.note-container.drag-active .aloha-block-handle {
+.note-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
 }
 
-div.note-container.drag-active {
-    background: #FAFAFA;
-}
-div.note-container.active {
-    border: 1px solid #ccc;
-}
-div.note-container {
-    padding: 10px 0 10px;
-    margin-top: 10px;
+.note {
+    padding: 20px;
+    margin: 10px 50px 10px 50px;
+    border: 1px solid #333;
+    border-top-color: #ccc;
+    border-left-color: #ccc;
 }
 
-div.note .title:before {
+.note-container .note-controlls {
+    border-left: 1px solid #ccc;
+    background: #F5F5F5;
+    padding-left: 1px; 
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 100%;
+    display: none; 
+}
+.note-container.active .note-controlls {
+    display: block;
+}
+.note-container.active .note-controlls a:hover {
+    background: #CCC;
+}
+
+.note .title:before {
     content: "\25A0  Note";
     margin: 5px 10px 0 5px;
     color: #369;
 }
 
-div.note .title {
+.note .title {
   font-size: 1em;
 }
 
-div.note .body {
+.note .body {
   padding: 20px 10px 15px 10px;
 }
 
