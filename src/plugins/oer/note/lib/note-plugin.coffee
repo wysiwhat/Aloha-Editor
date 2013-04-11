@@ -25,12 +25,12 @@ define [
 		.on('mouseleave', '.aloha-block-draghandle', () -> $(this).parents('.note-container').removeClass('drag-active') if not $(this).data('dragging'))
 		.on('mousedown' , '.aloha-block-draghandle', () -> $(this).data('dragging', true))
 		.on('mouseup'   , '.aloha-block-draghandle', () -> $(this).data('dragging', false))
-		.on('mouseleave', '.note-container'        , () -> $(this).children('.aloha-block-draghandle').hide() if not $(this).children('.aloha-block-draghandle').data('dragging'))
-		.on('mouseover' , '.note-container'        , () -> $(this).children('.aloha-block-draghandle').show())
 
     # events for active state when interacting with the note
 	$(document)
-		.on('mouseover' , '.note-container', () -> $(this).addClass('active') if !$(this).find('.note-container.active').length)
+		.on('mouseover' , '.note-container', () ->
+			$(this).addClass('active') if !$(this).find('.note-container.active').length
+			$(this).parents('.note-container').removeClass('active'))
 		.on('mouseleave', '.note-container', () -> $(this).removeClass('active'))
 
 	UI.adopt 'insertNote', Button,

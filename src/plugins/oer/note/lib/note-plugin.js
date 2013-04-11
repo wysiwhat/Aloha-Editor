@@ -14,17 +14,12 @@
       return $(this).data('dragging', true);
     }).on('mouseup', '.aloha-block-draghandle', function() {
       return $(this).data('dragging', false);
-    }).on('mouseleave', '.note-container', function() {
-      if (!$(this).children('.aloha-block-draghandle').data('dragging')) {
-        return $(this).children('.aloha-block-draghandle').hide();
-      }
-    }).on('mouseover', '.note-container', function() {
-      return $(this).children('.aloha-block-draghandle').show();
     });
     $(document).on('mouseover', '.note-container', function() {
       if (!$(this).find('.note-container.active').length) {
-        return $(this).addClass('active');
+        $(this).addClass('active');
       }
+      return $(this).parents('.note-container').removeClass('active');
     }).on('mouseleave', '.note-container', function() {
       return $(this).removeClass('active');
     });

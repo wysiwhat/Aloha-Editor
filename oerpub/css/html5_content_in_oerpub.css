@@ -548,9 +548,13 @@ math{
     margin: 5px 0 0 0;
     position: absolute;
     left: 50%;
+    display: none !important; /* override the default aloha display logic for handles */
 }
 .note-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
+}
+.note-container.active > .aloha-block-handle {
+    display: block !important; /* override the default aloha display logic for handles */
 }
 
 .note {
@@ -572,7 +576,7 @@ math{
     height: 100%;
     display: none; 
 }
-.note-container.active .note-controlls {
+.note-container.active > .note-controlls {
     display: block;
 }
 .note-container.active .note-controlls a:hover {
