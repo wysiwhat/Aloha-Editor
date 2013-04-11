@@ -587,9 +587,23 @@ math{
     background: #CCC;
 }
 
-.note .type-selector {
+.note-container .type:before {
+    content: "\25A0";
+    margin-right: 3px;
+}
+.note-container.active > .note > .title-container .type:before {
+    content: "\25BE";
+    margin-right: 3px;
+}
+
+.note .type {
     margin: 5px 10px 0 5px;
     color: #369;
+    text-decoration: none;
+}
+
+.note .title-container li {
+    list-style-type: none !important; 
 }
 
 .note .title {

@@ -13,8 +13,15 @@ define [
                <a href=""><i class="icon-cog"></i></a> 
             </div> 
             <div class="note">
-                <div class="title-container">
-                    <span class="type-selector">&#9632; Note</span>
+                <div class="title-container dropdown">
+                    <a class="type" data-toggle="dropdown">Note</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="">Note</a></li>
+                        <li><a href="">Aside</a></li>
+                        <li><a href="">Warning</a></li>
+                        <li><a href="">Tip</a></li>
+                        <li><a href="">Important</a></li>
+                    </ul>
                     <span class="title" placeholder="Add a title (optional)"></span>
                 </div>
                 <div class="body" placeholder="Type the text of your note here."></div>
@@ -44,22 +51,22 @@ define [
 
 		$node.data('noteEventsInitialized', true)
 
- 	    # events for the drag handle
+ 	    # drag handle
 		$node
 			.on('mouseenter', '.aloha-block-draghandle', () -> $(this).parents('.note-container').addClass('drag-active'))
 			.on('mouseleave', '.aloha-block-draghandle', () -> $(this).parents('.note-container').removeClass('drag-active') if not $(this).data('dragging'))
 			.on('mousedown' , '.aloha-block-draghandle', () -> $(this).data('dragging', true))
 			.on('mouseup'   , '.aloha-block-draghandle', () -> $(this).data('dragging', false))
 
- 	    # events for active state when hovering on a note
- 	    # when hovering over a nested note only the child is active 
+ 	    # active state when hovering on a note when hovering 
+ 	    # over a nested note only the child is active 
 		$node
 			.on('mouseover' , '.note-container', () ->
 				$(this).addClass('active') if !$(this).find('.note-container.active').length
 				$(this).parents('.note-container').removeClass('active'))
 			.on('mouseleave', '.note-container', () -> $(this).removeClass('active'))
 
- 	    # events for note controlls 
+ 	    # note controlls 
 		$node
 			.on('click' , '.note-container .note-delete', (e) ->
 				e.preventDefault()
@@ -67,6 +74,7 @@ define [
 				$note.slideUp 'slow', () -> $note.remove()
 			)
 
+ 	    # placeholder text 
 		$node
 			.on('click' , '.note-container [placeholder]', (e) ->
 				$(this).removeClass('placeholder')
@@ -77,6 +85,12 @@ define [
 					$(this).addClass('placeholder')
 			)
 
+ 	    # note type selector 
+		$node
+			.on('click' , '.note-container .title-container li a', (e) ->
+				e.preventDefault()
+				$(this).parents('.title-container').first().children('.type').text($(this).text())
+			)
 	# ## Enable Editing a Note
 	# Cleans up a Note (`.note`) and prepares it for editing by:
 	#

@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
     var NEW_NOTE_TEMPLATE, bindNoteEventsTo, enable, mostSeniorEditableOf;
-    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href="" class="note-delete"><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title-container">\n            <span class="type-selector">&#9632; Note</span>\n            <span class="title" placeholder="Add a title (optional)"></span>\n        </div>\n        <div class="body" placeholder="Type the text of your note here."></div>\n    </div>\n</div>';
+    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href="" class="note-delete"><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title-container dropdown">\n            <a class="type" data-toggle="dropdown">Note</a>\n            <ul class="dropdown-menu">\n                <li><a href="">Note</a></li>\n                <li><a href="">Aside</a></li>\n                <li><a href="">Warning</a></li>\n                <li><a href="">Tip</a></li>\n                <li><a href="">Important</a></li>\n            </ul>\n            <span class="title" placeholder="Add a title (optional)"></span>\n        </div>\n        <div class="body" placeholder="Type the text of your note here."></div>\n    </div>\n</div>';
     UI.adopt('insertNote', Button, {
       click: function(a, b, c) {
         var $newNote, range;
@@ -51,7 +51,7 @@
           return $note.remove();
         });
       });
-      return $node.on('click', '.note-container [placeholder]', function(e) {
+      $node.on('click', '.note-container [placeholder]', function(e) {
         $(this).removeClass('placeholder');
         if ($(this).attr('placeholder') === $(this).text()) {
           return $(this).text('');
@@ -61,6 +61,10 @@
           $(this).text($(this).attr('placeholder'));
           return $(this).addClass('placeholder');
         }
+      });
+      return $node.on('click', '.note-container .title-container li a', function(e) {
+        e.preventDefault();
+        return $(this).parents('.title-container').first().children('.type').text($(this).text());
       });
     };
     enable = function($noteContainer) {
