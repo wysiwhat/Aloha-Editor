@@ -2,27 +2,8 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
-    var NEW_NOTE_TEMPLATE, enable;
+    var NEW_NOTE_TEMPLATE, bindNoteEventsTo, enable, mostSeniorEditableOf;
     NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href=""><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
-    $(document).on('mouseenter', '.aloha-block-draghandle', function() {
-      return $(this).parents('.note-container').addClass('drag-active');
-    }).on('mouseleave', '.aloha-block-draghandle', function() {
-      if (!$(this).data('dragging')) {
-        return $(this).parents('.note-container').removeClass('drag-active');
-      }
-    }).on('mousedown', '.aloha-block-draghandle', function() {
-      return $(this).data('dragging', true);
-    }).on('mouseup', '.aloha-block-draghandle', function() {
-      return $(this).data('dragging', false);
-    });
-    $(document).on('mouseover', '.note-container', function() {
-      if (!$(this).find('.note-container.active').length) {
-        $(this).addClass('active');
-      }
-      return $(this).parents('.note-container').removeClass('active');
-    }).on('mouseleave', '.note-container', function() {
-      return $(this).removeClass('active');
-    });
     UI.adopt('insertNote', Button, {
       click: function(a, b, c) {
         var $newNote, range;
@@ -35,6 +16,35 @@
         return enable($newNote);
       }
     });
+    mostSeniorEditableOf = function($node) {
+      return $node.parents('.aloha-editable').last();
+    };
+    bindNoteEventsTo = function($node) {
+      if ($node.data('noteEventsInitialized')) {
+        return;
+      }
+      console.log('binding note events');
+      $node.data('noteEventsInitialized', true);
+      $node.on('mouseenter', '.aloha-block-draghandle', function() {
+        return $(this).parents('.note-container').addClass('drag-active');
+      }).on('mouseleave', '.aloha-block-draghandle', function() {
+        if (!$(this).data('dragging')) {
+          return $(this).parents('.note-container').removeClass('drag-active');
+        }
+      }).on('mousedown', '.aloha-block-draghandle', function() {
+        return $(this).data('dragging', true);
+      }).on('mouseup', '.aloha-block-draghandle', function() {
+        return $(this).data('dragging', false);
+      });
+      return $node.on('mouseover', '.note-container', function() {
+        if (!$(this).find('.note-container.active').length) {
+          $(this).addClass('active');
+        }
+        return $(this).parents('.note-container').removeClass('active');
+      }).on('mouseleave', '.note-container', function() {
+        return $(this).removeClass('active');
+      });
+    };
     enable = function($noteContainer) {
       var $body, $note, $title;
       $note = $noteContainer.children('.note');
@@ -50,7 +60,8 @@
       $body.appendTo($note);
       $title.aloha();
       $body.aloha();
-      return $noteContainer.alohaBlock();
+      $noteContainer.alohaBlock();
+      return bindNoteEventsTo(mostSeniorEditableOf($noteContainer));
     };
     return Aloha.bind('aloha-editable-activated', function(evt, props) {
       return props.editable.obj.find('.note').each(function(i, note) {

@@ -19,20 +19,6 @@ define [
         </div>
 	'''
 
-    # events for state when interacting with the drag handle
-	$(document)
-		.on('mouseenter', '.aloha-block-draghandle', () -> $(this).parents('.note-container').addClass('drag-active'))
-		.on('mouseleave', '.aloha-block-draghandle', () -> $(this).parents('.note-container').removeClass('drag-active') if not $(this).data('dragging'))
-		.on('mousedown' , '.aloha-block-draghandle', () -> $(this).data('dragging', true))
-		.on('mouseup'   , '.aloha-block-draghandle', () -> $(this).data('dragging', false))
-
-    # events for active state when interacting with the note
-	$(document)
-		.on('mouseover' , '.note-container', () ->
-			$(this).addClass('active') if !$(this).find('.note-container.active').length
-			$(this).parents('.note-container').removeClass('active'))
-		.on('mouseleave', '.note-container', () -> $(this).removeClass('active'))
-
 	UI.adopt 'insertNote', Button,
 		click: (a, b, c) ->
 			# The action for creating a new note
@@ -47,6 +33,28 @@ define [
       $newNote.removeClass('aloha-new-note')
       enable($newNote)
 
+	mostSeniorEditableOf = ($node) ->
+		$node.parents('.aloha-editable').last()
+
+	bindNoteEventsTo = ($node) ->
+		return if $node.data('noteEventsInitialized')
+		console.log('binding note events')
+
+		$node.data('noteEventsInitialized', true)
+
+ 	    # events for state when interacting with the drag handle
+		$node
+			.on('mouseenter', '.aloha-block-draghandle', () -> $(this).parents('.note-container').addClass('drag-active'))
+			.on('mouseleave', '.aloha-block-draghandle', () -> $(this).parents('.note-container').removeClass('drag-active') if not $(this).data('dragging'))
+			.on('mousedown' , '.aloha-block-draghandle', () -> $(this).data('dragging', true))
+			.on('mouseup'   , '.aloha-block-draghandle', () -> $(this).data('dragging', false))
+
+ 	    # events for active state when interacting with the note
+		$node
+			.on('mouseover' , '.note-container', () ->
+				$(this).addClass('active') if !$(this).find('.note-container.active').length
+				$(this).parents('.note-container').removeClass('active'))
+			.on('mouseleave', '.note-container', () -> $(this).removeClass('active'))
 
 	# ## Enable Editing a Note
 	# Cleans up a Note (`.note`) and prepares it for editing by:
@@ -80,6 +88,10 @@ define [
 
 		# After setting up the editable children, enable the block
 		$noteContainer.alohaBlock()
+
+		# Bind all JS events needed for note interaction 
+		bindNoteEventsTo mostSeniorEditableOf $noteContainer
+
 
 	Aloha.bind 'aloha-editable-activated', (evt, props) ->
 		props.editable.obj.find('.note').each (i, note) ->
