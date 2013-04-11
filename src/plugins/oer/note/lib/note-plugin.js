@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
     var NEW_NOTE_TEMPLATE, bindNoteEventsTo, enable, mostSeniorEditableOf;
-    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href=""><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
+    NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href="" class="note-delete"><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title"></div>\n        <div class="body">Replace this with the body of the note</div>\n    </div>\n</div>';
     UI.adopt('insertNote', Button, {
       click: function(a, b, c) {
         var $newNote, range;
@@ -36,13 +36,21 @@
       }).on('mouseup', '.aloha-block-draghandle', function() {
         return $(this).data('dragging', false);
       });
-      return $node.on('mouseover', '.note-container', function() {
+      $node.on('mouseover', '.note-container', function() {
         if (!$(this).find('.note-container.active').length) {
           $(this).addClass('active');
         }
         return $(this).parents('.note-container').removeClass('active');
       }).on('mouseleave', '.note-container', function() {
         return $(this).removeClass('active');
+      });
+      return $node.on('click', '.note-container .note-delete', function(e) {
+        var $note;
+        e.preventDefault();
+        $note = $(this).parents('.note-container').first();
+        return $note.slideUp('slow', function() {
+          return $note.remove();
+        });
       });
     };
     enable = function($noteContainer) {

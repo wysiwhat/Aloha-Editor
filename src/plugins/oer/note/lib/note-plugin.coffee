@@ -9,7 +9,7 @@ define [
 	NEW_NOTE_TEMPLATE = '''
         <div class="note-container">
             <div class="note-controlls">
-               <a href=""><i class="icon-remove"></i></a> 
+               <a href="" class="note-delete"><i class="icon-remove"></i></a> 
                <a href=""><i class="icon-cog"></i></a> 
             </div> 
             <div class="note">
@@ -42,19 +42,28 @@ define [
 
 		$node.data('noteEventsInitialized', true)
 
- 	    # events for state when interacting with the drag handle
+ 	    # events for the drag handle
 		$node
 			.on('mouseenter', '.aloha-block-draghandle', () -> $(this).parents('.note-container').addClass('drag-active'))
 			.on('mouseleave', '.aloha-block-draghandle', () -> $(this).parents('.note-container').removeClass('drag-active') if not $(this).data('dragging'))
 			.on('mousedown' , '.aloha-block-draghandle', () -> $(this).data('dragging', true))
 			.on('mouseup'   , '.aloha-block-draghandle', () -> $(this).data('dragging', false))
 
- 	    # events for active state when interacting with the note
+ 	    # events for active state when hovering on a note
+ 	    # when hovering over a nested note only the child is active 
 		$node
 			.on('mouseover' , '.note-container', () ->
 				$(this).addClass('active') if !$(this).find('.note-container.active').length
 				$(this).parents('.note-container').removeClass('active'))
 			.on('mouseleave', '.note-container', () -> $(this).removeClass('active'))
+
+ 	    # events for note controlls 
+		$node
+			.on('click' , '.note-container .note-delete', (e) ->
+				e.preventDefault()
+				$note = $(this).parents('.note-container').first()
+				$note.slideUp 'slow', () -> $note.remove()
+			)
 
 	# ## Enable Editing a Note
 	# Cleans up a Note (`.note`) and prepares it for editing by:
