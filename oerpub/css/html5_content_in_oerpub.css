@@ -523,6 +523,10 @@ math{
 
 /* ========== note ========== */
 
+.placeholder {
+    color: #AAA;
+}
+
 .note-container.drag-active {
     background: #FAFAFA;
 }
@@ -583,14 +587,19 @@ math{
     background: #CCC;
 }
 
-.note .title:before {
-    content: "\25A0  Note";
+.note .type-selector {
     margin: 5px 10px 0 5px;
     color: #369;
 }
 
 .note .title {
   font-size: 1em;
+}
+.note .title.placeholder {
+    display: none;
+}
+.note-container.active > .note > .title-container .title.placeholder {
+    display: inline;
 }
 
 .note .body {

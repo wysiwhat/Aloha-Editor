@@ -13,8 +13,11 @@ define [
                <a href=""><i class="icon-cog"></i></a> 
             </div> 
             <div class="note">
-                <div class="title"></div>
-                <div class="body">Replace this with the body of the note</div>
+                <div class="title-container">
+                    <span class="type-selector">&#9632; Note</span>
+                    <span class="title" placeholder="Add a title (optional)"></span>
+                </div>
+                <div class="body" placeholder="Type the text of your note here."></div>
             </div>
         </div>
 	'''
@@ -38,7 +41,6 @@ define [
 
 	bindNoteEventsTo = ($node) ->
 		return if $node.data('noteEventsInitialized')
-		console.log('binding note events')
 
 		$node.data('noteEventsInitialized', true)
 
@@ -65,6 +67,16 @@ define [
 				$note.slideUp 'slow', () -> $note.remove()
 			)
 
+		$node
+			.on('click' , '.note-container [placeholder]', (e) ->
+				$(this).removeClass('placeholder')
+				$(this).text('') if $(this).attr('placeholder') == $(this).text())
+			.on('blur' , '.note-container [placeholder]', (e) ->
+				if not $(this).text()
+					$(this).text($(this).attr('placeholder'))
+					$(this).addClass('placeholder')
+			)
+
 	# ## Enable Editing a Note
 	# Cleans up a Note (`.note`) and prepares it for editing by:
 	#
@@ -77,9 +89,7 @@ define [
 		# get the note from the container 
 		$note = $noteContainer.children('.note')
 		# Pull out the title (as long as it's the 1st element)
-		$title = $note.children('.title')
-		# If there is no title, prepend one
-		$title = jQuery('<h1 class="title"></h1>').prependTo $note if not $title.is('.title')
+		$title = $note.children('.title-container').children('.title')
 
 		# Move all the other children into an editable body div
 		$body = $note.find('.body')
@@ -100,6 +110,9 @@ define [
 
 		# Bind all JS events needed for note interaction 
 		bindNoteEventsTo mostSeniorEditableOf $noteContainer
+
+		$title.blur()
+		$body.blur()
 
 
 	Aloha.bind 'aloha-editable-activated', (evt, props) ->
