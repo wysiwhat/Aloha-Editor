@@ -220,7 +220,7 @@
       });
       deferred = $.Deferred();
       dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
-        var child, video, video_id, _j, _len1, _ref1;
+        var child, mediaElement, video_id, _j, _len1, _ref1;
         evt.preventDefault();
         if ($el.is('img')) {
           $el.attr('src', videoSource);
@@ -232,13 +232,14 @@
               child = _ref1[_j];
               if (child.className === 'search-result-selected') {
                 video_id = child.id;
-                AlohaInsertIntoDom(active_embedder.embed_code_gen(video_id));
+                mediaElement = active_embedder.embed_code_gen(video_id);
+                break;
               }
             }
           } else {
-            video = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource));
-            AlohaInsertIntoDom(video);
+            mediaElement = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource));
           }
+          AlohaInsertIntoDom(mediaElement);
           return dialog.modal('hide');
         }
       });

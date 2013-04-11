@@ -252,16 +252,21 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
           $el.attr 'alt', dialog.find('[name=alt]').val()
         else
           # Embeds the video into the page
+          #mediaWrapper = jQuery('<div class="media"></div>')
           if videoSource.length == 0
             # Use search results
             for child in $searchResults.children()
               if child.className == 'search-result-selected'
                 video_id = child.id
-                AlohaInsertIntoDom(active_embedder.embed_code_gen(video_id))
+                mediaElement = active_embedder.embed_code_gen(video_id)
+                break
           else
             # Use url
-            video = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource))
-            AlohaInsertIntoDom(video);
+            mediaElement = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource))
+
+          #mediaWrapper.append(mediaElement)
+          #AlohaInsertIntoDom(mediaWrapper)
+          AlohaInsertIntoDom(mediaElement)
           dialog.modal('hide')
 
       dialog.on 'click', '.btn.btn-primary.action.search', (evt) =>
