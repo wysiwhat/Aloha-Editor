@@ -46,6 +46,19 @@ define [
 	mostSeniorEditableOf = ($node) ->
 		$node.parents('.aloha-editable').last()
 
+	$('[note-droppable]').droppable({
+		drop: (e, ui) -> enable(ui.draggable)
+	})
+
+	$('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
+		zIndex: 1000,
+		connectToSortable: '#canvas',
+		revert: 'invalid',
+		helper: () -> $(NEW_NOTE_TEMPLATE),
+		start: (e, ui) -> $(ui.helper).addClass('dragging'),
+		refreshPositions: true
+	})
+
 	bindNoteEventsTo = ($node) ->
 		return if $node.data('noteEventsInitialized')
 
@@ -91,6 +104,7 @@ define [
 				e.preventDefault()
 				$(this).parents('.title-container').first().children('.type').text($(this).text())
 			)
+
 	# ## Enable Editing a Note
 	# Cleans up a Note (`.note`) and prepares it for editing by:
 	#
@@ -127,7 +141,6 @@ define [
 
 		$title.blur()
 		$body.blur()
-
 
 	Aloha.bind 'aloha-editable-activated', (evt, props) ->
 		props.editable.obj.find('.note').each (i, note) ->

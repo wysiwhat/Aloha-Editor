@@ -27,6 +27,8 @@
                   tal:attributes="href body_base"/>
             <script src="/Aloha-Editor/oerpub/js/jquery-1.7.1.min.js"
                     tal:replace="nothing"> <!-- xhtml --></script>
+            <script src="/Aloha-Editor/oerpub/js/jquery-ui-1.9.0.custom-aloha.js"
+                    tal:replace="nothing"> <!-- xhtml --></script>
             <script src="/Aloha-Editor/oerpub/js/jquery.center.js"
                     tal:replace="nothing"> <!-- xhtml --></script>
             <!-- Aloha editor -->
@@ -371,15 +373,19 @@
                 </metal:toolbar>
 
                 <div id="content">
-                <div id="artboard">
-                    <metal:editor define-macro="editor">
-                    <div id="statusmessage"></div>
-                    <div id="editor">
-                        <div id="canvas">
+                    <div id="artboard">
+                        <metal:editor define-macro="editor">
+                        <div id="statusmessage"></div>
+                        <div id="editor">
+                            <div style="position: absolute; top: 50px; left: 15px; width: 185px;">
+                                <h4>Drag to add a new ...</h4>
+
+                                <div note-drag-source></div>
+                            </div>
+                            <div id="canvas" style="margin-left: 200px;" note-droppable></div>
                         </div>
+                        </metal:editor>
                     </div>
-                    </metal:editor>
-                </div>
                 </div>
             </div>
         </div>

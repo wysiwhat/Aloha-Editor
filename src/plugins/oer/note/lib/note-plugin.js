@@ -19,6 +19,23 @@
     mostSeniorEditableOf = function($node) {
       return $node.parents('.aloha-editable').last();
     };
+    $('[note-droppable]').droppable({
+      drop: function(e, ui) {
+        return enable(ui.draggable);
+      }
+    });
+    $('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
+      zIndex: 1000,
+      connectToSortable: '#canvas',
+      revert: 'invalid',
+      helper: function() {
+        return $(NEW_NOTE_TEMPLATE);
+      },
+      start: function(e, ui) {
+        return $(ui.helper).addClass('dragging');
+      },
+      refreshPositions: true
+    });
     bindNoteEventsTo = function($node) {
       if ($node.data('noteEventsInitialized')) {
         return;
