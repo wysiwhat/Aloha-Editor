@@ -22,7 +22,6 @@
     Aloha.ready(function() {
       return $('#canvas').sortable({
         'beforeStop': function(e, ui) {
-          console.log('here');
           return enable(ui.item);
         }
       });

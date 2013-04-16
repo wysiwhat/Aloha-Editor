@@ -49,7 +49,6 @@ define [
 	Aloha.ready(() ->
 		$('#canvas').sortable({
 			'beforeStop': (e, ui) ->
-				console.log('here')
 				enable(ui.item)
 		})
 	)
