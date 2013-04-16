@@ -29,6 +29,13 @@ define [
         </div>
 	'''
 
+	NOTE_DRAG_HELPER_TEMPLATE = '''
+        <div class="note-drag-helper">
+            <div class="title">Note to Reader:</div>
+            <div class="body">Drag me to the desired location in the document</div>
+        </div>
+	'''
+
 	UI.adopt 'insertNote', Button,
 		click: (a, b, c) ->
 			# The action for creating a new note
@@ -49,21 +56,19 @@ define [
 	Aloha.ready(() ->
 		$('#canvas').sortable({
 			'beforeStop': (e, ui) ->
-				enable(ui.item)
+				enable(ui.item) if ui.item.is('.note-container')
 		})
 	)
 
 	$('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
-		zIndex: 1000,
 		connectToSortable: $('#canvas'),
 		revert: 'invalid',
-		helper: () -> $(NEW_NOTE_TEMPLATE),
+		helper: () -> $(NOTE_DRAG_HELPER_TEMPLATE),
 		start: (e, ui) ->
 			$('#canvas').addClass('aloha-block-dropzone')
 			$(ui.helper).addClass('dragging')
 		stop: (e, ui) ->
 			$('#canvas').removeClass('aloha-block-dropzone')
-			$(ui.helper).removeClass('dragging')
 		refreshPositions: true
 	})
 

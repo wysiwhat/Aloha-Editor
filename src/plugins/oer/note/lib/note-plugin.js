@@ -2,8 +2,9 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
-    var NEW_NOTE_TEMPLATE, bindNoteEventsTo, enable, mostSeniorEditableOf;
+    var NEW_NOTE_TEMPLATE, NOTE_DRAG_HELPER_TEMPLATE, bindNoteEventsTo, enable, mostSeniorEditableOf;
     NEW_NOTE_TEMPLATE = '<div class="note-container">\n    <div class="note-controlls">\n       <a href="" class="note-delete"><i class="icon-remove"></i></a> \n       <a href=""><i class="icon-cog"></i></a> \n    </div> \n    <div class="note">\n        <div class="title-container dropdown">\n            <a class="type" data-toggle="dropdown">Note</a>\n            <ul class="dropdown-menu">\n                <li><a href="">Note</a></li>\n                <li><a href="">Aside</a></li>\n                <li><a href="">Warning</a></li>\n                <li><a href="">Tip</a></li>\n                <li><a href="">Important</a></li>\n            </ul>\n            <span class="title" placeholder="Add a title (optional)"></span>\n        </div>\n        <div class="body" placeholder="Type the text of your note here."></div>\n    </div>\n</div>';
+    NOTE_DRAG_HELPER_TEMPLATE = '<div class="note-drag-helper">\n    <div class="title">Note to Reader:</div>\n    <div class="body">Drag me to the desired location in the document</div>\n</div>';
     UI.adopt('insertNote', Button, {
       click: function(a, b, c) {
         var $newNote, range;
@@ -22,24 +23,24 @@
     Aloha.ready(function() {
       return $('#canvas').sortable({
         'beforeStop': function(e, ui) {
-          return enable(ui.item);
+          if (ui.item.is('.note-container')) {
+            return enable(ui.item);
+          }
         }
       });
     });
     $('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
-      zIndex: 1000,
       connectToSortable: $('#canvas'),
       revert: 'invalid',
       helper: function() {
-        return $(NEW_NOTE_TEMPLATE);
+        return $(NOTE_DRAG_HELPER_TEMPLATE);
       },
       start: function(e, ui) {
         $('#canvas').addClass('aloha-block-dropzone');
         return $(ui.helper).addClass('dragging');
       },
       stop: function(e, ui) {
-        $('#canvas').removeClass('aloha-block-dropzone');
-        return $(ui.helper).removeClass('dragging');
+        return $('#canvas').removeClass('aloha-block-dropzone');
       },
       refreshPositions: true
     });

@@ -632,11 +632,29 @@ math{
 [note-drag-source] .note-container:after {
     content: "Note to Reader";
 }
-[note-drag-source] .note-container.dragging {
+
+.note-drag-helper {
+    border-radius: 5px;
+    margin: 10px;
+    padding: 4px 0 4px 20px;
+    background: white;
+    border: 1px solid black;
     width: 300px;
     height: 50px;
     max-width: 300px;
     max-height: 50px;
+}
+
+.note-drag-helper .title,
+.note-drag-helper .body {
+    display: inline;
+}
+.note-drag-helper .title:before {
+    content: "\25A0";
+    margin-right: 3px;
+}
+.note-drag-helper .title {
+    color: #369;
 }
 
 .footnote-reference{
