@@ -46,16 +46,25 @@ define [
 	mostSeniorEditableOf = ($node) ->
 		$node.parents('.aloha-editable').last()
 
-	$('[note-droppable]').droppable({
-		drop: (e, ui) -> enable(ui.draggable)
-	})
+	Aloha.ready(() ->
+		$('#canvas').sortable({
+			'beforeStop': (e, ui) ->
+				console.log('here')
+				enable(ui.item)
+		})
+	)
 
 	$('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
 		zIndex: 1000,
-		connectToSortable: '#canvas',
+		connectToSortable: $('#canvas'),
 		revert: 'invalid',
 		helper: () -> $(NEW_NOTE_TEMPLATE),
-		start: (e, ui) -> $(ui.helper).addClass('dragging'),
+		start: (e, ui) ->
+			$('#canvas').addClass('aloha-block-dropzone')
+			$(ui.helper).addClass('dragging')
+		stop: (e, ui) ->
+			$('#canvas').removeClass('aloha-block-dropzone')
+			$(ui.helper).removeClass('dragging')
 		refreshPositions: true
 	})
 

@@ -19,20 +19,28 @@
     mostSeniorEditableOf = function($node) {
       return $node.parents('.aloha-editable').last();
     };
-    $('[note-droppable]').droppable({
-      drop: function(e, ui) {
-        return enable(ui.draggable);
-      }
+    Aloha.ready(function() {
+      return $('#canvas').sortable({
+        'beforeStop': function(e, ui) {
+          console.log('here');
+          return enable(ui.item);
+        }
+      });
     });
     $('[note-drag-source]').append(jQuery(NEW_NOTE_TEMPLATE)).find('.note-container').draggable({
       zIndex: 1000,
-      connectToSortable: '#canvas',
+      connectToSortable: $('#canvas'),
       revert: 'invalid',
       helper: function() {
         return $(NEW_NOTE_TEMPLATE);
       },
       start: function(e, ui) {
+        $('#canvas').addClass('aloha-block-dropzone');
         return $(ui.helper).addClass('dragging');
+      },
+      stop: function(e, ui) {
+        $('#canvas').removeClass('aloha-block-dropzone');
+        return $(ui.helper).removeClass('dragging');
       },
       refreshPositions: true
     });
