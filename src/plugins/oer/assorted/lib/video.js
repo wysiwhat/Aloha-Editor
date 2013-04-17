@@ -44,7 +44,19 @@
       return eleList;
     };
     vimeo_url_validator = function(url) {
-      return true;
+      var c, intRegex, videoIdStr, _i, _len;
+      if (url.indexOf('https://vimeo.com/') === 0) {
+        videoIdStr = url.substring(18);
+        intRegex = /^[0-9]$/;
+        for (_i = 0, _len = videoIdStr.length; _i < _len; _i++) {
+          c = videoIdStr[_i];
+          if (!intRegex.test(c)) {
+            return false;
+          }
+        }
+        return videoIdStr;
+      }
+      return false;
     };
     vimeo_embed_code_generator = function(url) {
       return '<p></p>';
@@ -74,6 +86,7 @@
       for (_i = 0, _len = embedders.length; _i < _len; _i++) {
         embedder = embedders[_i];
         if (embedder.url_validator(url)) {
+          console.debug('Url validated');
           return true;
         }
       }
@@ -130,7 +143,9 @@
         var currentVal, target, valid;
         target = event.currentTarget;
         currentVal = target.value;
+        console.debug(currentVal);
         valid = checkURL(currentVal);
+        console.debug(valid);
         if (valid) {
           target.style.borderColor = 'green';
           return target.style.borderWidth = 'medium';
@@ -172,9 +187,7 @@
         imageAltText = '';
       }
       dialog.find('[name=alt]').val(imageAltText);
-      console.debug('Checking');
       if (checkURL(videoSource)) {
-        console.debug('Checked');
         $uploadUrl.val(videoSource);
         $uploadUrl.show();
       }

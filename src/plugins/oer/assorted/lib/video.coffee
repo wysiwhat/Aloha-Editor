@@ -40,7 +40,14 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return eleList
 
   vimeo_url_validator = (url) ->
-    true
+    if url.indexOf('https://vimeo.com/') == 0
+      videoIdStr = url.substring(18)
+      intRegex = /^[0-9]$/
+      for c in videoIdStr
+        if !intRegex.test(c)
+          return false
+      return videoIdStr
+    return false
   
   vimeo_embed_code_generator = (url) ->
     return '<p></p>'
@@ -77,6 +84,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   checkURL = (url) ->
     for embedder in embedders
       if (embedder.url_validator(url)) 
+        console.debug 'Url validated'
         return true
     return false
 
@@ -154,7 +162,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       dialog.find("#video-url-input")[0].onkeyup = (event) -> 
         target = event.currentTarget
         currentVal = target.value
+        console.debug currentVal
         valid = checkURL(currentVal)
+        console.debug valid
         if(valid) 
             target.style.borderColor='green'
             target.style.borderWidth='medium'
@@ -196,10 +206,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.find('[name=alt]').val(imageAltText)
       # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
-      console.debug 'Checking'
       # /^https?:\/\// - old regex
       if checkURL(videoSource)
-        console.debug 'Checked'
         $uploadUrl.val(videoSource)
         $uploadUrl.show()
       # Retrieves embedder which can matches the format of the URL
