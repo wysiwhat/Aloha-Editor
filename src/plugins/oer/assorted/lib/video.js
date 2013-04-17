@@ -58,14 +58,13 @@
       }
       return false;
     };
-    vimeo_embed_code_generator = function(url) {
-      return '<p></p>';
+    vimeo_embed_code_generator = function(id) {
+      return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/' + id + '" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
     };
     vimeo_query_generator = function(queryTerms) {
       var terms, url;
       terms = queryTerms.split(' ');
       url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query=' + terms.join('+') + '&user_id=jmaxg3';
-      console.debug(url);
       return url;
     };
     vimeo_search_results_generator = function(responseObj) {
@@ -86,7 +85,6 @@
       for (_i = 0, _len = embedders.length; _i < _len; _i++) {
         embedder = embedders[_i];
         if (embedder.url_validator(url)) {
-          console.debug('Url validated');
           return true;
         }
       }
@@ -233,7 +231,7 @@
       });
       deferred = $.Deferred();
       dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
-        var child, mediaElement, video_id, _j, _len1, _ref1;
+        var child, mediaElement, video_id, _j, _k, _len1, _len2, _ref1;
         evt.preventDefault();
         if ($el.is('img')) {
           $el.attr('src', videoSource);
@@ -250,7 +248,13 @@
               }
             }
           } else {
-            mediaElement = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource));
+            for (_k = 0, _len2 = embedders.length; _k < _len2; _k++) {
+              embedder = embedders[_k];
+              if (embedder.url_validator(videoSource)) {
+                mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource));
+                break;
+              }
+            }
           }
           AlohaInsertIntoDom(mediaElement);
           return dialog.modal('hide');

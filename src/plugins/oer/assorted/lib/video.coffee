@@ -49,19 +49,12 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       return videoIdStr
     return false
   
-  vimeo_embed_code_generator = (url) ->
-    return '<p></p>'
-#video_id = youtube_url_validator(url)
-#    embed_html = ''
-#    if (video_id)
-#embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
-#      embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
-#    return embed_html
+  vimeo_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
 
   vimeo_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
     url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query='+terms.join('+')+'&user_id=jmaxg3'
-    console.debug url
     return url
 
   vimeo_search_results_generator = (responseObj) ->
@@ -84,7 +77,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   checkURL = (url) ->
     for embedder in embedders
       if (embedder.url_validator(url)) 
-        console.debug 'Url validated'
         return true
     return false
 
@@ -270,7 +262,10 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 break
           else
             # Use url
-            mediaElement = active_embedder.embed_code_gen(active_embedder.url_validator(videoSource))
+            for embedder in embedders
+              if (embedder.url_validator(videoSource))
+                mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource))
+                break
 
           #mediaWrapper.append(mediaElement)
           #AlohaInsertIntoDom(mediaWrapper)
