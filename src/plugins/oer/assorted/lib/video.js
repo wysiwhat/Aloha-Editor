@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
-    var DIALOG_HTML, SLIDESHARE_ID, VIMEO_ID, WARNING_IMAGE_PATH, YOUTUBE_ID, active_embedder, active_embedder_value, checkURL, embedder, embedders, getTimeString, lastKnownUrlId, lastWorkingEmbedder, populator, selector, showModalDialog, slideshare_embed_code_generator, slideshare_embedder, slideshare_query_generator, slideshare_search_results_generator, slideshare_url_validator, uploadImage, vimeo_embed_code_generator, vimeo_embedder, vimeo_query_generator, vimeo_search_results_generator, vimeo_url_validator, youtube_embed_code_generator, youtube_embedder, youtube_query_generator, youtube_search_results_generator, youtube_url_validator;
+    var CONCORD_ID, DIALOG_HTML, SLIDESHARE_ID, VIMEO_ID, WARNING_IMAGE_PATH, YOUTUBE_ID, active_embedder, active_embedder_value, checkURL, concord_embed_code_generator, concord_embedder, concord_query_generator, concord_search_results_generator, concord_url_validator, embedder, embedders, getTimeString, lastKnownUrlId, lastWorkingEmbedder, populator, selector, showModalDialog, slideshare_embed_code_generator, slideshare_embedder, slideshare_query_generator, slideshare_search_results_generator, slideshare_url_validator, uploadImage, vimeo_embed_code_generator, vimeo_embedder, vimeo_query_generator, vimeo_search_results_generator, vimeo_url_validator, youtube_embed_code_generator, youtube_embedder, youtube_query_generator, youtube_search_results_generator, youtube_url_validator;
     embedder = function(url_validator, embed_code_generator, query_generator, search_results_generator) {
       var result;
       this.embed_code_gen = embed_code_generator;
@@ -14,6 +14,7 @@
     YOUTUBE_ID = 0;
     VIMEO_ID = 1;
     SLIDESHARE_ID = 2;
+    CONCORD_ID = 3;
     lastKnownUrlId = '';
     lastWorkingEmbedder = -1;
     youtube_url_validator = function(url) {
@@ -85,9 +86,6 @@
       return url;
     };
     vimeo_search_results_generator = function(responseObj) {
-      var eleList;
-      eleList = [];
-      console.debug(responseObj);
       return [];
     };
     slideshare_url_validator = function(inputurl, inputbox) {
@@ -123,13 +121,44 @@
     slideshare_search_results_generator = function(responseObj) {
       return [];
     };
+    concord_url_validator = function(url) {
+      var concordLabUrl, id, offset, post;
+      concordLabUrl = 'lab.concord.org/examples/interactives/interactives.html#interactives/samples/';
+      if (url.indexOf(concordLabUrl) !== -1) {
+        offset = url.indexOf(concordLabUrl);
+        offset = offset + concordLabUrl.length;
+        id = url.substring(offset);
+        if (id.length > 5) {
+          post = id.substring(id.length - 5);
+          if (post === '.json') {
+            id = id.substring(0, id.length - 5);
+            console.debug(id);
+            lastKnownUrlId = id;
+            lastWorkingEmbedder = CONCORD_ID;
+            return id;
+          }
+        }
+      }
+      return false;
+    };
+    concord_embed_code_generator = function(id) {
+      return jQuery('<iframe style="width:925px; height:575px" width="925" height="575" frameborder="no" scrolling="no" src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/' + id + '.json"></iframe>');
+    };
+    concord_query_generator = function(queryTerms) {
+      return false;
+    };
+    concord_search_results_generator = function(responseObj) {
+      return [];
+    };
     youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator);
     vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator);
     slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator);
+    concord_embedder = new embedder(concord_url_validator, concord_embed_code_generator, concord_query_generator, concord_search_results_generator);
     embedders = [];
     embedders[YOUTUBE_ID] = youtube_embedder;
     embedders[VIMEO_ID] = vimeo_embedder;
     embedders[SLIDESHARE_ID] = slideshare_embedder;
+    embedders[CONCORD_ID] = concord_embedder;
     active_embedder = youtube_embedder;
     active_embedder_value = 'youtube';
     checkURL = function(url, inputbox) {
@@ -273,7 +302,6 @@
         $previewImg = $placeholder.find('img');
         url = $uploadUrl.val();
         setvideoSource(url);
-        console.debug('changing');
         if (settings.image.preview) {
           $previewImg.attr('src', url);
           return $placeholder.show();
@@ -283,6 +311,7 @@
       dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
         var child, mediaElement, video_id, _j, _len1, _ref1;
         evt.preventDefault();
+        console.debug('Inserting...');
         if ($el.is('img')) {
           $el.attr('src', videoSource);
           return $el.attr('alt', dialog.find('[name=alt]').val());
@@ -298,6 +327,7 @@
               }
             }
           } else {
+            console.debug('Attempting URL support with ' + lastWorkingEmbedder);
             if (lastWorkingEmbedder === -1) {
               return;
             }
@@ -435,7 +465,6 @@
     UI.adopt('insertVideo-oer', null, {
       click: function() {
         var newEl, promise;
-        console.debug('Inserting video..');
         newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
         promise = showModalDialog(newEl);
         promise.done(function(data) {
