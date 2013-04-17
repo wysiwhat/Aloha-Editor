@@ -2,61 +2,183 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
-    var DIALOG_HTML, WARNING_IMAGE_PATH, checkURL, embedder, embedders, populator, selector, showModalDialog, uploadImage, youtube_embed_code_generator, youtube_embedder, youtube_url_validator;
-    embedder = function(url_validator, embed_code_generator) {
-      var result, set_embed_code_generator, set_url_validator;
+    var DIALOG_HTML, SLIDESHARE_ID, VIMEO_ID, WARNING_IMAGE_PATH, YOUTUBE_ID, active_embedder, active_embedder_value, checkURL, embedder, embedders, getTimeString, lastKnownUrlId, lastWorkingEmbedder, populator, selector, showModalDialog, slideshare_embed_code_generator, slideshare_embedder, slideshare_query_generator, slideshare_search_results_generator, slideshare_url_validator, uploadImage, vimeo_embed_code_generator, vimeo_embedder, vimeo_query_generator, vimeo_search_results_generator, vimeo_url_validator, youtube_embed_code_generator, youtube_embedder, youtube_query_generator, youtube_search_results_generator, youtube_url_validator;
+    embedder = function(url_validator, embed_code_generator, query_generator, search_results_generator) {
+      var result;
       this.embed_code_gen = embed_code_generator;
       this.url_validator = url_validator;
-      embed_code_generator = function(url) {
-        var embed_html;
-        embed_html = '<p> Hello World </p>';
-        return 'Validates a URL. Returns video id if URL is valide. Else returns false.\nShould be replaced with actual function. The default validates youtube URLs';
-      };
-      url_validator = function(url) {
-        var regexp, result;
-        regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
-        return result = url.match(regexp) ? RegExp.$1 : false;
-      };
-      set_embed_code_generator = function(url) {
-        return this.embed_code_gen = embed_code_generator;
-      };
-      set_url_validator = function(url) {
-        return this.url_validator = url_validator;
-      };
+      this.query_generator = query_generator;
+      this.search_results_generator = search_results_generator;
       return result = this;
     };
+    YOUTUBE_ID = 0;
+    VIMEO_ID = 1;
+    SLIDESHARE_ID = 2;
+    lastKnownUrlId = '';
+    lastWorkingEmbedder = -1;
     youtube_url_validator = function(url) {
-      var regexp, result;
+      var regexp;
       regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/;
-      return result = url.match(regexp) ? RegExp.$1 : false;
-    };
-    youtube_embed_code_generator = function(url) {
-      var embed_html, video_id;
-      video_id = youtube_url_validator(url);
-      embed_html = '';
-      if (video_id) {
-        embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>';
+      if (url.match(regexp)) {
+        lastKnownUrlId = RegExp.$1;
+        lastWorkingEmbedder = YOUTUBE_ID;
+        return RegExp.$1;
+      } else {
+        lastWorkingEmbedder = -1;
+        return false;
       }
-      return embed_html;
     };
-    youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator);
+    youtube_embed_code_generator = function(id) {
+      return jQuery('<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>');
+    };
+    youtube_query_generator = function(queryTerms) {
+      var terms;
+      terms = queryTerms.split(' ');
+      return 'https://gdata.youtube.com/feeds/api/videos?q=' + terms.join('+') + '&alt=json&v=2';
+    };
+    youtube_search_results_generator = function(responseObj) {
+      var eleList, idTokens, newEntry, thumbnailHeight, thumbnailUrl, thumbnailWidth, video, videoDescription, videoId, videoLengthString, videoList, videoTitle, _i, _len;
+      eleList = [];
+      videoList = responseObj.feed.entry;
+      for (_i = 0, _len = videoList.length; _i < _len; _i++) {
+        video = videoList[_i];
+        thumbnailUrl = video.media$group.media$thumbnail[0].url;
+        thumbnailHeight = video.media$group.media$thumbnail[0].height;
+        thumbnailWidth = video.media$group.media$thumbnail[0].width;
+        videoTitle = video.title.$t;
+        videoDescription = video.media$group.media$description.$t;
+        videoLengthString = getTimeString(video.media$group.yt$duration.seconds);
+        idTokens = video.id.$t.split(':');
+        videoId = idTokens[idTokens.length - 1];
+        newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=' + videoId + '><table><tr><td rowspan=3><img src=' + thumbnailUrl + ' /></td><td><b>' + videoTitle + '</b></td></tr><tr><td>' + videoDescription + '</td></tr><tr><td>Duration: ' + videoLengthString + '</td></tr></table></div>');
+        eleList.push(newEntry);
+      }
+      return eleList;
+    };
+    vimeo_url_validator = function(url) {
+      var c, intRegex, offset, videoIdStr, _i, _len;
+      if (url.indexOf('vimeo.com/') !== -1) {
+        offset = url.indexOf('vimeo.com/');
+        offset = offset + 10;
+        videoIdStr = url.substring(offset);
+        intRegex = /^[0-9]$/;
+        for (_i = 0, _len = videoIdStr.length; _i < _len; _i++) {
+          c = videoIdStr[_i];
+          if (!intRegex.test(c)) {
+            return false;
+          }
+        }
+        lastKnownUrlId = videoIdStr;
+        lastWorkingEmbedder = VIMEO_ID;
+        return videoIdStr;
+      }
+      lastWorkingEmbedder = -1;
+      return false;
+    };
+    vimeo_embed_code_generator = function(id) {
+      return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/' + id + '" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>');
+    };
+    vimeo_query_generator = function(queryTerms) {
+      var terms, url;
+      terms = queryTerms.split(' ');
+      url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query=' + terms.join('+') + '&user_id=jmaxg3';
+      return url;
+    };
+    vimeo_search_results_generator = function(responseObj) {
+      var eleList;
+      eleList = [];
+      console.debug(responseObj);
+      return [];
+    };
+    slideshare_url_validator = function(inputurl, inputbox) {
+      var encodedUrl;
+      if (inputurl.indexOf('slideshare.net') === -1) {
+        return false;
+      }
+      encodedUrl = encodeURIComponent(inputurl);
+      jQuery.ajax({
+        url: 'http://www.slideshare.net/api/oembed/2?url=' + encodedUrl + '&format=jsonp',
+        async: false,
+        dataType: 'jsonp',
+        success: function(result, status, statusObject) {
+          var id;
+          id = result.slideshow_id;
+          if (inputurl === inputbox.value) {
+            inputbox.style.borderColor = 'green';
+            inputbox.style.borderWidth = 'medium';
+            lastKnownUrlId = id;
+            return lastWorkingEmbedder = SLIDESHARE_ID;
+          }
+        }
+      });
+      lastWorkingEmbedder = -1;
+      return false;
+    };
+    slideshare_embed_code_generator = function(id) {
+      return jQuery('<iframe style="width:427px; height:356px" src="http://www.slideshare.net/slideshow/embed_code/' + id + '" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>');
+    };
+    slideshare_query_generator = function(queryTerms) {
+      return false;
+    };
+    slideshare_search_results_generator = function(responseObj) {
+      return [];
+    };
+    youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator);
+    vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator);
+    slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator);
     embedders = [];
-    embedders[0] = youtube_embedder;
-    console.debug('initializing');
-    checkURL = function(url) {
+    embedders[YOUTUBE_ID] = youtube_embedder;
+    embedders[VIMEO_ID] = vimeo_embedder;
+    embedders[SLIDESHARE_ID] = slideshare_embedder;
+    active_embedder = youtube_embedder;
+    active_embedder_value = 'youtube';
+    checkURL = function(url, inputbox) {
       var _i, _len;
       for (_i = 0, _len = embedders.length; _i < _len; _i++) {
         embedder = embedders[_i];
-        if (embedder.url_validator(url)) {
+        if (embedder.url_validator(url, inputbox)) {
           return true;
         }
       }
       return false;
     };
     WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png';
-    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><button type="search" class="btn btn-primary action insert">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert video</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <center><input type="text" style="width:80%;" id="video-url-input" class="upload-url-input" placeholder="Enter URL of video ..."/></center>\n    </div>\n    <center>OR</center>\n    <div class="modal-body" >\n        <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>\n        <center><table><tr><td><input id=\'media-sites\' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input id=\'media-sites\' type="radio" name="video-site" value="vimeo">Vimeo</input></td></tr></table></center>\n        <center><button type="search" class="btn btn-primary action search">Search</button></center>\n    </div>\n    <div class="modal-body" >\n        <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">\n        </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" class="btn btn-primary action insert">Insert</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    getTimeString = function(timeInSeconds) {
+      var ivalue, nHours, nMinutes, nSeconds, str;
+      nHours = 0;
+      nMinutes = 0;
+      nSeconds = 0;
+      ivalue = parseInt(timeInSeconds);
+      if (ivalue > 3600) {
+        nHours = Math.floor(ivalue / 3600);
+        ivalue = ivalue - (3600 * nHours);
+      }
+      if (ivalue > 60) {
+        nMinutes = Math.floor(ivalue / 60);
+        ivalue = ivalue - (60 * nMinutes);
+      }
+      nSeconds = ivalue;
+      str = '';
+      if (nHours > 0) {
+        str = str + nHours.toString() + ' hours';
+      }
+      if (nMinutes > 0) {
+        if (str.length !== 0) {
+          str = str + ', ';
+        }
+        str = str + nMinutes.toString() + ' mins';
+      }
+      if (nSeconds > 0) {
+        if (str.length !== 0) {
+          str = str + ', ';
+        }
+        str = str + nSeconds.toString() + ' secs';
+      }
+      return str;
+    };
     showModalDialog = function($el) {
-      var $placeholder, $submit, $uploadUrl, deferred, dialog, getEmbedEle, getEmbedder, imageAltText, loadLocalFile, root, settings, setvideoSource, videoSource,
+      var $placeholder, $searchResults, $searchTerms, $submit, $uploadUrl, deferred, dialog, imageAltText, loadLocalFile, radio, root, settings, setvideoSource, videoSource, _i, _len, _ref,
         _this = this;
       console.debug('Inside showModalDialog');
       settings = Aloha.require('assorted/assorted-plugin').settings;
@@ -64,12 +186,14 @@
       dialog = jQuery(DIALOG_HTML);
       $placeholder = dialog.find('.placeholder.preview');
       $uploadUrl = dialog.find('.upload-url-input');
+      $searchTerms = dialog.find('#video-search-input');
+      $searchResults = dialog.find('#search-results');
       $submit = dialog.find('.action.insert');
       dialog.find("#video-url-input")[0].onkeyup = function(event) {
         var currentVal, target, valid;
         target = event.currentTarget;
         currentVal = target.value;
-        valid = checkURL(currentVal);
+        valid = checkURL(currentVal, target);
         if (valid) {
           target.style.borderColor = 'green';
           return target.style.borderWidth = 'medium';
@@ -78,6 +202,31 @@
           return target.style.borderWidth = 'medium';
         }
       };
+      _ref = dialog.find('#media-sites');
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        radio = _ref[_i];
+        radio.onclick = function(event) {
+          var index, val, _j, _len1, _ref1, _results;
+          console.debug('Radio button clicked');
+          val = event.target.value;
+          if (active_embedder_value !== val) {
+            index = 0;
+            _ref1 = dialog.find('#media-sites');
+            _results = [];
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              radio = _ref1[_j];
+              if (radio.value === val) {
+                console.debug('Setting ' + radio.value);
+                active_embedder_value = radio.value;
+                active_embedder = embedders[index];
+                break;
+              }
+              _results.push(index = index + 1);
+            }
+            return _results;
+          }
+        };
+      }
       if ($el.is('img')) {
         videoSource = $el.attr('src');
         imageAltText = $el.attr('alt');
@@ -86,35 +235,13 @@
         imageAltText = '';
       }
       dialog.find('[name=alt]').val(imageAltText);
-      console.debug('Checking');
-      if (checkURL(videoSource)) {
-        console.debug('Checked');
+      if (checkURL(videoSource, $uploadUrl)) {
         $uploadUrl.val(videoSource);
         $uploadUrl.show();
       }
-      getEmbedder = function(url) {
-        var _i, _len;
-        for (_i = 0, _len = embedders.length; _i < _len; _i++) {
-          embedder = embedders[_i];
-          if (embedder.url_validator(url)) {
-            return embedder;
-          }
-        }
-        return false;
-      };
       setvideoSource = function(href) {
         videoSource = href;
         return $submit.removeClass('disabled');
-      };
-      getEmbedEle = function(url) {
-        var video;
-        if (!(embedder = getEmbedder(url))) {
-          console.debug("Error: URL not supported");
-          dialog.modal('hide');
-        }
-        video = jQuery(embedder.embed_code_gen(url));
-        video.attr('alt', dialog.find('[name=alt]').val());
-        return video;
       };
       loadLocalFile = function(file, $img, callback) {
         var reader;
@@ -153,21 +280,72 @@
         }
       });
       deferred = $.Deferred();
-      dialog.on('submit', function(evt) {
-        var video;
-        console.debug('Submit pressed');
-        console.debug($el.is('img'));
+      dialog.on('click', '.btn.btn-primary.action.insert', function(evt) {
+        var child, mediaElement, video_id, _j, _len1, _ref1;
         evt.preventDefault();
         if ($el.is('img')) {
           $el.attr('src', videoSource);
           return $el.attr('alt', dialog.find('[name=alt]').val());
         } else {
-          console.debug("Embedding the video");
-          video = getEmbedEle(videoSource);
-          console.debug(video);
-          AlohaInsertIntoDom(video);
+          if (videoSource.length === 0) {
+            _ref1 = $searchResults.children();
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              child = _ref1[_j];
+              if (child.className === 'search-result-selected') {
+                video_id = child.id;
+                mediaElement = active_embedder.embed_code_gen(video_id);
+                break;
+              }
+            }
+          } else {
+            if (lastWorkingEmbedder === -1) {
+              return;
+            }
+            mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId);
+          }
+          AlohaInsertIntoDom(mediaElement);
           return dialog.modal('hide');
         }
+      });
+      dialog.on('click', '.btn.btn-primary.action.search', function(evt) {
+        var queryUrl;
+        evt.preventDefault();
+        queryUrl = active_embedder.query_generator($searchTerms[0].value);
+        $searchResults.empty();
+        $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'));
+        return jQuery.get(queryUrl, function(data) {
+          var ele, responseObj, searchElements, _j, _len1, _results;
+          $searchResults.empty();
+          responseObj = jQuery.parseJSON(data);
+          searchElements = active_embedder.search_results_generator(responseObj);
+          _results = [];
+          for (_j = 0, _len1 = searchElements.length; _j < _len1; _j++) {
+            ele = searchElements[_j];
+            console.debug(ele);
+            ele[0].onclick = function(evt) {
+              var child, target, targetId, _k, _len2, _ref1, _results1;
+              console.debug(evt);
+              target = evt.target;
+              while (target.tagName !== 'DIV') {
+                target = target.parentNode;
+              }
+              targetId = target.id;
+              _ref1 = $searchResults.children();
+              _results1 = [];
+              for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+                child = _ref1[_k];
+                if (child.id === targetId) {
+                  _results1.push(child.className = 'search-result-selected');
+                } else {
+                  _results1.push(child.className = 'search-result');
+                }
+              }
+              return _results1;
+            };
+            _results.push($searchResults.append(ele));
+          }
+          return _results;
+        });
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();

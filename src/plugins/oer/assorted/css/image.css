@@ -40,3 +40,24 @@ form#linkModal:focus {
 .placeholder.preview h4 {
     margin: 0 0 1em 0;
 }
+
+.search-result {
+    background: #fff;
+    width:100%;
+    border-bottom: 2px solid white;
+    cursor:pointer;
+    font-size:90%;
+}
+
+.search-result:hover {
+    background: #999;
+}
+
+.search-result-selected {
+    background:#888;
+    width:100%;
+    border-bottom: 2px solid white;
+    cursor:pointer;
+    font-size:90%;
+
+}

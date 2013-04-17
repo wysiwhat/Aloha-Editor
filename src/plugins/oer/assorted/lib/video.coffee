@@ -4,47 +4,129 @@
 #
 define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
 
-  embedder = (url_validator, embed_code_generator) ->
+  embedder = (url_validator, embed_code_generator, query_generator, search_results_generator) ->
     this.embed_code_gen = embed_code_generator
     this.url_validator = url_validator
-    embed_code_generator = (url) ->
-      # Generates embed html -- this function should be replaced
-      embed_html = '<p> Hello World </p>'
-      '''
-      Validates a URL. Returns video id if URL is valide. Else returns false.
-      Should be replaced with actual function. The default validates youtube URLs
-      '''
-    url_validator = (url) ->
-      regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
-      result = if(url.match(regexp)) then RegExp.$1 else false
-    set_embed_code_generator = (url) ->
-      this.embed_code_gen = embed_code_generator
-    set_url_validator = (url) ->
-      this.url_validator = url_validator
+    this.query_generator = query_generator
+    this.search_results_generator = search_results_generator
     result = this
+
+
+  YOUTUBE_ID = 0
+  VIMEO_ID = 1
+  SLIDESHARE_ID = 2
+
+  lastKnownUrlId = ''
+  lastWorkingEmbedder = -1
 
   # Creates a youtube embedder
   youtube_url_validator = (url) ->
     regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
-    result = if(url.match(regexp)) then RegExp.$1 else false
+    if url.match(regexp)
+      lastKnownUrlId = RegExp.$1
+      lastWorkingEmbedder = YOUTUBE_ID
+      return RegExp.$1
+    else
+      lastWorkingEmbedder = -1
+      return false
   
-  youtube_embed_code_generator = (url) ->
-    video_id = youtube_url_validator(url)
-    embed_html = ''
-    if (video_id)
-#embed_html = '<div class="multimedia-video"><iframe width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe></div>'
-      embed_html = '<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + video_id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>'
-    return embed_html
-  youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator)
+  youtube_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>')
+
+  youtube_query_generator = (queryTerms) -> 
+    terms = queryTerms.split(' ')
+    return 'https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
+
+  youtube_search_results_generator = (responseObj) ->
+    eleList = [ ]
+    videoList = responseObj.feed.entry
+    for video in videoList
+      thumbnailUrl = video.media$group.media$thumbnail[0].url
+      thumbnailHeight = video.media$group.media$thumbnail[0].height
+      thumbnailWidth = video.media$group.media$thumbnail[0].width
+      videoTitle = video.title.$t
+      videoDescription = video.media$group.media$description.$t
+      videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
+      idTokens = video.id.$t.split(':')
+      videoId = idTokens[idTokens.length-1]
+      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      eleList.push(newEntry)
+    return eleList
+
+  vimeo_url_validator = (url) ->
+    if url.indexOf('vimeo.com/') != -1
+      offset = url.indexOf('vimeo.com/')
+      offset = offset + 10
+      videoIdStr = url.substring(offset)
+      intRegex = /^[0-9]$/
+      for c in videoIdStr
+        if !intRegex.test(c)
+          return false
+      lastKnownUrlId = videoIdStr
+      lastWorkingEmbedder = VIMEO_ID
+      return videoIdStr
+    lastWorkingEmbedder = -1
+    return false
+
+  vimeo_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+
+  vimeo_query_generator = (queryTerms) -> 
+    terms = queryTerms.split(' ')
+    url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query='+terms.join('+')+'&user_id=jmaxg3'
+    return url
+
+  vimeo_search_results_generator = (responseObj) ->
+    eleList = [ ]
+    console.debug responseObj
+    return [ ]
+
+  slideshare_url_validator = (inputurl, inputbox) ->
+    if inputurl.indexOf('slideshare.net') == -1
+      return false
+
+    encodedUrl = encodeURIComponent(inputurl)
+    jQuery.ajax({
+            url: 'http://www.slideshare.net/api/oembed/2?url='+encodedUrl+'&format=jsonp',
+            async:false,
+            dataType: 'jsonp',
+            success: (result, status, statusObject) -> 
+              id = result.slideshow_id
+              if inputurl == inputbox.value
+                inputbox.style.borderColor='green'
+                inputbox.style.borderWidth='medium'
+                lastKnownUrlId = id
+                lastWorkingEmbedder = SLIDESHARE_ID
+            })
+    
+    lastWorkingEmbedder = -1
+    return false
+  
+  slideshare_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:427px; height:356px" src="http://www.slideshare.net/slideshow/embed_code/'+id+'" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>') 
+
+  slideshare_query_generator = (queryTerms) -> 
+    return false
+
+  slideshare_search_results_generator = (responseObj) ->
+    return [ ]
+
+  youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
+  vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator)
+  slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator)
 
   # Adds the youtube embedders to the list of embedders
   embedders = []
-  embedders[0] = youtube_embedder
-  console.debug 'initializing'
+  embedders[YOUTUBE_ID] = youtube_embedder
+  embedders[VIMEO_ID] = vimeo_embedder
+  embedders[SLIDESHARE_ID] = slideshare_embedder
 
-  checkURL = (url) ->
+  active_embedder = youtube_embedder
+  active_embedder_value = 'youtube'
+  
+  checkURL = (url, inputbox) ->
     for embedder in embedders
-      if (embedder.url_validator(url)) 
+      if (embedder.url_validator(url, inputbox)) 
         return true
     return false
 
@@ -64,18 +146,47 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <center>OR</center>
         <div class="modal-body" >
             <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
-            <center><button type="search" class="btn btn-primary action insert">Search</button></center>
+            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo</input></td></tr></table></center>
+            <center><button type="search" class="btn btn-primary action search">Search</button></center>
         </div>
         <div class="modal-body" >
-            <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;">
+            <div style="border:1px solid; height:200px; width:100%; overflow-x:auto; overflow-y:scroll;" id="search-results">
             </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button type="submit" class="btn btn-primary action insert">Insert</button>
         <button class="btn action cancel">Cancel</button>
       </div>
     </form>'''
+
+ 
+  getTimeString = (timeInSeconds) ->
+    nHours = 0
+    nMinutes = 0
+    nSeconds = 0
+    ivalue = parseInt(timeInSeconds)
+
+    if ivalue > 3600
+      nHours = Math.floor(ivalue / 3600)
+      ivalue = ivalue - (3600 * nHours)
+    if ivalue > 60
+      nMinutes = Math.floor(ivalue / 60)
+      ivalue = ivalue - (60 * nMinutes)
+    nSeconds = ivalue
+
+    str = ''
+    if nHours > 0
+      str = str + nHours.toString()+' hours'
+    if nMinutes > 0
+      if str.length != 0
+        str = str + ', '
+      str = str + nMinutes.toString() + ' mins'
+    if nSeconds > 0
+      if str.length != 0
+        str = str + ', '
+      str = str + nSeconds.toString() + ' secs'
+    return str
 
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
@@ -87,11 +198,13 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # Find the dynamic modal elements and bind events to the buttons
       $placeholder = dialog.find('.placeholder.preview')
       $uploadUrl =   dialog.find('.upload-url-input')
+      $searchTerms = dialog.find('#video-search-input')
+      $searchResults = dialog.find('#search-results')
       $submit = dialog.find('.action.insert')
       dialog.find("#video-url-input")[0].onkeyup = (event) -> 
         target = event.currentTarget
         currentVal = target.value
-        valid = checkURL(currentVal)
+        valid = checkURL(currentVal, target)
         if(valid) 
             target.style.borderColor='green'
             target.style.borderWidth='medium'
@@ -99,6 +212,20 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             target.style.borderColor='red'
             target.style.borderWidth='medium'
 
+      for radio in dialog.find('#media-sites')
+        radio.onclick = (event) ->
+          console.debug 'Radio button clicked'
+          val = event.target.value
+          if active_embedder_value != val
+            index = 0
+            for radio in dialog.find('#media-sites')
+              if radio.value == val
+                console.debug 'Setting '+radio.value
+                active_embedder_value = radio.value
+                active_embedder = embedders[index]
+                break
+              index = index + 1
+              
       # If we're editing an image pull in the src.
       # It will be undefined if this is a new image.
       #
@@ -119,31 +246,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.find('[name=alt]').val(imageAltText)
       # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
-      console.debug 'Checking'
       # /^https?:\/\// - old regex
-      if checkURL(videoSource)
-        console.debug 'Checked'
+      if checkURL(videoSource, $uploadUrl)
         $uploadUrl.val(videoSource)
         $uploadUrl.show()
       # Retrieves embedder which can matches the format of the URL
-      getEmbedder = (url) ->
-        for embedder in embedders
-          if (embedder.url_validator(url)) 
-            return embedder
-        return false
+
       setvideoSource = (href) ->
         videoSource = href
         $submit.removeClass('disabled')
-      getEmbedEle = (url) ->
-        # Retrieves the embedder for this type of video
-        if(!(embedder = getEmbedder(url)))
-          console.debug("Error: URL not supported")
-          # TODO - ADD HELPFUL MESSAGE TO USER
-          dialog.modal('hide')
 
-        video = jQuery(embedder.embed_code_gen(url));
-        video.attr 'alt', dialog.find('[name=alt]').val()
-        return video
       # Uses the File API to render a preview of the image
       # and updates the modal's videoSource
       loadLocalFile = (file, $img, callback) ->
@@ -180,21 +292,61 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       # On save update the actual video element. Use the submit event because this
       # allows the use of html5 validation.
       deferred = $.Deferred()
-      dialog.on 'submit', (evt) =>
-        console.debug 'Submit pressed'
-        console.debug $el.is('img')
+
+      dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
         evt.preventDefault() # Don't submit the form
         if $el.is('img')
           $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
         else
-          console.debug "Embedding the video"
           # Embeds the video into the page
-          video = getEmbedEle(videoSource)
-          console.debug video
-          AlohaInsertIntoDom(video);
-          #$el.replaceWith(video)
+          #mediaWrapper = jQuery('<div class="media"></div>')
+          if videoSource.length == 0
+            # Use search results
+            for child in $searchResults.children()
+              if child.className == 'search-result-selected'
+                video_id = child.id
+                mediaElement = active_embedder.embed_code_gen(video_id)
+                break
+          else
+            # Use url
+            if lastWorkingEmbedder == -1
+              return
+            mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
+            #for embedder in embedders
+            #  if (embedder.url_validator(videoSource))
+            #    mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource))
+            #    break
+
+          #mediaWrapper.append(mediaElement)
+          #AlohaInsertIntoDom(mediaWrapper)
+          AlohaInsertIntoDom(mediaElement)
           dialog.modal('hide')
+
+      dialog.on 'click', '.btn.btn-primary.action.search', (evt) =>
+        evt.preventDefault() # Don't submit the form
+        queryUrl = active_embedder.query_generator($searchTerms[0].value)
+        $searchResults.empty()
+        $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'))
+        jQuery.get(queryUrl, (data) => 
+                $searchResults.empty()
+                responseObj = jQuery.parseJSON(data)
+                searchElements = active_embedder.search_results_generator(responseObj)
+                for ele in searchElements
+                  console.debug ele
+                  ele[0].onclick = (evt) => 
+                   console.debug evt
+                   target = evt.target
+                   while target.tagName != 'DIV'
+                     target = target.parentNode
+                   targetId = target.id
+                   for child in $searchResults.children()
+                     if child.id == targetId
+                       child.className = 'search-result-selected'
+                     else
+                       child.className = 'search-result'
+                  $searchResults.append(ele)
+                )
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
