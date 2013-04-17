@@ -11,10 +11,24 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     this.search_results_generator = search_results_generator
     result = this
 
+
+  YOUTUBE_ID = 0
+  VIMEO_ID = 1
+  SLIDESHARE_ID = 2
+
+  lastKnownUrlId = ''
+  lastWorkingEmbedder = -1
+
   # Creates a youtube embedder
   youtube_url_validator = (url) ->
     regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
-    result = if(url.match(regexp)) then RegExp.$1 else false
+    if url.match(regexp)
+      lastKnownUrlId = RegExp.$1
+      lastWorkingEmbedder = YOUTUBE_ID
+      return RegExp.$1
+    else
+      lastWorkingEmbedder = -1
+      return false
   
   youtube_embed_code_generator = (id) ->
     return jQuery('<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>')
@@ -48,7 +62,10 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       for c in videoIdStr
         if !intRegex.test(c)
           return false
+      lastKnownUrlId = videoIdStr
+      lastWorkingEmbedder = VIMEO_ID
       return videoIdStr
+    lastWorkingEmbedder = -1
     return false
 
   vimeo_embed_code_generator = (id) ->
@@ -64,27 +81,34 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     console.debug responseObj
     return [ ]
 
-  slideshare_url_validator = (url) ->
-    if url.indexOf('https://vimeo.com/') == 0
-      videoIdStr = url.substring(18)
-      intRegex = /^[0-9]$/
-      for c in videoIdStr
-        if !intRegex.test(c)
-          return false
-      return videoIdStr
+  slideshare_url_validator = (inputurl, inputbox) ->
+    if inputurl.indexOf('slideshare.net') == -1
+      return false
+
+    encodedUrl = encodeURIComponent(inputurl)
+    jQuery.ajax({
+            url: 'http://www.slideshare.net/api/oembed/2?url='+encodedUrl+'&format=jsonp',
+            async:false,
+            dataType: 'jsonp',
+            success: (result, status, statusObject) -> 
+              id = result.slideshow_id
+              if inputurl == inputbox.value
+                inputbox.style.borderColor='green'
+                inputbox.style.borderWidth='medium'
+                lastKnownUrlId = id
+                lastWorkingEmbedder = SLIDESHARE_ID
+            })
+    
+    lastWorkingEmbedder = -1
     return false
   
   slideshare_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+    return jQuery('<iframe style="width:427px; height:356px" src="http://www.slideshare.net/slideshow/embed_code/'+id+'" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>') 
 
   slideshare_query_generator = (queryTerms) -> 
-    terms = queryTerms.split(' ')
-    url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query='+terms.join('+')+'&user_id=jmaxg3'
-    return url
+    return false
 
   slideshare_search_results_generator = (responseObj) ->
-    eleList = [ ]
-    console.debug responseObj
     return [ ]
 
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
@@ -93,16 +117,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   # Adds the youtube embedders to the list of embedders
   embedders = []
-  embedders[0] = youtube_embedder
-  embedders[1] = vimeo_embedder
-  embedders[2] = slideshare_embedder
+  embedders[YOUTUBE_ID] = youtube_embedder
+  embedders[VIMEO_ID] = vimeo_embedder
+  embedders[SLIDESHARE_ID] = slideshare_embedder
 
   active_embedder = youtube_embedder
   active_embedder_value = 'youtube'
   
-  checkURL = (url) ->
+  checkURL = (url, inputbox) ->
     for embedder in embedders
-      if (embedder.url_validator(url)) 
+      if (embedder.url_validator(url, inputbox)) 
         return true
     return false
 
@@ -180,9 +204,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       dialog.find("#video-url-input")[0].onkeyup = (event) -> 
         target = event.currentTarget
         currentVal = target.value
-        console.debug currentVal
-        valid = checkURL(currentVal)
-        console.debug valid
+        valid = checkURL(currentVal, target)
         if(valid) 
             target.style.borderColor='green'
             target.style.borderWidth='medium'
@@ -225,7 +247,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       dialog.find('[name=alt]').val(imageAltText)
       # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
       # /^https?:\/\// - old regex
-      if checkURL(videoSource)
+      if checkURL(videoSource, $uploadUrl)
         $uploadUrl.val(videoSource)
         $uploadUrl.show()
       # Retrieves embedder which can matches the format of the URL
@@ -288,10 +310,13 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 break
           else
             # Use url
-            for embedder in embedders
-              if (embedder.url_validator(videoSource))
-                mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource))
-                break
+            if lastWorkingEmbedder == -1
+              return
+            mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
+            #for embedder in embedders
+            #  if (embedder.url_validator(videoSource))
+            #    mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource))
+            #    break
 
           #mediaWrapper.append(mediaElement)
           #AlohaInsertIntoDom(mediaWrapper)
