@@ -313,10 +313,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             if lastWorkingEmbedder == -1
               return
             mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
-            #for embedder in embedders
-            #  if (embedder.url_validator(videoSource))
-            #    mediaElement = embedder.embed_code_gen(embedder.url_validator(videoSource))
-            #    break
 
           #mediaWrapper.append(mediaElement)
           #AlohaInsertIntoDom(mediaWrapper)
