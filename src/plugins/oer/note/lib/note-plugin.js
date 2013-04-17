@@ -97,11 +97,6 @@
       $note = $noteContainer.children('.note');
       $title = $note.children('.title-container').children('.title');
       $body = $note.find('.body');
-      if (!$body[0]) {
-        $body = jQuery('<div class="body"></div>');
-        $note.children().not($title).appendTo($body);
-      }
-      $body.appendTo($note);
       $title.aloha();
       $body.aloha();
       $noteContainer.alohaBlock();

@@ -127,21 +127,9 @@ define [
 	# 4. Enables aloha on the body (all the other children)
 	# 5. Register the note with the block plugin (so it can be moved around)
 	enable = ($noteContainer) ->
-		# get the note from the container 
-		$note = $noteContainer.children('.note')
-		# Pull out the title (as long as it's the 1st element)
+		$note  = $noteContainer.children('.note')
 		$title = $note.children('.title-container').children('.title')
-
-		# Move all the other children into an editable body div
-		$body = $note.find('.body')
-		if not $body[0]
-			$body = jQuery('<div class="body"></div>')
-			# Fill the new body element with the original children
-			$note.children().not($title).appendTo $body
-		# Mark that the body div should be unwrapped
-		# TODO: a Div cannot have both a class of "aloha-editable" and "aloha-ephemera-wrapper"
-		# Ephemera.markWrapper($body)
-		$body.appendTo($note)
+		$body  = $note.find('.body')
 
 		$title.aloha()
 		$body.aloha()
