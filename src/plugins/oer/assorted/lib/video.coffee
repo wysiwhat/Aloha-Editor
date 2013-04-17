@@ -40,15 +40,17 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return eleList
 
   vimeo_url_validator = (url) ->
-    if url.indexOf('https://vimeo.com/') == 0
-      videoIdStr = url.substring(18)
+    if url.indexOf('vimeo.com/') != -1
+      offset = url.indexOf('vimeo.com/')
+      offset = offset + 10
+      videoIdStr = url.substring(offset)
       intRegex = /^[0-9]$/
       for c in videoIdStr
         if !intRegex.test(c)
           return false
       return videoIdStr
     return false
-  
+
   vimeo_embed_code_generator = (id) ->
     return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
 
@@ -62,14 +64,38 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     console.debug responseObj
     return [ ]
 
+  slideshare_url_validator = (url) ->
+    if url.indexOf('https://vimeo.com/') == 0
+      videoIdStr = url.substring(18)
+      intRegex = /^[0-9]$/
+      for c in videoIdStr
+        if !intRegex.test(c)
+          return false
+      return videoIdStr
+    return false
+  
+  slideshare_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+
+  slideshare_query_generator = (queryTerms) -> 
+    terms = queryTerms.split(' ')
+    url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query='+terms.join('+')+'&user_id=jmaxg3'
+    return url
+
+  slideshare_search_results_generator = (responseObj) ->
+    eleList = [ ]
+    console.debug responseObj
+    return [ ]
 
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
   vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator)
+  slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator)
 
   # Adds the youtube embedders to the list of embedders
   embedders = []
   embedders[0] = youtube_embedder
   embedders[1] = vimeo_embedder
+  embedders[2] = slideshare_embedder
 
   active_embedder = youtube_embedder
   active_embedder_value = 'youtube'
