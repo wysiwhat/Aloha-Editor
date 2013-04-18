@@ -1,5 +1,4 @@
 define(
-'semanticblock',
 ['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'],
 function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
 
@@ -102,7 +101,7 @@ function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
 	Aloha.ready(function() {
 		$('#canvas').sortable({
 			'beforeStop': function(e, ui) {
-                if (ui.item.is('.note-container')) {
+                if (ui.item.is('.semantic-container')) {
                     enable(ui.item);
                 }
 		    }

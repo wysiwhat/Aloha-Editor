@@ -5,7 +5,7 @@ define [
 	'aloha/ephemera'
 	'ui/ui'
 	'ui/button'
-    'semanticblock'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
+    '../../semanticblock/lib/semanticblock-plugin'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
 	NEW_NOTE_TEMPLATE = '''
         <div class="note">
