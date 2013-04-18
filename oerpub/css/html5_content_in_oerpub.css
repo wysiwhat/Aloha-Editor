@@ -527,18 +527,18 @@ math{
     color: #AAA;
 }
 
-.note-container.drag-active {
+.semantic-container.drag-active {
     background: #FAFAFA;
 }
-.note-container.active {
+.semantic-container.active {
     border: 1px solid #ccc;
 }
-.note-container {
+.semantic-container {
     padding: 10px 0 10px;
     margin-top: 10px;
 }
 
-.note-container .aloha-block-handle {
+.semantic-container .aloha-block-handle {
     background-image: 
         linear-gradient(45deg, #C0C0C0 25%, transparent 25%, transparent 75%, #C0C0C0 75%), 
         linear-gradient(45deg, #C0C0C0 25%, transparent 25%, transparent 75%, #C0C0C0 75%);
@@ -554,10 +554,10 @@ math{
     left: 50%;
     display: none !important; /* override the default aloha display logic for handles */
 }
-.note-container.drag-active .aloha-block-handle {
+.semantic-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
 }
-.note-container.active > .aloha-block-handle {
+.semantic-container.active > .aloha-block-handle {
     display: block !important; /* override the default aloha display logic for handles */
 }
 
@@ -569,7 +569,7 @@ math{
     border-left-color: #ccc;
 }
 
-.note-container .note-controlls {
+.semantic-container .semantic-controlls {
     border-left: 1px solid #ccc;
     background: #F5F5F5;
     padding-left: 1px; 
@@ -580,18 +580,18 @@ math{
     height: 100%;
     display: none; 
 }
-.note-container.active > .note-controlls {
+.semantic-container.active > .semantic-controlls {
     display: block;
 }
 .note-container.active .note-controlls a:hover {
     background: #CCC;
 }
 
-.note-container .type:before {
+.semantic-container .type:before {
     content: "\25A0";
     margin-right: 3px;
 }
-.note-container.active > .note > .title-container .type:before {
+.semantic-container.active > .note > .title-container .type:before {
     content: "\25BE";
     margin-right: 3px;
 }
@@ -612,7 +612,9 @@ math{
 .note .title.placeholder {
     display: none;
 }
-.note-container.active > .note > .title-container .title.placeholder {
+
+/*not doing anything?*/
+.semantic-container.active > .note > .title-container .title.placeholder {
     display: inline;
 }
 
@@ -620,20 +622,20 @@ math{
   padding: 20px 10px 15px 10px;
 }
 
-[note-drag-source] .note-container > * {
+[note-drag-source] .semantic-container > * {
     display: none;
 }
-[note-drag-source] .note-container {
+[note-drag-source] .semantic-container {
     border-radius: 5px;
     padding: 4px 0 4px 20px;
     background: #EEE;
     color: black;
 }
-[note-drag-source] .note-container:after {
+[note-drag-source] .semantic-container:after {
     content: "Note to Reader";
 }
 
-.note-drag-helper {
+.semantic-drag-helper {
     border-radius: 5px;
     margin: 10px;
     padding: 4px 0 4px 20px;
@@ -645,15 +647,15 @@ math{
     max-height: 50px;
 }
 
-.note-drag-helper .title,
-.note-drag-helper .body {
+.semantic-drag-helper .title,
+.semantic-drag-helper .body {
     display: inline;
 }
-.note-drag-helper .title:before {
+.semantic-drag-helper .title:before {
     content: "\25A0";
     margin-right: 3px;
 }
-.note-drag-helper .title {
+.semantic-drag-helper .title {
     color: #369;
 }
 
