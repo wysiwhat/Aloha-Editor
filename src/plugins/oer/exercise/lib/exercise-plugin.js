@@ -4,10 +4,10 @@
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', '../../semanticblock/lib/semanticblock-plugin'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TEMPLATE;
     TEMPLATE = '<div class="note">\n    <div class="title-container dropdown">\n        <a class="type" data-toggle="dropdown">Note</a>\n        <ul class="dropdown-menu">\n            <li><a href="">Note</a></li>\n            <li><a href="">Aside</a></li>\n            <li><a href="">Warning</a></li>\n            <li><a href="">Tip</a></li>\n            <li><a href="">Important</a></li>\n        </ul>\n        <span class="title" semantic-editable placeholder="Add a title (optional)"></span>\n    </div>\n    <div class="body" semantic-editable placeholder="Type the text of your note here."></div>\n</div>';
-    return Plugin.create('note', {
+    return Plugin.create('exercise', {
       init: function() {
-        semanticBlock.enableDragToAdd('Note to Reader', '[semantic-drag-source=note]', TEMPLATE);
-        return UI.adopt('insertNote', Button, {
+        semanticBlock.enableDragToAdd('Exercise', '[semantic-drag-source=exercise]', TEMPLATE);
+        return UI.adopt('insertExercise', Button, {
           click: function(a, b, c) {
             return semanticBlock.insertAtCursor(TEMPLATE);
           }

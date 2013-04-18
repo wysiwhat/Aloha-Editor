@@ -75,6 +75,7 @@
                                     common/undo,
                                     oer/undobutton,
                                     oer/genericbutton,
+                                    oer/exercise,
                                     oer/note"> <!-- xhtml workaround --></script>
 
             <script type="text/javascript"
@@ -366,6 +367,7 @@
                         </button>
                         <ul class="dropdown-menu">
                           <li><a href="#" class="action insertNote">Note to Reader</a></li>
+                          <li><a href="#" class="action insertExercise">Exercise</a></li>
                         </ul>
                       </div>
                     </div>
@@ -380,7 +382,8 @@
                             <div style="position: fixed; top: 50px; left: 15px; width: 185px; z-index: 2;">
                                 <h4>Drag to add a new ...</h4>
 
-                                <div note-drag-source></div>
+                                <div semantic-drag-source="note"></div>
+                                <div semantic-drag-source="exercise"></div>
                             </div>
                             <div id="canvas" style="margin-left: 200px;" note-droppable></div>
                         </div>

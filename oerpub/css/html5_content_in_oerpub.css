@@ -535,7 +535,7 @@ math{
 }
 .semantic-container {
     padding: 10px 0 10px;
-    margin-top: 10px;
+    margin: 10px 0 10px 0;
 }
 
 .semantic-container .aloha-block-handle {
@@ -621,23 +621,30 @@ math{
   padding: 20px 10px 15px 10px;
 }
 
-[note-drag-source] .semantic-container > * {
+[semantic-drag-source] {
+    position: relative;
+}
+[semantic-drag-source] > span {
+    position: absolute;
+    top: 3px;
+    left: 10px;
+    pointer-events: none;
+}
+[semantic-drag-source] .semantic-container > * {
     display: none;
 }
-[note-drag-source] .semantic-container {
+[semantic-drag-source] .semantic-container {
     border-radius: 5px;
     padding: 4px 0 4px 20px;
     background: #EEE;
     color: black;
-}
-[note-drag-source] .semantic-container:after {
-    content: "Note to Reader";
+    height: 20px;
 }
 
 .semantic-drag-helper {
     border-radius: 5px;
     margin: 10px;
-    padding: 4px 0 4px 20px;
+    padding: 4px 20px 4px 20px;
     background: white;
     border: 1px solid black;
     width: 300px;
@@ -653,6 +660,10 @@ math{
 .semantic-drag-helper .title:before {
     content: "\25A0";
     margin-right: 3px;
+}
+.semantic-drag-helper .title:after {
+    content: ":";
+    margin-right: 10px;
 }
 .semantic-drag-helper .title {
     color: #369;

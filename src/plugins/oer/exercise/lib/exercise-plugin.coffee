@@ -24,10 +24,10 @@ define [
         </div>
 	'''
 
-	Plugin.create('note', {
+	Plugin.create('exercise', {
 		init: () ->
-			semanticBlock.enableDragToAdd('Note to Reader', '[semantic-drag-source=note]', TEMPLATE)
-			UI.adopt 'insertNote', Button,
+			semanticBlock.enableDragToAdd('Exercise', '[semantic-drag-source=exercise]', TEMPLATE)
+			UI.adopt 'insertExercise', Button,
 				click: (a, b, c) ->
 					semanticBlock.insertAtCursor(TEMPLATE)
 		})

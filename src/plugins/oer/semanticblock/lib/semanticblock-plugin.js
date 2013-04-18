@@ -1,6 +1,11 @@
 define(
-['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'],
-function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
+['aloha', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'],
+function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
+
+    // hack to accomodate multiple executions
+    if (pluginManager.plugins.semanticblock) {
+        return pluginManager.plugins.semanticblock;
+    }
 
 	var blockTemplate = jQuery("<div class=\"semantic-container\"><div class=\"semantic-controlls\"><a href=\"\" class=\"semantic-delete\"><i class=\"icon-remove\"></i></a><a href=\"\"><i class=\"icon-cog\"></i></a></div></div>"),
         blockDragHelper = jQuery("<div class=\"semantic-drag-helper\"><div class=\"title\"></div><div class=\"body\">Drag me to the desired location in the document</div></div>");
@@ -114,13 +119,21 @@ function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
         insertAtCursor: function(template) {
             insertElement(blockTemplate.clone().append(template));
         },
-        enableDragToAdd: function(containerSelector, template) {
+        enableDragToAdd: function(label, containerSelector, template) {
 
-            $(containerSelector).append(blockTemplate.clone().append(template)).find('.semantic-container').draggable({
+            var element = blockTemplate.clone().append(template).css('after', label),
+                labelElement = $('<span>').text(label);
+
+            $(containerSelector).append(labelElement);
+            $(containerSelector).append(element);
+
+            element.draggable({
                 connectToSortable: $('#canvas'),
                 revert: 'invalid',
                 helper: function() {
-                    return $(blockDragHelper);
+                    var helper = $(blockDragHelper).clone();
+                    helper.find('.title').text(label);
+                    return helper;
                 },
                 start: function(e, ui) {
                     $('#canvas').addClass('aloha-block-dropzone');
