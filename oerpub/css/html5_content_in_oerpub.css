@@ -583,7 +583,7 @@ math{
 .semantic-container.active > .semantic-controlls {
     display: block;
 }
-.note-container.active .note-controlls a:hover {
+.semantic-controlls a:hover {
     background: #CCC;
 }
 
@@ -613,7 +613,6 @@ math{
     display: none;
 }
 
-/*not doing anything?*/
 .semantic-container.active > .note > .title-container .title.placeholder {
     display: inline;
 }

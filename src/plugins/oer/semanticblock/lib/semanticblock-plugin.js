@@ -110,7 +110,6 @@ function(Aloha, Plugin, jQuery, Ephemera, UI, Button) {
 
     return Plugin.create('semanticblock', {
         init: function(){
-            Aloha.semanticBlock = this;
         },
         insertAtCursor: function(template) {
             insertElement(blockTemplate.clone().append(template));
