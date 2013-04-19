@@ -561,6 +561,7 @@ math{
     display: block !important; /* override the default aloha display logic for handles */
 }
 
+.exercise,
 .note {
     padding: 20px;
     margin: 10px 50px 10px 50px;
@@ -591,22 +592,22 @@ math{
     content: "\25A0";
     margin-right: 3px;
 }
-.semantic-container.active > .note > .title-container .type:before {
+.semantic-container.active .type:before {
     content: "\25BE";
     margin-right: 3px;
 }
 
-.note .type {
+.semantic-container .type {
     margin: 5px 10px 0 5px;
     color: #369;
     text-decoration: none;
 }
 
-.note .title-container li {
+.semantic-container .title-container li {
     list-style-type: none !important; 
 }
 
-.note .title {
+.semantic-container .title {
   font-size: 1em;
 }
 .note .title.placeholder {
@@ -617,7 +618,7 @@ math{
     display: inline;
 }
 
-.note .body {
+.semantic-container .body {
   padding: 20px 10px 15px 10px;
 }
 
@@ -639,6 +640,31 @@ math{
     background: #EEE;
     color: black;
     height: 20px;
+}
+
+.semantic-container .exercise .solution-placeholder {
+    color: #AAA;
+    padding: 5px;
+    border: 1px dashed #ccc;
+    display: none; 
+}
+.semantic-container.active > .exercise > .solution-placeholder {
+    display: block; 
+}
+
+.semantic-container .exercise .solution-toggle {
+    position: absolute;
+    left: 50%;
+    margin-bottom: 10px;
+}
+.semantic-container .exercise .solution-controlls {
+    text-align: center;
+}
+.semantic-container .exercise .solution-controlls a {
+    text-decoration: none;
+}
+.semantic-container .exercise .solution-controlls a:visited {
+    color: blue !important;
 }
 
 .semantic-drag-helper {
