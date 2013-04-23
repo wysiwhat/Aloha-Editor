@@ -51,7 +51,7 @@
         videoLengthString = getTimeString(video.media$group.yt$duration.seconds);
         idTokens = video.id.$t.split(':');
         videoId = idTokens[idTokens.length - 1];
-        newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=' + videoId + '><table><tr><td rowspan=3><img src=' + thumbnailUrl + ' /></td><td><b>' + videoTitle + '</b></td></tr><tr><td>' + videoDescription + '</td></tr><tr><td>Duration: ' + videoLengthString + '</td></tr></table></div>');
+        newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=' + videoId + '><table><tr><td width=20% rowspan=3><img src=' + thumbnailUrl + ' /></td><td><b>' + videoTitle + '</b></td></tr><tr><td>' + videoDescription + '</td></tr><tr><td>Duration: ' + videoLengthString + '</td></tr></table></div>');
         eleList.push(newEntry);
       }
       return eleList;
@@ -209,7 +209,6 @@
     showModalDialog = function($el) {
       var $placeholder, $searchResults, $searchTerms, $submit, $uploadUrl, deferred, dialog, imageAltText, loadLocalFile, radio, root, settings, setvideoSource, videoSource, _i, _len, _ref,
         _this = this;
-      console.debug('Inside showModalDialog');
       settings = Aloha.require('assorted/assorted-plugin').settings;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
@@ -236,7 +235,6 @@
         radio = _ref[_i];
         radio.onclick = function(event) {
           var index, val, _j, _len1, _ref1, _results;
-          console.debug('Radio button clicked');
           val = event.target.value;
           if (active_embedder_value !== val) {
             index = 0;
@@ -289,8 +287,7 @@
       dialog.find('.upload-image-link').on('click', function(evt) {
         evt.preventDefault();
         $placeholder.hide();
-        $uploadUrl.hide();
-        return console.debug('Hiding placeholder url');
+        return $uploadUrl.hide();
       });
       dialog.find('.upload-url-link').on('click', function(evt) {
         evt.preventDefault();
@@ -343,15 +340,16 @@
         queryUrl = active_embedder.query_generator($searchTerms[0].value);
         $searchResults.empty();
         $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'));
-        return jQuery.get(queryUrl, function(data) {
-          var ele, responseObj, searchElements, _j, _len1, _results;
+        return jQuery.get(queryUrl, function(responseObj) {
+          var ele, searchElements, _j, _len1, _results;
           $searchResults.empty();
-          responseObj = jQuery.parseJSON(data);
+          if ((typeof responseObj) === 'string') {
+            responseObj = jQuery.parseJSON(responseObj);
+          }
           searchElements = active_embedder.search_results_generator(responseObj);
           _results = [];
           for (_j = 0, _len1 = searchElements.length; _j < _len1; _j++) {
             ele = searchElements[_j];
-            console.debug(ele);
             ele[0].onclick = function(evt) {
               var child, target, targetId, _k, _len2, _ref1, _results1;
               console.debug(evt);

@@ -50,7 +50,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
       idTokens = video.id.$t.split(':')
       videoId = idTokens[idTokens.length-1]
-      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
       eleList.push(newEntry)
     return eleList
 
@@ -217,7 +217,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
-      console.debug 'Inside showModalDialog'
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
       dialog = jQuery(DIALOG_HTML)
@@ -241,7 +240,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       for radio in dialog.find('#media-sites')
         radio.onclick = (event) ->
-          console.debug 'Radio button clicked'
           val = event.target.value
           if active_embedder_value != val
             index = 0
@@ -300,7 +298,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         evt.preventDefault()
         $placeholder.hide()
         $uploadUrl.hide()
-        console.debug 'Hiding placeholder url'
 
       dialog.find('.upload-url-link').on 'click', (evt) ->
         evt.preventDefault()
@@ -352,12 +349,13 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         queryUrl = active_embedder.query_generator($searchTerms[0].value)
         $searchResults.empty()
         $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'))
-        jQuery.get(queryUrl, (data) => 
+        jQuery.get(queryUrl, (responseObj) => 
                 $searchResults.empty()
-                responseObj = jQuery.parseJSON(data)
+                if (typeof responseObj) == 'string'
+                  responseObj = jQuery.parseJSON(responseObj)
+
                 searchElements = active_embedder.search_results_generator(responseObj)
                 for ele in searchElements
-                  console.debug ele
                   ele[0].onclick = (evt) => 
                    console.debug evt
                    target = evt.target
