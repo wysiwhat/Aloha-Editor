@@ -70,7 +70,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return false
 
   vimeo_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+    return jQuery('<iframe style="width:640px; height:380px" src="http://player.vimeo.com/video/'+id+'" width="640" height="380" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
 
   vimeo_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
