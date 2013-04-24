@@ -173,7 +173,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <center>OR</center>
         <div class="modal-body" >
             <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
-            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo</input></td></tr></table></center>
+            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input disabled id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo (search not working)</input></td></tr></table></center>
             <center><button type="search" class="btn btn-primary action search">Search</button></center>
         </div>
         <div class="modal-body" >
