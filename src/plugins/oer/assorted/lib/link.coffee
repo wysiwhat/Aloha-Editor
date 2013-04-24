@@ -35,6 +35,7 @@ define [
           <ul class="nav nav-tabs">
             <li><a href="#link-tab-external" data-toggle="tab">External</a></li>
             <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>
+            <li><a href="#link-tab-module" data-toggle="tab">My module</a></li>
           </ul>
           <div class="tab-content">
             <div class="tab-pane" id="link-tab-external">
@@ -43,7 +44,13 @@ define [
             </div>
             <div class="tab-pane" id="link-tab-internal">
               <label for="link-internal">Link to a part in this document</label>
-              <select class="link-input link-internal" id="link-internal" size="5" multiple="multiple"></select>
+              <select class="link-input link-internal" id="link-internal" size="5"></select>
+            </div>
+            <div class="tab-pane" id="link-tab-module">
+              <input type="text" class="input-medium search-query" />
+              <button type="submit" class="btn">Search</button>
+              <label for="link-internal">Link to my module</label>
+              <select class="link-input link-module" id="link-module" size="5"></select>
             </div>
           </div>
         </div>
@@ -89,6 +96,7 @@ define [
       # Build the link options and then populate one of them.
       linkExternal = dialog.find('.link-external')
       linkInternal = dialog.find('.link-internal')
+      linkModule = dialog.find('.link-module')
       linkSave     = dialog.find('.link-save')
 
       # Combination of linkExternal and linkInternal
@@ -118,11 +126,25 @@ define [
         caption = item.find('caption,figcaption')
         appendOption id, caption if caption[0]
 
+      appendMyModule = (url, title) ->
+        option = jQuery('<option>' + title + '</option>')
+        option.attr 'value', '/' + url
+        option.appendTo linkModule
+
+      searchModule = (keyword) ->
+        $.getJSON "/oerpub/sandbox/ajax/modules.json", (data) ->
+          $.each data, (key, val) ->
+            appendMyModule key, val
+
       dialog.find('a[data-toggle=tab]').on 'shown', (evt) ->
         prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'))
         newTab  = jQuery(jQuery(evt.target).attr('href'))
         prevTab.find('.link-input').removeAttr('required')
         newTab.find('.link-input').attr('required', true)
+        #Huy.VQ add here 24-Apr-2013
+        if newTab.selector is "#link-tab-module"
+          # Change url with Rest URL
+          searchModule "sampleKeyword"
 
       # Activate the current tab
       href = $el.attr('href')
@@ -133,7 +155,8 @@ define [
       linkInputId = '#link-tab-external'
       linkInputId = '#link-tab-internal' if $el.attr('href').match(/^#/)
 
-      #dialog.find('#link-tab-internal').tab('show')
+      dialog.find('#link-tab-internal').tab('show')
+
       dialog.find(linkInputId)
       .addClass('active')
       .find('.link-input')

@@ -32,6 +32,8 @@
             <!-- Aloha editor -->
             <script type="text/javascript" src="/Aloha-Editor/src/lib/require.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/require.js"> <!-- xhtml workaround --></script>
+            <script src="/Aloha-Editor/oerpub/js/jquery-ui-1.9.0.custom-aloha.js"
+                    tal:replace="nothing"> <!-- xhtml --></script>
 
             <!-- Mathjax -->
             <script type="text/javascript"
@@ -72,7 +74,9 @@
                                     oer/title,
                                     common/undo,
                                     oer/undobutton,
-                                    oer/genericbutton"> <!-- xhtml workaround --></script>
+                                    oer/genericbutton,
+                                    oer/exercise,
+                                    oer/note"> <!-- xhtml workaround --></script>
 
             <script type="text/javascript"
                     tal:content="string:var body_url = '${body_url}';">
@@ -354,22 +358,36 @@
                         </ul>
                         <button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>
                       </div>
-
+                      <span class="separator"> </span>
+                      <div class="btn-group">
+                        <button class="btn btn-text dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Add a new...">
+                          Add a new...
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li><a href="#" class="action insertNote">Note to Reader</a></li>
+                          <li><a href="#" class="action insertExercise">Exercise</a></li>
+                        </ul>
+                      </div>
                     </div>
-
                 </div><!-- / ".toolbar" -->
                 </metal:toolbar>
 
                 <div id="content">
-                <div id="artboard">
-                    <metal:editor define-macro="editor">
-                    <div id="statusmessage"></div>
-                    <div id="editor">
-                        <div id="canvas">
+                    <div id="artboard">
+                        <metal:editor define-macro="editor">
+                        <div id="statusmessage"></div>
+                        <div id="editor">
+                            <div style="position: fixed; top: 50px; left: 15px; width: 185px; z-index: 2;">
+                                <h4>Drag to add a new ...</h4>
+
+                                <div semantic-drag-source="note"></div>
+                                <div semantic-drag-source="exercise"></div>
+                            </div>
+                            <div id="canvas" style="margin-left: 200px;" note-droppable></div>
                         </div>
+                        </metal:editor>
                     </div>
-                    </metal:editor>
-                </div>
                 </div>
             </div>
         </div>

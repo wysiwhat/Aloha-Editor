@@ -6,15 +6,19 @@
 /* hide future features */
 
 #link-destination {
-  display: none;
+  display: block;
 }
 
 ul.nav.nav-tabs {
-  display: none;
+  display: block;
 }
 
-#link-tab-internal {
-  display: none;
+/*#link-tab-internal {
+  display: block;
+}*/
+
+#link-module{
+  width: 100%;
 }
 
 /* style the  Edit LInk dialog box */
