@@ -505,7 +505,7 @@ math{
     pointer-events: none;
 }
 [semantic-drag-source] .semantic-container > * {
-    display: none;
+    display: none !important;
 }
 [semantic-drag-source] .semantic-container {
     border-radius: 5px;
