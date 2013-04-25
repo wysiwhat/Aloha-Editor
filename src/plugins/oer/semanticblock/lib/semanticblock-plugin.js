@@ -118,7 +118,6 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             element.find('[semantic-editable]').aloha();
             element.alohaBlock();
 
-            bindEvents(mostSeniorEditable(element)); 
             element.find('[placeholder]').blur();
         },
         bindEvents = function(element) {
@@ -134,9 +133,6 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 event = pluginEvents[i];
                 element.on(event.name, event.selector, event.callback);
             }
-        },
-        mostSeniorEditable = function(element) {
-		    return element.parents('.aloha-editable').last();
         };
  
 	Aloha.ready(function() {
@@ -147,6 +143,8 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 }
 		    }
 	    });
+
+        bindEvents($(document));
     });
 
     return Plugin.create('semanticblock', {
