@@ -262,34 +262,6 @@ blockquote{
   border: 0;
 }
 
-/* ========== exercise ========== */
-
-.problemset-header{
-  margin: 2em 0 1em;
-  font-size: 1.15em;
-}
-
-.exercise{
-  margin: 1em 0;
-}
-
-.problem, .commentary{
-  margin: .5em 0;
-}
-
-.solution{
-  margin: .5em 0 .5em 3em;
-}
-
-.solution-toggles{
-  text-align: center;
-  margin-top: 1em;
-}
-
-.solution-toggles a{
-  text-decoration: none;
-}
-
 /* ========== assorted inline elements ========== */
 
 .cnxn{
