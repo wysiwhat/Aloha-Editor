@@ -1,0 +1,33 @@
+
+.exercise {
+    padding: 20px;
+    margin: 10px 50px 10px 50px;
+    border: 1px solid #333;
+    border-top-color: #ccc;
+    border-left-color: #ccc;
+}
+
+.semantic-container .exercise .solution-placeholder {
+    color: #AAA;
+    padding: 5px;
+    border: 1px dashed #ccc;
+    display: none; 
+}
+.semantic-container.active > .exercise > .solution-placeholder {
+    display: block; 
+}
+
+.semantic-container .exercise .solution-toggle {
+    position: absolute;
+    left: 50%;
+    margin-bottom: 10px;
+}
+.semantic-container .exercise .solution-controlls {
+    text-align: center;
+}
+.semantic-container .exercise .solution-controlls a {
+    text-decoration: none;
+}
+.semantic-container .exercise .solution-controlls a:visited {
+    color: blue !important;
+}

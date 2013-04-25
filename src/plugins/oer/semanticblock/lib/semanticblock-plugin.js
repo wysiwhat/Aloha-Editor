@@ -1,5 +1,5 @@
 define(
-['aloha', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button'],
+['aloha', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'css!semanticblock/css/semanticblock-plugin.css'],
 function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
 
     // hack to accomodate multiple executions
