@@ -172,6 +172,12 @@
                                 $html.attr('xmlns:bib',  'http://bibtexml.sf.net/');
                                 $html.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
 
+                                // Build simple header with title.
+                                var $head = $('<head />'),
+                                    title = editor.obj.find('>div.title').text();
+                                $('<title/>').text(title).appendTo($head);
+                                $html.append($head);
+
                                 var $body = $('<body />');
                                 $body.attr('class', 'content');
                                 $body.append(editor.getContents());
