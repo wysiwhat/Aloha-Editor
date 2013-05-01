@@ -51,4 +51,12 @@
             cnx: '../plugins/cnx'
         }
     };
+
+    Aloha.settings.contentHandler = {
+        insertHtml: [ 'word', 'generic', 'oembed'],
+        initEditable: [],
+        getContents: []
+    }
+
+
 })(window);
