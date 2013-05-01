@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oer/math/css/math.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
-    var EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, MATHML_ELEMENTS, SELECTOR, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, filter, findFormula, getEncoding, getMathFor, insertMath, makeCloseIcon, name, squirrelMath, triggerMathJax, _ref;
+    var EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, SELECTOR, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, findFormula, getEncoding, getMathFor, insertMath, makeCloseIcon, squirrelMath, triggerMathJax;
     EDITOR_HTML = '<div class="math-editor-dialog">\n    <div class="math-container">\n        <pre><span></span><br></pre>\n        <textarea type="text" class="formula" rows="1"\n                  placeholder="Insert your math notation here"></textarea>\n    </div>\n    <div class="footer">\n      <span>This is:</span>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath\n      </label>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/tex"> LaTeX\n      </label>\n      <label class="radio inline mime-type-mathml">\n          <input type="radio" name="mime-type" value="math/mml"> MathML\n      </label>\n      <button class="btn btn-primary done">Done</button>\n    </div>\n</div>';
     LANGUAGES = {
       'math/asciimath': {
@@ -27,12 +27,6 @@
       'asciimath': 'math/asciimath'
     };
     TOOLTIP_TEMPLATE = '<div class="aloha-ephemera tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>';
-    MATHML_ELEMENTS = ['abs', 'and', 'annotation', 'annotation-xml', 'apply', 'approx', 'arccos', 'arccosh', 'arccot', 'arccoth', 'arccsc', 'arccsch', 'arcsec', 'arcsech', 'arcsin', 'arcsinh', 'arctan', 'arctanh', 'arg', 'bvar', 'card', 'cartesianproduct', 'ceiling', 'ci', 'cn', 'codomain', 'complexes', 'compose', 'condition', 'conjugate', 'cos', 'cosh', 'cot', 'coth', 'csc', 'csch', 'csymbol', 'curl', 'declare', 'degree', 'determinant', 'diff', 'divergence', 'divide', 'domain', 'domainofapplication', 'emptyset', 'eq', 'equivalent', 'eulergamma', 'exists', 'exp', 'exponentiale', 'factorial', 'factorof', 'false', 'floor', 'fn', 'forall', 'gcd', 'geq', 'grad', 'gt', 'ident', 'image', 'imaginary', 'imaginaryi', 'implies', 'in', 'infinity', 'int', 'integers', 'intersect', 'interval', 'inverse', 'lambda', 'laplacian', 'lcm', 'leq', 'limit', 'list', 'ln', 'log', 'logbase', 'lowlimit', 'lt', 'maction', 'maligngroup', 'malignmark', 'math', 'matrix', 'matrixrow', 'max', 'mean', 'median', 'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'min', 'minus', 'mlabeledtr', 'mlongdiv', 'mmultiscripts', 'mn', 'mo', 'mode', 'moment', 'momentabout', 'mover', 'mpadded', 'mphantom', 'mroot', 'mrow', 'ms', 'mscarries', 'mscarry', 'msgroup', 'msline', 'mspace', 'msqrt', 'msrow', 'mstack', 'mstyle', 'msub', 'msubsup', 'msup', 'mtable', 'mtd', 'mtext', 'mtr', 'munder', 'munderover', 'naturalnumbers', 'neq', 'not', 'notanumber', 'notin', 'notprsubset', 'notsubset', 'or', 'outerproduct', 'partialdiff', 'pi', 'piecewise', 'plus', 'power', 'primes', 'product', 'prsubset', 'quotient', 'rationals', 'real', 'reals', 'reln', 'rem', 'root', 'scalarproduct', 'sdev', 'sec', 'sech', 'selector', 'semantics', 'sep', 'set', 'setdiff', 'sin', 'sinh', 'subset', 'sum', 'tan', 'tanh', 'tendsto', 'times', 'transpose', 'true', 'union', 'uplimit', 'variance', 'vector', 'vectorproduct', 'xor'];
-    _ref = Aloha.defaults.sanitize;
-    for (name in _ref) {
-      filter = _ref[name];
-      filter.elements = filter.elements.concat(MATHML_ELEMENTS);
-    }
     Aloha.ready(function() {
       if (typeof MathJax !== "undefined" && MathJax !== null) {
         return MathJax.Hub.Configured();
@@ -58,16 +52,16 @@
       $maths = ed.editable.obj.find('math');
       $maths.wrap('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>');
       return jQuery.each($maths, function(i, mml) {
-        var $mathElement, $mml, mathParts, _ref1;
+        var $mathElement, $mml, mathParts, _ref;
         $mml = jQuery(mml);
         $mathElement = $mml.parent().parent();
         mathParts = findFormula($mml);
-        if (_ref1 = mathParts.mimeType, __indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, _ref1) >= 0) {
+        if (_ref = mathParts.mimeType, __indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, _ref) >= 0) {
           $mathElement.find('.mathjax-wrapper').text(LANGUAGES[mathParts.mimeType].open + mathParts.formula + LANGUAGES[mathParts.mimeType].close);
         }
         return triggerMathJax($mathElement, function() {
-          var _ref2;
-          if (_ref2 = mathParts.mimeType, __indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, _ref2) >= 0) {
+          var _ref1;
+          if (_ref1 = mathParts.mimeType, __indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, _ref1) >= 0) {
             addAnnotation($mathElement, mathParts.formula, mathParts.mimeType);
           }
           makeCloseIcon($mathElement);
