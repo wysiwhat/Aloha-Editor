@@ -1,6 +1,5 @@
 // Google Picker for uploading images
 function newImagePicker() {
-    console.log("Creating new image Picker");
     google.load('picker', '1', {"callback" : createImagePicker});
 }       
 
@@ -35,13 +34,11 @@ function ImagePickerCallback(data) {
 
         var img = Aloha.jQuery("<img />").attr("src", image_url);
         AlohaInsertIntoDom(img);
-        console.log("Inserting into Dom from ImagePickerCallback");
     }
 }
 
 // Google Picker for uploading videos
 function newVideoPicker() {
-    console.log("Creating new video Picker in newVideoPicker");
     google.load('picker', '1', {"callback" : createVideoPicker});
 }
 // A simple callback implementation for Picker.
@@ -53,13 +50,11 @@ function VideoPickerCallback(data) {
         embed_url = doc[google.picker.Document.EMBEDDABLE_URL];
         var embed_code_template = Aloha.jQuery('<object width="420" height="236"><param name="movie" value="http://www.youtube.com/v/Rj8JoAAytyg?version=3&amp;hl=de_DE"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>');
         var embed_code = Aloha.jQuery(embed_code_template).find('embed').attr('src', embed_url);
-        console.log("Inserting into Dom from VideoPickerCallback");
         AlohaInsertIntoDom(embed_code);
     }
 }
 
 function createVideoPicker() {
-    console.log("Creating new video Picker");
     var picker = new google.picker.PickerBuilder().
         addView(new google.picker.VideoSearchView().
             setSite(google.picker.VideoSearchView.YOUTUBE)).
@@ -67,6 +62,5 @@ function createVideoPicker() {
         addView(new google.picker.WebCamView()).
         setCallback(VideoPickerCallback).
         build();
-        console.log("Created video Picker and set call back");
     picker.setVisible(true);
 }
