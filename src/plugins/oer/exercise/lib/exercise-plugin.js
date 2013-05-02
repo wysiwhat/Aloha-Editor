@@ -7,7 +7,6 @@
     SOLUTION_TEMPLATE = '<div class="solution">\n    <div class="title-container dropdown">\n        <a class="type" data-toggle="dropdown">Solution</a>\n        <ul class="dropdown-menu">\n            <li><a href="">Solution</a></li>\n            <li><a href="">Answer</a></li>\n        </ul>\n    </div>\n    <div class="body" semantic-editable placeholder="Type your solution here."></div>\n    <div class="solution-controlls">\n        <a href="">[HIDE SOLUTION]</a>\n    </div>\n</div> ';
     return Plugin.create('exercise', {
       init: function() {
-        semanticBlock.enableDragToAdd('Exercise', '[semantic-drag-source=exercise]', TEMPLATE);
         semanticBlock.registerEvent('click', '.exercise .solution-placeholder', function() {
           $(this).hide();
           return semanticBlock.appendElement($(SOLUTION_TEMPLATE), $(this).parent());

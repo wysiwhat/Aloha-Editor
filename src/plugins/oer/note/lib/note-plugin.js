@@ -2,11 +2,38 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
-    var TEMPLATE;
-    TEMPLATE = '<div class="note">\n    <div class="title-container dropdown">\n        <a class="type" data-toggle="dropdown">Note</a>\n        <ul class="dropdown-menu">\n            <li><a href="">Note</a></li>\n            <li><a href="">Aside</a></li>\n            <li><a href="">Warning</a></li>\n            <li><a href="">Tip</a></li>\n            <li><a href="">Important</a></li>\n        </ul>\n        <span class="title" semantic-editable placeholder="Add a title (optional)"></span>\n    </div>\n    <div class="body" semantic-editable placeholder="Type the text of your note here."></div>\n</div>';
+    var TEMPLATE, TITLE_CONTAINER;
+    TEMPLATE = '<div class="note" data-type="note">\n    <div class="title"></div>\n    <div class="body" semantic-editable placeholder="Type the text of your note here."></div>\n</div>';
+    TITLE_CONTAINER = '<div class="title-container dropdown">\n    <a class="type"></a>\n    <span class="title" semantic-editable placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n        <li><a href="">Note</a></li>\n        <li><a href="">Aside</a></li>\n        <li><a href="">Warning</a></li>\n        <li><a href="">Tip</a></li>\n        <li><a href="">Important</a></li>\n    </ul>\n</div>';
     return Plugin.create('note', {
       init: function() {
-        semanticBlock.enableDragToAdd('Note to Reader', '[semantic-drag-source=note]', TEMPLATE);
+        semanticBlock.activateHandler('note', function(element) {
+          var title, titleContainer, titleElement, type;
+          titleElement = element.children('.title');
+          if (titleElement.length) {
+            title = titleElement.text();
+            titleElement.remove();
+          } else {
+            title = "";
+          }
+          if (element.data('type')) {
+            type = element.data('type');
+          } else {
+            type = "note";
+          }
+          titleContainer = jQuery(TITLE_CONTAINER);
+          titleContainer.find('.title').text(title);
+          titleContainer.find('.type').text(type);
+          titleContainer.prependTo(element);
+          titleContainer.children('.title').aloha();
+          return element.children('.body').aloha();
+        });
+        semanticBlock.deactivateHandler('note', function(element) {
+          var title;
+          title = element.children('.title-container').children('.title').text();
+          element.children('.title-container').remove();
+          return jQuery("<div>").addClass('title').text(title).prependTo(element);
+        });
         return UI.adopt('insertNote', Button, {
           click: function(a, b, c) {
             return semanticBlock.insertAtCursor(TEMPLATE);

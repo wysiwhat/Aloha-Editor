@@ -383,8 +383,13 @@
                             <div style="position: fixed; top: 50px; left: 15px; width: 185px; z-index: 2;">
                                 <h4>Drag to add a new ...</h4>
 
-                                <div semantic-drag-source="note"></div>
-                                <div semantic-drag-source="exercise"></div>
+                                <div class="semantic-drag-source">
+                                    <div class="note" data-type="note">
+                                        <div class="title"></div>
+                                        <div class="body"></div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div id="canvas" style="margin-left: 200px;" note-droppable></div>
                         </div>

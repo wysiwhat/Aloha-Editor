@@ -7,8 +7,11 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
         return pluginManager.plugins.semanticblock;
     }
 
-	var blockTemplate = jQuery("<div class=\"semantic-container\"><div class=\"semantic-controlls\"><a href=\"\" class=\"semantic-delete\"><i class=\"icon-remove\"></i></a><a href=\"\"><i class=\"icon-cog\"></i></a></div></div>"),
+	var blockTemplate = jQuery("<div class=\"semantic-container\"></div>"),
+        blockControls = jQuery("<div class=\"semantic-controls\"><button class=\"semantic-delete\"><i class=\"icon-remove\"></i></button><button><i class=\"icon-cog\"></i></button></div>"),
         blockDragHelper = jQuery("<div class=\"semantic-drag-helper\"><div class=\"title\"></div><div class=\"body\">Drag me to the desired location in the document</div></div>"),
+        activateHandlers = {},
+        deactivateHandlers = {},
         pluginEvents = [
             {
                 name: 'mouseenter',
@@ -29,7 +32,8 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             {
                 name: 'mousedown',
                 selector: '.aloha-block-draghandle',
-                callback: function() {
+                callback: function(e) {
+                    e.preventDefault();
                     $(this).parents('.semantic-container').data('dragging', true);
                 }
             },
@@ -42,12 +46,9 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             },
             {
                 name: 'mouseover',
-                selector: '.semantic-container',
+                selector: '.semantic-block',
                 callback: function() {
-                    if (!$(this).find('.semantic-container.active').length) {
-                        $(this).addClass('active'); 
-                    }
-                    $(this).parents('.semantic-container').removeClass('active');
+                    activate($(this));
                 }
             },
             {
@@ -55,7 +56,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 selector: '.semantic-container',
                 callback: function() {
                     if (!$(this).data('dragging')) {
-                        $(this).removeClass('active');
+                        deactivate($(this).children('.semantic-block'));
                     }
                 }
             },
@@ -74,17 +75,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             },
             {
                 name: 'click',
-                selector: '.semantic-container [placeholder]',
-                callback: function() { 
-                    $(this).removeClass('placeholder');
-                    if ($(this).attr('placeholder') == $(this).text()) {
-                        $(this).text('');
-                    }
-                }
-            },
-            {
-                name: 'click',
-                selector: '.semantic-container [placeholder]',
+                selector: '[placeholder]',
                 callback: function() { 
                     $(this).removeClass('placeholder');
                     if ($(this).attr('placeholder') == $(this).text()) {
@@ -94,7 +85,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             },
             {
                 name: 'blur',
-                selector: '.semantic-container [placeholder]',
+                selector: '[placeholder]',
                 callback: function() {
                     if (!$(this).text()) {
                         $(this).text($(this).attr('placeholder'));
@@ -104,7 +95,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             },
             {
                 name: 'click',
-                selector: '.semantic-container .title-container li a',
+                selector: '.semantic-block .title-container li a',
                 callback: function(e) {
                     e.preventDefault();
                     $(this).parents('.title-container').first().children('.type').text($(this).text());
@@ -114,11 +105,45 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
    
     var insertElement = function(element) {
         },
-        enable = function(element) {
-            element.find('[semantic-editable]').aloha();
-            element.alohaBlock();
+        activate = function(element) {
+            if (!element.parent('.semantic-container').length) {
+                element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock();
 
-            element.find('[placeholder]').blur();
+                var type;
+                for (type in activateHandlers) {
+                    if (element.hasClass(type)) {
+                        activateHandlers[type](element);
+                        break;
+                    }
+                }
+            }
+        },
+        deactivate = function(element) {
+            if (element.parent('.semantic-container').length) {
+
+                element.find('[placeholder]').trigger('click');
+
+                var type;
+                for (type in deactivateHandlers) {
+                    if (element.hasClass(type)) {
+                        deactivateHandlers[type](element);
+                        break;
+                    }
+                }
+
+                element.siblings('.semantic-controls').remove();
+                element.unwrap();
+            }
+        },
+        register = function(element) {
+            element.addClass('semantic-block');
+        },
+        crawl = function(elements) {
+            jQuery('.note').not('.semantic-block').each(function() {
+                if (!$(this).parents('.semantic-drag-source').length) {
+                    register($(this));
+                }
+            });            
         },
         bindEvents = function(element) {
             if (element.data('noteEventsInitialized')) {
@@ -134,15 +159,31 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 element.on(event.name, event.selector, event.callback);
             }
         };
- 
+
 	Aloha.ready(function() {
-		$('#canvas').sortable({
-			'beforeStop': function(e, ui) {
-                if (ui.item.is('.semantic-container')) {
-                    enable(ui.item);
-                }
-		    }
-	    });
+
+        $('.semantic-drag-source').children().each(function() {
+            var element = $(this); 
+
+            element.draggable({
+                connectToSortable: $('#canvas'),
+                revert: 'invalid',
+                helper: function() {
+                    var helper = $(blockDragHelper).clone();
+                    helper.find('.title').text('im a helper');
+                    return helper;
+                },
+                start: function(e, ui) {
+                    $('#canvas').addClass('aloha-block-dropzone');
+                    $(ui.helper).addClass('dragging');
+                },
+                stop: function(e, ui) {
+                    $('#canvas').removeClass('aloha-block-dropzone');
+                    crawl();
+                },
+                refreshPositions: true
+            });
+        });
 
         bindEvents($(document));
     });
@@ -161,7 +202,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
             element = Aloha.jQuery('.semantic-temp')
                 .removeClass('semantic-temp');
             
-            enable(element);
+            register(element);
         },
         appendElement: function(element, target) {
             element = blockTemplate.clone().append(element);
@@ -172,40 +213,20 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
 
             element = Aloha.jQuery('.semantic-temp')
                 .removeClass('semantic-temp');
-            
-            enable(element);            
+    
+            register(element);            
+        },
+        activateHandler: function(type, handler){
+            activateHandlers[type] = handler;
+        },
+        deactivateHandler: function(type, handler){
+            deactivateHandlers[type] = handler;
         },
         registerEvent: function(name, selector, callback) {
             pluginEvents.push({
                 name: name,
                 selector: selector,
                 callback: callback
-            });
-        },
-        enableDragToAdd: function(label, containerSelector, template) {
-
-            var element = blockTemplate.clone().append(template).css('after', label),
-                labelElement = $('<span>').text(label);
-
-            $(containerSelector).append(labelElement);
-            $(containerSelector).append(element);
-
-            element.draggable({
-                connectToSortable: $('#canvas'),
-                revert: 'invalid',
-                helper: function() {
-                    var helper = $(blockDragHelper).clone();
-                    helper.find('.title').text(label);
-                    return helper;
-                },
-                start: function(e, ui) {
-                    $('#canvas').addClass('aloha-block-dropzone');
-                    $(ui.helper).addClass('dragging');
-                },
-                stop: function(e, ui) {
-                    $('#canvas').removeClass('aloha-block-dropzone');
-                },
-                refreshPositions: true
             });
         }
     });

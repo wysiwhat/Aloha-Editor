@@ -1,4 +1,23 @@
 
+.semantic-drag-source .note > * {
+    display: none;
+}
+.semantic-drag-source .note:hover {
+    background: #DDD;
+}
+.semantic-drag-source .note {
+    margin: 5px;
+    padding: 5px 0 5px 10px;
+    border: 1px solid black;
+    height: 20px;
+    width: 155px;
+    border-radius: 5px;
+    background: #EEE;
+}
+.semantic-drag-source .note:before {
+    content: "Note";
+}
+
 .note {
     padding: 20px;
     margin: 10px 50px 10px 50px;
@@ -11,6 +30,9 @@
     display: none;
 }
 
-.semantic-container.active > .note > .title-container .title.placeholder {
+.semantic-container > .note > .title-container .title.placeholder {
     display: inline;
 }
+
+
+.note[data-type=note] > .title:before {content: '\25A0  Note'}

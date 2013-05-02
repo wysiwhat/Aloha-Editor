@@ -47,9 +47,6 @@ define [
 
 	Plugin.create('exercise', {
 		init: () ->
-			semanticBlock.enableDragToAdd('Exercise', '[semantic-drag-source=exercise]', TEMPLATE)
-
-
 			semanticBlock.registerEvent('click', '.exercise .solution-placeholder', () ->
 				$(this).hide()
 				semanticBlock.appendElement($(SOLUTION_TEMPLATE), $(this).parent())
