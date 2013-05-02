@@ -37,8 +37,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       return false
   
   youtube_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:640px; height:360px" width="640" height="360" src="http:\/\/www.youtube.com/embed/' + id + '?wmode=transparent" frameborder="0" allowfullscreen></iframe>')
-
+    return jQuery("""<iframe style="width:640px; height:360px" width="640" height="360" 
+      src="http:\/\/www.youtube.com/embed/#{id}?wmode=transparent" frameborder="0" allowfullscreen></iframe>""")
   youtube_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
     return 'https://gdata.youtube.com/feeds/api/videos?q='+terms.join('+')+'&alt=json&v=2'
@@ -55,7 +55,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
       idTokens = video.id.$t.split(':')
       videoId = idTokens[idTokens.length-1]
-      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      # newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      newEntry = jQuery("""<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=#{videoId}><table>
+        <tr><td width=20% rowspan=3><img src=#{thumbnailUrl}/></td>
+        <td><b>#{videoTitle}</b></td></tr><tr><td>#{videoDescription}</td></tr>
+        <tr><td>Duration:#{videoLengthString}</td></tr></table></div>""")
       eleList.push(newEntry)
     return eleList
 
@@ -80,11 +84,14 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return false
 
   vimeo_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:640px; height:380px" src="http://player.vimeo.com/video/'+id+'" width="640" height="380" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+    return jQuery("""<iframe style="width:640px; height:380px" src="http://player.vimeo.com/video/#{id}" 
+      width="640" height="380" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>""") 
 
   vimeo_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
-    url = 'http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&oauth_version=1.0&page=0&per_page=50&query='+terms.join('+')+'&user_id=jmaxg3'
+    url = """http://vimeo.com/api/rest/v2&format=json&method=vimeo.videos.search&oauth_consumer_key=c1f5add1d34817a6775d10b3f6821268&
+    oauth_nonce=da3f0c0437ad303c7cdb11c522abef4f&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1365564937&oauth_token=1bba5c6f35030672b0b4b5c8cf8ed156&
+    oauth_version=1.0&page=0&per_page=50&query=#{terms.join('+')}&user_id=jmaxg3"""
     return url
 
   vimeo_search_results_generator = (responseObj) ->
@@ -97,14 +104,14 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
     encodedUrl = encodeURIComponent(inputurl)
     jQuery.ajax({
-            url: 'http://www.slideshare.net/api/oembed/2?url='+encodedUrl+'&format=jsonp',
+            url: """http://www.slideshare.net/api/oembed/2?url=#{encodedUrl}&format=jsonp""",
             async:false,
             dataType: 'jsonp',
             success: (result, status, statusObject) -> 
               id = result.slideshow_id
               if inputurl == inputbox.value
-                inputbox.style.borderColor='green'
-                inputbox.style.borderWidth='medium'
+                inputbox.style.borderColor = 'green'
+                inputbox.style.borderWidth = 'medium'
                 lastKnownUrlId = id
                 lastWorkingEmbedder = SLIDESHARE_ID
             })
@@ -113,7 +120,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return false
   
   slideshare_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:427px; height:356px" src="http://www.slideshare.net/slideshow/embed_code/'+id+'" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>') 
+    return jQuery("""<iframe style="width:427px; height:356px" src="http://www.slideshare.net/slideshow/embed_code/#{id}" width="427" height="356" frameborder="0" 
+      marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" 
+      allowfullscreen webkitallowfullscreen mozallowfullscreen> </iframe>""") 
 
   slideshare_query_generator = (queryTerms) -> 
     return false
@@ -138,7 +147,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return false
 
   concord_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:925px; height:575px" width="925" height="575" frameborder="no" scrolling="no" src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/'+id+'.json"></iframe>')
+    return jQuery("""<iframe style="width:925px; height:575px" width="925" height="575" frameborder="no" scrolling="no" 
+      src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/#{id}.json"></iframe>""")
 
   concord_query_generator = (queryTerms) -> 
     false
