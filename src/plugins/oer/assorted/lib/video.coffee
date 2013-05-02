@@ -15,6 +15,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   YOUTUBE_ID = 0
   VIMEO_ID = 1
   SLIDESHARE_ID = 2
+  CONCORD_ID = 3
 
   lastKnownUrlId = ''
   lastWorkingEmbedder = -1
@@ -49,7 +50,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
       idTokens = video.id.$t.split(':')
       videoId = idTokens[idTokens.length-1]
-      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
+      newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
       eleList.push(newEntry)
     return eleList
 
@@ -69,7 +70,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return false
 
   vimeo_embed_code_generator = (id) ->
-    return jQuery('<iframe style="width:500px; height:281px" src="http://player.vimeo.com/video/'+id+'" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
+    return jQuery('<iframe style="width:640px; height:380px" src="http://player.vimeo.com/video/'+id+'" width="640" height="380" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>') 
 
   vimeo_query_generator = (queryTerms) -> 
     terms = queryTerms.split(' ')
@@ -77,8 +78,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return url
 
   vimeo_search_results_generator = (responseObj) ->
-    eleList = [ ]
-    console.debug responseObj
     return [ ]
 
   slideshare_url_validator = (inputurl, inputbox) ->
@@ -111,15 +110,43 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   slideshare_search_results_generator = (responseObj) ->
     return [ ]
 
+  concord_url_validator = (url) ->
+    concordLabUrl = 'lab.concord.org/examples/interactives/interactives.html#interactives/samples/'
+    if url.indexOf(concordLabUrl) != -1
+      offset = url.indexOf(concordLabUrl)
+      offset = offset + concordLabUrl.length
+      id = url.substring(offset)
+      if id.length > 5
+        post = id.substring(id.length-5)
+        if post == '.json'
+          id = id.substring(0, id.length-5)
+          console.debug id
+          lastKnownUrlId = id
+          lastWorkingEmbedder = CONCORD_ID
+          return id
+
+    return false
+
+  concord_embed_code_generator = (id) ->
+    return jQuery('<iframe style="width:925px; height:575px" width="925" height="575" frameborder="no" scrolling="no" src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/'+id+'.json"></iframe>')
+
+  concord_query_generator = (queryTerms) -> 
+    false
+
+  concord_search_results_generator = (responseObj) ->
+    return [ ]
+
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
   vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator)
   slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator)
+  concord_embedder = new embedder(concord_url_validator, concord_embed_code_generator, concord_query_generator, concord_search_results_generator)
 
   # Adds the youtube embedders to the list of embedders
   embedders = []
   embedders[YOUTUBE_ID] = youtube_embedder
   embedders[VIMEO_ID] = vimeo_embedder
   embedders[SLIDESHARE_ID] = slideshare_embedder
+  embedders[CONCORD_ID] = concord_embedder
 
   active_embedder = youtube_embedder
   active_embedder_value = 'youtube'
@@ -146,7 +173,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         <center>OR</center>
         <div class="modal-body" >
             <center><input type="text" style="width:80%;" id="video-search-input" class-"upload-url-input" placeholder="Enter search terms for your video ..."/></center>
-            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo</input></td></tr></table></center>
+            <center><table><tr><td><input id='media-sites' type="radio" name="video-site" value="youtube" checked>Youtube</input></td><td><input disabled id='media-sites' type="radio" name="video-site" value="vimeo">Vimeo (search not working)</input></td></tr></table></center>
             <center><button type="search" class="btn btn-primary action search">Search</button></center>
         </div>
         <div class="modal-body" >
@@ -190,7 +217,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   # Defines a template for an embedder object which is responsible for generating embed html and validating a url
   showModalDialog = ($el) ->
-      console.debug 'Inside showModalDialog'
       settings = Aloha.require('assorted/assorted-plugin').settings
       root = Aloha.activeEditable.obj
       dialog = jQuery(DIALOG_HTML)
@@ -214,7 +240,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       for radio in dialog.find('#media-sites')
         radio.onclick = (event) ->
-          console.debug 'Radio button clicked'
           val = event.target.value
           if active_embedder_value != val
             index = 0
@@ -273,7 +298,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         evt.preventDefault()
         $placeholder.hide()
         $uploadUrl.hide()
-        console.debug 'Hiding placeholder url'
 
       dialog.find('.upload-url-link').on 'click', (evt) ->
         evt.preventDefault()
@@ -284,7 +308,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         $previewImg = $placeholder.find('img')
         url = $uploadUrl.val()
         setvideoSource(url)
-        console.debug 'changing'
         if settings.image.preview
           $previewImg.attr 'src', url
           $placeholder.show()
@@ -295,6 +318,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
         evt.preventDefault() # Don't submit the form
+        console.debug 'Inserting...'
         if $el.is('img')
           $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
@@ -310,6 +334,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 break
           else
             # Use url
+            console.debug 'Attempting URL support with '+lastWorkingEmbedder
             if lastWorkingEmbedder == -1
               return
             mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
@@ -324,12 +349,13 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         queryUrl = active_embedder.query_generator($searchTerms[0].value)
         $searchResults.empty()
         $searchResults.append(jQuery('<div style="width=100%" >Searching...</div>'))
-        jQuery.get(queryUrl, (data) => 
+        jQuery.get(queryUrl, (responseObj) => 
                 $searchResults.empty()
-                responseObj = jQuery.parseJSON(data)
+                if (typeof responseObj) == 'string'
+                  responseObj = jQuery.parseJSON(responseObj)
+
                 searchElements = active_embedder.search_results_generator(responseObj)
                 for ele in searchElements
-                  console.debug ele
                   ele[0].onclick = (evt) => 
                    console.debug evt
                    target = evt.target
@@ -436,7 +462,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   UI.adopt 'insertVideo-oer', null,
     click: () ->
-      console.debug 'Inserting video..'
       newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
       # Inserts Google Picker into the DOM
 # newVideoPicker()        
