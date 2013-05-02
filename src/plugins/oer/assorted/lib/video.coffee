@@ -20,6 +20,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   lastKnownUrlId = ''
   lastWorkingEmbedder = -1
 
+  ### 
+
+  Youtube Plugin 
+
+  ###
   # Creates a youtube embedder
   youtube_url_validator = (url) ->
     regexp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/
@@ -54,6 +59,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       eleList.push(newEntry)
     return eleList
 
+  ### 
+
+  Vimeo Plugin 
+
+  ###
   vimeo_url_validator = (url) ->
     if url.indexOf('vimeo.com/') != -1
       offset = url.indexOf('vimeo.com/')
@@ -80,6 +90,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   vimeo_search_results_generator = (responseObj) ->
     return [ ]
 
+  
   slideshare_url_validator = (inputurl, inputbox) ->
     if inputurl.indexOf('slideshare.net') == -1
       return false
@@ -120,7 +131,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         post = id.substring(id.length-5)
         if post == '.json'
           id = id.substring(0, id.length-5)
-          console.debug id
           lastKnownUrlId = id
           lastWorkingEmbedder = CONCORD_ID
           return id
@@ -245,7 +255,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             index = 0
             for radio in dialog.find('#media-sites')
               if radio.value == val
-                console.debug 'Setting '+radio.value
                 active_embedder_value = radio.value
                 active_embedder = embedders[index]
                 break
@@ -318,7 +327,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
         evt.preventDefault() # Don't submit the form
-        console.debug 'Inserting...'
         if $el.is('img')
           $el.attr 'src', videoSource
           $el.attr 'alt', dialog.find('[name=alt]').val()
@@ -334,7 +342,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 break
           else
             # Use url
-            console.debug 'Attempting URL support with '+lastWorkingEmbedder
             if lastWorkingEmbedder == -1
               return
             mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
@@ -357,7 +364,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 searchElements = active_embedder.search_results_generator(responseObj)
                 for ele in searchElements
                   ele[0].onclick = (evt) => 
-                   console.debug evt
                    target = evt.target
                    while target.tagName != 'DIV'
                      target = target.parentNode
