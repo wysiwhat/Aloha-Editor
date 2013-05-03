@@ -110,8 +110,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             success: (result, status, statusObject) -> 
               id = result.slideshow_id
               if inputurl == inputbox.value
-                inputbox.style.borderColor = 'green'
-                inputbox.style.borderWidth = 'medium'
+                inputbox.style.class = 'validURL'
                 lastKnownUrlId = id
                 lastWorkingEmbedder = SLIDESHARE_ID
             })
@@ -252,11 +251,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         currentVal = target.value
         valid = checkURL(currentVal, target)
         if(valid) 
-            target.style.borderColor='green'
-            target.style.borderWidth='medium'
+            target.style.class = 'validURL'
         else
-            target.style.borderColor='red'
-            target.style.borderWidth='medium'
+            target.style.class = 'invalidURL'
 
       for radio in dialog.find('#media-sites')
         radio.onclick = (event) ->
