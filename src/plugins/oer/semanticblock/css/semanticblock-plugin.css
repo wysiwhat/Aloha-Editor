@@ -68,11 +68,11 @@
     padding: 0;
 }
 
-.semantic-block .body {
+.aloha-oer-block .body {
   padding: 20px 10px 15px 10px;
 }
 
-.semantic-block .type:before {
+.aloha-oer-block .type:before {
     content: "\25A0";
     margin-right: 3px;
 }
@@ -82,16 +82,16 @@
     margin-right: 3px;
 }
 
-.semantic-block .type {
+.aloha-oer-block .type {
     margin: 5px 10px 0 5px;
     color: #369;
     text-decoration: none;
 }
 
-.semantic-block .title-container li {
+.aloha-oer-block .title-container li {
     list-style-type: none !important; 
 }
 
-.semantic-block .title {
+.aloha-oer-block .title {
   font-size: 1em;
 }

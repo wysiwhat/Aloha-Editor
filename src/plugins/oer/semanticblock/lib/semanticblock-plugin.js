@@ -46,7 +46,7 @@ function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Butto
             },
             {
                 name: 'mouseover',
-                selector: '.semantic-block',
+                selector: '.aloha-oer-block',
                 callback: function() {
                     activate($(this));
                 }
@@ -56,7 +56,7 @@ function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Butto
                 selector: '.semantic-container',
                 callback: function() {
                     if (!$(this).data('dragging')) {
-                        deactivate($(this).children('.semantic-block'));
+                        deactivate($(this).children('.aloha-oer-block'));
                     }
                 }
             },
@@ -95,11 +95,11 @@ function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Butto
             },
             {
                 name: 'click',
-                selector: '.semantic-block .title-container li a',
+                selector: '.aloha-oer-block .title-container li a',
                 callback: function(e) {
                     e.preventDefault();
                     $(this).parents('.title-container').first().children('.type').text($(this).text());
-                    $(this).parents('.semantic-block').first().attr('data-type', $(this).text().toLowerCase());
+                    $(this).parents('.aloha-oer-block').first().attr('data-type', $(this).text().toLowerCase());
                 }
             }
         ];
@@ -138,10 +138,10 @@ function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Butto
             }
         },
         register = function(element) {
-            element.addClass('semantic-block');
+            element.addClass('aloha-oer-block');
         },
         crawl = function(elements) {
-            jQuery('.note').not('.semantic-block').each(function() {
+            jQuery('.note').not('.aloha-oer-block').each(function() {
                 if (!$(this).parents('.semantic-drag-source').length) {
                     register($(this));
                 }
