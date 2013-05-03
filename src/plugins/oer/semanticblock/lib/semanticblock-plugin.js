@@ -190,9 +190,11 @@ function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Butto
         bindEvents($(document));
     });
 
+    Aloha.bind('aloha-editable-created', function() {
+        crawl();
+    });
+
     return Plugin.create('semanticblock', {
-        init: function(){
-        },
         insertAtCursor: function(template) {
             var element = blockTemplate.clone().append(template),
                 range = Aloha.Selection.getRangeObject();
