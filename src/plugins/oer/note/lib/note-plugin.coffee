@@ -28,8 +28,6 @@ define [
         </div>
 	'''
 
-	#element.find('[semantic-editable]').aloha();
-	#element.find('[placeholder]').blur();
 	Plugin.create('note', {
 		init: () ->
 			semanticBlock.activateHandler('note', (element) ->
