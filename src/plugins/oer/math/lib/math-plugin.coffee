@@ -75,12 +75,6 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
 
   TOOLTIP_TEMPLATE = '<div class="aloha-ephemera tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 
-  MATHML_ELEMENTS = ['abs','and','annotation','annotation-xml','apply','approx','arccos','arccosh','arccot','arccoth','arccsc','arccsch','arcsec','arcsech','arcsin','arcsinh','arctan','arctanh','arg','bvar','card','cartesianproduct','ceiling','ci','cn','codomain','complexes','compose','condition','conjugate','cos','cosh','cot','coth','csc','csch','csymbol','curl','declare','degree','determinant','diff','divergence','divide','domain','domainofapplication','emptyset','eq','equivalent','eulergamma','exists','exp','exponentiale','factorial','factorof','false','floor','fn','forall','gcd','geq','grad','gt','ident','image','imaginary','imaginaryi','implies','in','infinity','int','integers','intersect','interval','inverse','lambda','laplacian','lcm','leq','limit','list','ln','log','logbase','lowlimit','lt','maction','maligngroup','malignmark','math','matrix','matrixrow','max','mean','median','menclose','merror','mfenced','mfrac','mglyph','mi','min','minus','mlabeledtr','mlongdiv','mmultiscripts','mn','mo','mode','moment','momentabout','mover','mpadded','mphantom','mroot','mrow','ms','mscarries','mscarry','msgroup','msline','mspace','msqrt','msrow','mstack','mstyle','msub','msubsup','msup','mtable','mtd','mtext','mtr','munder','munderover','naturalnumbers','neq','not','notanumber','notin','notprsubset','notsubset','or','outerproduct','partialdiff','pi','piecewise','plus','power','primes','product','prsubset','quotient','rationals','real','reals','reln','rem','root','scalarproduct','sdev','sec','sech','selector','semantics','sep','set','setdiff','sin','sinh','subset','sum','tan','tanh','tendsto','times','transpose','true','union','uplimit','variance','vector','vectorproduct','xor']
-
-  for name, filter of Aloha.defaults.sanitize
-    filter.elements = filter.elements.concat MATHML_ELEMENTS
-    
-
   # Wait until Aloha is started before loading MathJax
   # Also, wrap all math in a span/div. MathJax replaces the MathJax element
   # losing all jQuery data attached to it (like popover data, the original Math Formula, etc)

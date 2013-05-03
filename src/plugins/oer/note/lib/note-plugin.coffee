@@ -16,8 +16,8 @@ define [
 	'''
 	TITLE_CONTAINER = '''
         <div class="title-container dropdown">
-            <a class="type"></a>
-            <span class="title" semantic-editable placeholder="Add a title (optional)"></span>
+            <a class="type" data-toggle="dropdown"></a>
+            <span class="title" placeholder="Add a title (optional)"></span>
             <ul class="dropdown-menu">
                 <li><a href="">Note</a></li>
                 <li><a href="">Aside</a></li>
@@ -58,6 +58,7 @@ define [
 				title = element.children('.title-container').children('.title').text()
 				element.children('.title-container').remove()
 				jQuery("<div>").addClass('title').text(title).prependTo(element)
+				element.children('.body').mahalo()
 			)
 			UI.adopt 'insertNote', Button,
 				click: (a, b, c) ->

@@ -1,6 +1,6 @@
 define(
-['aloha', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'css!semanticblock/css/semanticblock-plugin.css'],
-function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
+['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'css!semanticblock/css/semanticblock-plugin.css'],
+function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
 
     // hack to accomodate multiple executions
     if (pluginManager.plugins.semanticblock) {
@@ -99,6 +99,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 callback: function(e) {
                     e.preventDefault();
                     $(this).parents('.title-container').first().children('.type').text($(this).text());
+                    $(this).parents('.semantic-block').first().attr('data-type', $(this).text().toLowerCase());
                 }
             }
         ];
@@ -132,6 +133,7 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
                 }
 
                 element.siblings('.semantic-controls').remove();
+                BlockManager.getBlock(element.parent('.semantic-container').get(0)).unblock();
                 element.unwrap();
             }
         },
@@ -188,9 +190,11 @@ function(Aloha, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
         bindEvents($(document));
     });
 
+    Aloha.bind('aloha-editable-created', function() {
+        crawl();
+    });
+
     return Plugin.create('semanticblock', {
-        init: function(){
-        },
         insertAtCursor: function(template) {
             var element = blockTemplate.clone().append(template),
                 range = Aloha.Selection.getRangeObject();
