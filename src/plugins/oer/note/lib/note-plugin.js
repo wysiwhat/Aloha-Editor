@@ -4,7 +4,7 @@
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TEMPLATE, TITLE_CONTAINER;
     TEMPLATE = '<div class="note" data-type="note">\n    <div class="title"></div>\n    <div class="body" semantic-editable placeholder="Type the text of your note here."></div>\n</div>';
-    TITLE_CONTAINER = '<div class="title-container dropdown">\n    <a class="type"></a>\n    <span class="title" semantic-editable placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n        <li><a href="">Note</a></li>\n        <li><a href="">Aside</a></li>\n        <li><a href="">Warning</a></li>\n        <li><a href="">Tip</a></li>\n        <li><a href="">Important</a></li>\n    </ul>\n</div>';
+    TITLE_CONTAINER = '<div class="title-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <span class="title" placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n        <li><a href="">Note</a></li>\n        <li><a href="">Aside</a></li>\n        <li><a href="">Warning</a></li>\n        <li><a href="">Tip</a></li>\n        <li><a href="">Important</a></li>\n    </ul>\n</div>';
     return Plugin.create('note', {
       init: function() {
         semanticBlock.activateHandler('note', function(element) {
@@ -32,7 +32,8 @@
           var title;
           title = element.children('.title-container').children('.title').text();
           element.children('.title-container').remove();
-          return jQuery("<div>").addClass('title').text(title).prependTo(element);
+          jQuery("<div>").addClass('title').text(title).prependTo(element);
+          return element.children('.body').mahalo();
         });
         return UI.adopt('insertNote', Button, {
           click: function(a, b, c) {
