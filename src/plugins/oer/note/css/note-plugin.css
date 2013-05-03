@@ -9,6 +9,7 @@
     margin: 5px;
     padding: 5px 0 5px 10px;
     border: 1px solid black;
+    min-height: 0;
     height: 20px;
     width: 155px;
     border-radius: 5px;
@@ -20,6 +21,7 @@
 
 .note {
     padding: 20px;
+    min-height: 50px;
     margin: 10px 50px 10px 50px;
     border: 1px solid #333;
     border-top-color: #ccc;

@@ -11,7 +11,6 @@ define [
 	TEMPLATE = '''
         <div class="note" data-type="note">
             <div class="title"></div>
-            <div class="body" semantic-editable placeholder="Type the text of your note here."></div>
         </div>
 	'''
 	TITLE_CONTAINER = '''
@@ -44,19 +43,26 @@ define [
 				else
 					type = "note"
 
+				body = element.children()
+				element.children().remove()
+
 				titleContainer = jQuery(TITLE_CONTAINER)
 				titleContainer.find('.title').text(title)
 				titleContainer.find('.type').text(type)
 				titleContainer.prependTo(element)
 				titleContainer.children('.title').aloha()
-				element.children('.body').aloha()
+				$('<div>').addClass('body').attr('placeholder', 'Type the text of your note here.').append(body).appendTo(element).aloha()
 
 			)
 			semanticBlock.deactivateHandler('note', (element) ->
 				title = element.children('.title-container').children('.title').text()
 				element.children('.title-container').remove()
+
+				body = element.children('.body').children()
+				element.children('.body').remove()
+
 				jQuery("<div>").addClass('title').text(title).prependTo(element)
-				element.children('.body').mahalo()
+				element.append(body)
 			)
 			UI.adopt 'insertNote', Button,
 				click: (a, b, c) ->

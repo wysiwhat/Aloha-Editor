@@ -3,12 +3,12 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TEMPLATE, TITLE_CONTAINER;
-    TEMPLATE = '<div class="note" data-type="note">\n    <div class="title"></div>\n    <div class="body" semantic-editable placeholder="Type the text of your note here."></div>\n</div>';
+    TEMPLATE = '<div class="note" data-type="note">\n    <div class="title"></div>\n</div>';
     TITLE_CONTAINER = '<div class="title-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <span class="title" placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n        <li><a href="">Note</a></li>\n        <li><a href="">Aside</a></li>\n        <li><a href="">Warning</a></li>\n        <li><a href="">Tip</a></li>\n        <li><a href="">Important</a></li>\n    </ul>\n</div>';
     return Plugin.create('note', {
       init: function() {
         semanticBlock.activateHandler('note', function(element) {
-          var title, titleContainer, titleElement, type;
+          var body, title, titleContainer, titleElement, type;
           titleElement = element.children('.title');
           if (titleElement.length) {
             title = titleElement.text();
@@ -21,19 +21,23 @@
           } else {
             type = "note";
           }
+          body = element.children();
+          element.children().remove();
           titleContainer = jQuery(TITLE_CONTAINER);
           titleContainer.find('.title').text(title);
           titleContainer.find('.type').text(type);
           titleContainer.prependTo(element);
           titleContainer.children('.title').aloha();
-          return element.children('.body').aloha();
+          return $('<div>').addClass('body').attr('placeholder', 'Type the text of your note here.').append(body).appendTo(element).aloha();
         });
         semanticBlock.deactivateHandler('note', function(element) {
-          var title;
+          var body, title;
           title = element.children('.title-container').children('.title').text();
           element.children('.title-container').remove();
+          body = element.children('.body').children();
+          element.children('.body').remove();
           jQuery("<div>").addClass('title').text(title).prependTo(element);
-          return element.children('.body').mahalo();
+          return element.append(body);
         });
         return UI.adopt('insertNote', Button, {
           click: function(a, b, c) {
