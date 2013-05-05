@@ -29,42 +29,57 @@ define [
 
   Plugin.create('note', {
     init: () ->
-      semanticBlock.activateHandler('note', (element) ->
-        titleElement = element.children('.title')
+      # Load up specific classes to listen to or use the default
+      types = @settings.classes or {note:false}
+      for className, hasTitle of types
 
-        if titleElement.length
-          title = titleElement.text() # Titles may contain markup `.children` instead?
-          titleElement.remove()
-        else
-          title = ""
+        semanticBlock.activateHandler(className, (element) ->
+          if hasTitle
+            titleElement = element.children('.title')
 
-        if element.data('type')
-          type = element.data('type')
-        else
-          type = "note"
+            if titleElement.length
+              title = titleElement.text() # Titles may contain markup `.children` instead?
+              titleElement.remove()
+            else
+              title = ''
 
-        body = element.children()
-        element.children().remove()
+          type = element.data('type') or className
 
-        titleContainer = jQuery(TITLE_CONTAINER)
-        titleContainer.find('.title').text(title)
-        titleContainer.find('.type').text(type)
-        titleContainer.prependTo(element)
-        titleContainer.children('.title').aloha()
-        $('<div>').addClass('body').attr('placeholder', 'Type the text of your note here.').append(body).appendTo(element).aloha()
+          body = element.children()
+          element.children().remove()
 
-      )
-      semanticBlock.deactivateHandler('note', (element) ->
-        title = element.children('.title-container').children('.title').text()
-        element.children('.title-container').remove()
+          if hasTitle
+            titleContainer = jQuery(TITLE_CONTAINER)
+            titleContainer.find('.title').text(title)
+            titleContainer.find('.type').text(type)
+            titleContainer.prependTo(element)
+            titleContainer.children('.title').aloha()
 
-        body = element.children('.body').children()
-        element.children('.body').remove()
+          # Create the body and add some placeholder text
+          $('<div>').addClass('body')
+          .attr('placeholder', "Type the text of your #{className} here.")
+          .append(body)
+          .appendTo(element)
+          .aloha()
 
-        jQuery("<div>").addClass('title').text(title).prependTo(element)
-        element.append(body)
-      )
-      UI.adopt 'insertNote', Button,
-        click: (a, b, c) ->
-          semanticBlock.insertAtCursor(TEMPLATE)
+        )
+        semanticBlock.deactivateHandler(className, (element) ->
+          body = element.children('.body').children()
+          element.children('.body').remove()
+
+          if hasTitle
+            title = element.children('.title-container').children('.title').text()
+            element.children('.title-container').remove()
+            jQuery("<div>").addClass('title').text(title).prependTo(element)
+
+          element.append(body)
+        )
+        # Add a listener
+        UI.adopt "insert-#{className}", Button,
+          click: -> semanticBlock.insertAtCursor(TEMPLATE)
+
+        # For legacy toolbars listen to 'insertNote'
+        if 'note' == className
+          UI.adopt "insertNote", Button,
+            click: -> semanticBlock.insertAtCursor(TEMPLATE)
     })
