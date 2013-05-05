@@ -16,14 +16,14 @@
         name: 'mouseenter',
         selector: '.aloha-block-draghandle',
         callback: function() {
-          return $(this).parents('.semantic-container').addClass('drag-active');
+          return jQuery(this).parents('.semantic-container').addClass('drag-active');
         }
       }, {
         name: 'mouseleave',
         selector: '.aloha-block-draghandle',
         callback: function() {
-          if (!$(this).parents('.semantic-container').data('dragging')) {
-            return $(this).parents('.semantic-container').removeClass('drag-active');
+          if (!jQuery(this).parents('.semantic-container').data('dragging')) {
+            return jQuery(this).parents('.semantic-container').removeClass('drag-active');
           }
         }
       }, {
@@ -31,26 +31,26 @@
         selector: '.aloha-block-draghandle',
         callback: function(e) {
           e.preventDefault();
-          return $(this).parents('.semantic-container').data('dragging', true);
+          return jQuery(this).parents('.semantic-container').data('dragging', true);
         }
       }, {
         name: 'mouseup',
         selector: '.aloha-block-draghandle',
         callback: function() {
-          return $(this).parents('.semantic-container').data('dragging', false);
+          return jQuery(this).parents('.semantic-container').data('dragging', false);
         }
       }, {
         name: 'mouseover',
         selector: '.aloha-oer-block',
         callback: function() {
-          return activate($(this));
+          return activate(jQuery(this));
         }
       }, {
         name: 'mouseleave',
         selector: '.semantic-container',
         callback: function() {
-          if (!$(this).data('dragging')) {
-            return deactivate($(this).children('.aloha-oer-block'));
+          if (!jQuery(this).data('dragging')) {
+            return deactivate(jQuery(this).children('.aloha-oer-block'));
           }
         }
       }, {
@@ -58,26 +58,26 @@
         selector: '.semantic-container .semantic-delete',
         callback: function(e) {
           e.preventDefault();
-          return $(this).parents('.semantic-container').first().slideUp('slow', function() {
-            return $(this).remove();
+          return jQuery(this).parents('.semantic-container').first().slideUp('slow', function() {
+            return jQuery(this).remove();
           });
         }
       }, {
         name: 'click',
         selector: '[placeholder]',
         callback: function() {
-          $(this).removeClass('placeholder');
-          if ($(this).attr('placeholder') === $(this).text()) {
-            return $(this).text('');
+          jQuery(this).removeClass('placeholder');
+          if (jQuery(this).attr('placeholder') === jQuery(this).text()) {
+            return jQuery(this).text('');
           }
         }
       }, {
         name: 'blur',
         selector: '[placeholder]',
         callback: function() {
-          if (!$(this).text()) {
-            $(this).text($(this).attr('placeholder'));
-            return $(this).addClass('placeholder');
+          if (!jQuery(this).text()) {
+            jQuery(this).text(jQuery(this).attr('placeholder'));
+            return jQuery(this).addClass('placeholder');
           }
         }
       }, {
@@ -85,8 +85,8 @@
         selector: '.aloha-oer-block .title-container li a',
         callback: function(e) {
           e.preventDefault();
-          $(this).parents('.title-container').first().children('.type').text($(this).text());
-          return $(this).parents('.aloha-oer-block').first().attr('data-type', $(this).text().toLowerCase());
+          jQuery(this).parents('.title-container').first().children('.type').text(jQuery(this).text());
+          return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
         }
       }
     ];
@@ -129,8 +129,8 @@
     };
     crawl = function(elements) {
       return jQuery('.note').not('.aloha-oer-block').each(function() {
-        if (!$(this).parents('.semantic-drag-source').length) {
-          return register($(this));
+        if (!jQuery(this).parents('.semantic-drag-source').length) {
+          return register(jQuery(this));
         }
       });
     };
@@ -152,30 +152,30 @@
       return _results;
     };
     Aloha.ready(function() {
-      $('.semantic-drag-source').children().each(function() {
+      jQuery('.semantic-drag-source').children().each(function() {
         var element;
-        element = $(this);
+        element = jQuery(this);
         return element.draggable({
-          connectToSortable: $('#canvas'),
+          connectToSortable: jQuery('#canvas'),
           revert: 'invalid',
           helper: function() {
             var helper;
-            helper = $(blockDragHelper).clone();
+            helper = jQuery(blockDragHelper).clone();
             helper.find('.title').text('im a helper');
             return helper;
           },
           start: function(e, ui) {
-            $('#canvas').addClass('aloha-block-dropzone');
-            return $(ui.helper).addClass('dragging');
+            jQuery('#canvas').addClass('aloha-block-dropzone');
+            return jQuery(ui.helper).addClass('dragging');
           },
           stop: function(e, ui) {
-            $('#canvas').removeClass('aloha-block-dropzone');
+            jQuery('#canvas').removeClass('aloha-block-dropzone');
             return crawl();
           },
           refreshPositions: true
         });
       });
-      return bindEvents($(document));
+      return bindEvents(jQuery(document));
     });
     Aloha.bind('aloha-editable-created', function() {
       return crawl();

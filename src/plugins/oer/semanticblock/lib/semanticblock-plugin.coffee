@@ -11,61 +11,61 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'mouseenter'
     selector: '.aloha-block-draghandle'
     callback: ->
-      $(this).parents('.semantic-container').addClass 'drag-active'
+      jQuery(this).parents('.semantic-container').addClass 'drag-active'
   ,
     name: 'mouseleave'
     selector: '.aloha-block-draghandle'
     callback: ->
-      $(this).parents('.semantic-container').removeClass 'drag-active'  unless $(this).parents('.semantic-container').data('dragging')
+      jQuery(this).parents('.semantic-container').removeClass 'drag-active'  unless jQuery(this).parents('.semantic-container').data('dragging')
   ,
     name: 'mousedown'
     selector: '.aloha-block-draghandle'
     callback: (e) ->
       e.preventDefault()
-      $(this).parents('.semantic-container').data 'dragging', true
+      jQuery(this).parents('.semantic-container').data 'dragging', true
   ,
     name: 'mouseup'
     selector: '.aloha-block-draghandle'
     callback: ->
-      $(this).parents('.semantic-container').data 'dragging', false
+      jQuery(this).parents('.semantic-container').data 'dragging', false
   ,
     name: 'mouseover'
     selector: '.aloha-oer-block'
     callback: ->
-      activate $(this)
+      activate jQuery(this)
   ,
     name: 'mouseleave'
     selector: '.semantic-container'
     callback: ->
-      deactivate $(this).children('.aloha-oer-block')  unless $(this).data('dragging')
+      deactivate jQuery(this).children('.aloha-oer-block')  unless jQuery(this).data('dragging')
   ,
     name: 'click'
     selector: '.semantic-container .semantic-delete'
     callback: (e) ->
       e.preventDefault()
-      $(this).parents('.semantic-container').first().slideUp 'slow', ->
-        $(this).remove()
+      jQuery(this).parents('.semantic-container').first().slideUp 'slow', ->
+        jQuery(this).remove()
 
   ,
     name: 'click'
     selector: '[placeholder]'
     callback: ->
-      $(this).removeClass 'placeholder'
-      $(this).text ''  if $(this).attr('placeholder') is $(this).text()
+      jQuery(this).removeClass 'placeholder'
+      jQuery(this).text ''  if jQuery(this).attr('placeholder') is jQuery(this).text()
   ,
     name: 'blur'
     selector: '[placeholder]'
     callback: ->
-      unless $(this).text()
-        $(this).text $(this).attr('placeholder')
-        $(this).addClass 'placeholder'
+      unless jQuery(this).text()
+        jQuery(this).text jQuery(this).attr('placeholder')
+        jQuery(this).addClass 'placeholder'
   ,
     name: 'click'
     selector: '.aloha-oer-block .title-container li a'
     callback: (e) ->
       e.preventDefault()
-      $(this).parents('.title-container').first().children('.type').text $(this).text()
-      $(this).parents('.aloha-oer-block').first().attr 'data-type', $(this).text().toLowerCase()
+      jQuery(this).parents('.title-container').first().children('.type').text jQuery(this).text()
+      jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
   ]
   insertElement = (element) ->
 
@@ -95,7 +95,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
   crawl = (elements) ->
     jQuery('.note').not('.aloha-oer-block').each ->
-      register $(this)  unless $(this).parents('.semantic-drag-source').length
+      register jQuery(this)  unless jQuery(this).parents('.semantic-drag-source').length
 
 
   bindEvents = (element) ->
@@ -110,28 +110,28 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       i++
 
   Aloha.ready ->
-    $('.semantic-drag-source').children().each ->
-      element = $(this)
+    jQuery('.semantic-drag-source').children().each ->
+      element = jQuery(this)
       element.draggable
-        connectToSortable: $('#canvas')
+        connectToSortable: jQuery('#canvas')
         revert: 'invalid'
         helper: ->
-          helper = $(blockDragHelper).clone()
+          helper = jQuery(blockDragHelper).clone()
           helper.find('.title').text 'im a helper'
           helper
 
         start: (e, ui) ->
-          $('#canvas').addClass 'aloha-block-dropzone'
-          $(ui.helper).addClass 'dragging'
+          jQuery('#canvas').addClass 'aloha-block-dropzone'
+          jQuery(ui.helper).addClass 'dragging'
 
         stop: (e, ui) ->
-          $('#canvas').removeClass 'aloha-block-dropzone'
+          jQuery('#canvas').removeClass 'aloha-block-dropzone'
           crawl()
 
         refreshPositions: true
 
 
-    bindEvents $(document)
+    bindEvents jQuery(document)
 
   Aloha.bind 'aloha-editable-created', ->
     crawl()
