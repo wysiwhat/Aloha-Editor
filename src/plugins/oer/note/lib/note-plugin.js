@@ -9,7 +9,7 @@
       init: function() {
         var className, hasTitle, types, _results;
         types = this.settings.classes || {
-          note: false
+          note: true
         };
         _results = [];
         for (className in types) {
