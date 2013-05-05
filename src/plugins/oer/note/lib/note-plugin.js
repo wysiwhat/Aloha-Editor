@@ -8,9 +8,7 @@
     return Plugin.create('note', {
       init: function() {
         var className, hasTitle, types, _results;
-        types = this.settings.classes || {
-          note: true
-        };
+        types = this.settings.types;
         _results = [];
         for (className in types) {
           hasTitle = types[className];

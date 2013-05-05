@@ -30,7 +30,7 @@ define [
   Plugin.create('note', {
     init: () ->
       # Load up specific classes to listen to or use the default
-      types = @settings.classes or {note:true}
+      types = @settings.types
       for className, hasTitle of types
 
         semanticBlock.activateHandler(className, (element) ->

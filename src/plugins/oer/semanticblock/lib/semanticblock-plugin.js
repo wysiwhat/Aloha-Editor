@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'css!semanticblock/css/semanticblock-plugin.css'], function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
-    var activate, activateHandlers, bindEvents, blockControls, blockDragHelper, blockTemplate, crawl, deactivate, deactivateHandlers, insertElement, pluginEvents, register;
+    var activate, activateHandlers, bindEvents, blockControls, blockDragHelper, blockTemplate, deactivate, deactivateHandlers, insertElement, pluginEvents;
     if (pluginManager.plugins.semanticblock) {
       return pluginManager.plugins.semanticblock;
     }
@@ -124,16 +124,6 @@
         return element.unwrap();
       }
     };
-    register = function(element) {
-      return element.addClass('aloha-oer-block');
-    };
-    crawl = function(elements) {
-      return jQuery('.note').not('.aloha-oer-block').each(function() {
-        if (!jQuery(this).parents('.semantic-drag-source').length) {
-          return register(jQuery(this));
-        }
-      });
-    };
     bindEvents = function(element) {
       var event, i, _results;
       if (element.data('noteEventsInitialized')) {
@@ -169,18 +159,32 @@
             return jQuery(ui.helper).addClass('dragging');
           },
           stop: function(e, ui) {
-            jQuery('#canvas').removeClass('aloha-block-dropzone');
-            return crawl();
+            return jQuery('#canvas').removeClass('aloha-block-dropzone');
           },
           refreshPositions: true
         });
       });
       return bindEvents(jQuery(document));
     });
-    Aloha.bind('aloha-editable-created', function() {
-      return crawl();
-    });
     return Plugin.create('semanticblock', {
+      init: function() {
+        var _this = this;
+        return Aloha.bind('aloha-editable-created', function(e, params) {
+          var $root, classes, cls;
+          $root = params.obj;
+          classes = [];
+          for (cls in activateHandlers) {
+            classes.push("." + cls);
+          }
+          return $root.find(classes.join()).each(function(i, el) {
+            var $el;
+            $el = jQuery(el);
+            if (!$el.parents('.semantic-drag-source')[0]) {
+              return $el.addClass('aloha-oer-block');
+            }
+          });
+        });
+      },
       insertAtCursor: function(template) {
         var element, range;
         element = blockTemplate.clone().append(template);
@@ -188,14 +192,14 @@
         element.addClass('semantic-temp');
         GENTICS.Utils.Dom.insertIntoDOM(element, range, Aloha.activeEditable.obj);
         element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
-        return register(element);
+        return element.addClass('aloha-oer-block');
       },
       appendElement: function(element, target) {
         element = blockTemplate.clone().append(element);
         element.addClass('semantic-temp');
         target.append(element);
         element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
-        return register(element);
+        return element.addClass('aloha-oer-block');
       },
       activateHandler: function(type, handler) {
         return activateHandlers[type] = handler;

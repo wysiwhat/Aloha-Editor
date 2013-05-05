@@ -90,14 +90,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       BlockManager.getBlock(element.parent('.semantic-container').get(0)).unblock()
       element.unwrap()
 
-  register = (element) ->
-    element.addClass 'aloha-oer-block'
-
-  crawl = (elements) ->
-    jQuery('.note').not('.aloha-oer-block').each ->
-      register jQuery(this)  unless jQuery(this).parents('.semantic-drag-source').length
-
-
   bindEvents = (element) ->
     return  if element.data('noteEventsInitialized')
     element.data 'noteEventsInitialized', true
@@ -126,31 +118,38 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
         stop: (e, ui) ->
           jQuery('#canvas').removeClass 'aloha-block-dropzone'
-          crawl()
 
         refreshPositions: true
 
 
     bindEvents jQuery(document)
 
-  Aloha.bind 'aloha-editable-created', ->
-    crawl()
-
   Plugin.create 'semanticblock',
+
+    init: ->
+      Aloha.bind 'aloha-editable-created', (e, params) =>
+        $root = params.obj
+        # Add a `.aloha-oer-block` to all registered classes
+        classes = []
+        classes.push ".#{cls}" for cls of activateHandlers
+        $root.find(classes.join()).each (i, el) ->
+          $el = jQuery(el)
+          $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
+
     insertAtCursor: (template) ->
       element = blockTemplate.clone().append(template)
       range = Aloha.Selection.getRangeObject()
       element.addClass 'semantic-temp'
       GENTICS.Utils.Dom.insertIntoDOM element, range, Aloha.activeEditable.obj
       element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      register element
+      element.addClass 'aloha-oer-block'
 
     appendElement: (element, target) ->
       element = blockTemplate.clone().append(element)
       element.addClass 'semantic-temp'
       target.append element
       element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      register element
+      element.addClass 'aloha-oer-block'
 
     activateHandler: (type, handler) ->
       activateHandlers[type] = handler
@@ -163,5 +162,4 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         name: name
         selector: selector
         callback: callback
-
 

@@ -47,6 +47,12 @@
       'oer/note'
     ]
 
+    note:
+      types:
+        'note': true
+        'noteish': true
+        'noteish-notitle': false
+
     # This whole thing is what's needed to:
     #
     # - set a custom URL to send files to
