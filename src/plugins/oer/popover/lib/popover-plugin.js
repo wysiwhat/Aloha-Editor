@@ -240,7 +240,7 @@ There are 3 variables that are stored on each element;
             return $node.removeData('aloha-bubble-visible');
           }
         });
-        return $el.on('mouseenter.bubble', this.selector, function(evt) {
+        $el.on('mouseenter.bubble', this.selector, function(evt) {
           var $node;
           $node = jQuery(evt.target);
           clearInterval($node.data('aloha-bubble-timer'));
@@ -271,6 +271,9 @@ There are 3 variables that are stored on each element;
               }
             });
           }
+        });
+        return $('body').on('mousedown.bubble', '.popover', function(evt) {
+          return evt.stopPropagation();
         });
       };
 

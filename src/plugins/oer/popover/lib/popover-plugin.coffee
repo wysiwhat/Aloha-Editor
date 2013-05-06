@@ -267,6 +267,12 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
                     $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) ## (STATE_WO) -> (STATE_*)
 
               $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) if not $node.data('aloha-bubble-timer')
+
+      # Stop mousedown events inside a popover from propagating up to
+      # aloha, causing the editor to deactivate and the popover to close.
+      $('body').on 'mousedown.bubble', '.popover', (evt) ->
+        evt.stopPropagation()
+
     stopAll: (editable) ->
       # Remove all events and close all bubbles
       jQuery(editable.obj).undelegate(@selector, '.bubble')
