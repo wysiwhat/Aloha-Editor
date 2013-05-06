@@ -56,8 +56,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       idTokens = video.id.$t.split(':')
       videoId = idTokens[idTokens.length-1]
       # newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
-      newEntry = jQuery("""<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id=#{videoId}><table>
-        <tr><td width=20% rowspan=3><img src=#{thumbnailUrl}/></td>
+      newEntry = jQuery("""<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id="#{videoId}"><table>
+        <tr><td width=20% rowspan=3><img src="#{thumbnailUrl}"/></td>
         <td><b>#{videoTitle}</b></td></tr><tr><td>#{videoDescription}</td></tr>
         <tr><td>Duration:#{videoLengthString}</td></tr></table></div>""")
       eleList.push(newEntry)
@@ -175,9 +175,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       if (embedder.url_validator(url, inputbox)) 
         return true
     return false
-
-  # This will be prefixed with Aloha.settings.baseUrl
-  WARNING_IMAGE_PATH = '/../plugins/oerpub/image/img/warning.png'
 
   DIALOG_HTML = '''
     <form class="plugin video modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">
