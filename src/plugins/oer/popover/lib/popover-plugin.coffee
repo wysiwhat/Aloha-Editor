@@ -157,11 +157,8 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       @$element.trigger('hide-popover')
       originalHide.bind(@)()
       @$element.trigger('hidden-popover')
-
-  # There's a bug in bootstrap's destroy(). It says this.hide().$element.off(...)
-  # But it should be this.hide().off(...)
-  Bootstrap_Popover_destroy = () ->
-    @hide().off('.' + @type).removeData(@type)
+      # return this
+      @
 
   # Apply the monkey patch
   monkeyPatch = () ->
@@ -169,7 +166,6 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     proto = jQuery.fn.popover.Constructor.prototype
     proto.show = Bootstrap_Popover_show
     proto.hide = Bootstrap_Popover_hide(proto.hide)
-    proto.destroy = Bootstrap_Popover_destroy
   monkeyPatch()
 
 

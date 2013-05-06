@@ -71,7 +71,7 @@ There are 3 variables that are stored on each element;
 (function() {
 
   define('popover', ['aloha', 'jquery'], function(Aloha, jQuery) {
-    var Bootstrap_Popover__position, Bootstrap_Popover_destroy, Bootstrap_Popover_hide, Bootstrap_Popover_show, Helper, Popover, bindHelper, findMarkup, monkeyPatch, selectionChangeHandler;
+    var Bootstrap_Popover__position, Bootstrap_Popover_hide, Bootstrap_Popover_show, Helper, Popover, bindHelper, findMarkup, monkeyPatch, selectionChangeHandler;
     Bootstrap_Popover__position = function($tip) {
       var actualHeight, actualWidth, inside, placement, pos, tp;
       placement = (typeof this.options.placement === "function" ? this.options.placement.call(this, $tip[0], this.$element[0]) : this.options.placement);
@@ -141,19 +141,16 @@ There are 3 variables that are stored on each element;
       return function() {
         this.$element.trigger('hide-popover');
         originalHide.bind(this)();
-        return this.$element.trigger('hidden-popover');
+        this.$element.trigger('hidden-popover');
+        return this;
       };
-    };
-    Bootstrap_Popover_destroy = function() {
-      return this.hide().off('.' + this.type).removeData(this.type);
     };
     monkeyPatch = function() {
       var proto;
       console && console.warn('Monkey patching Bootstrap popovers so the buttons in them are clickable');
       proto = jQuery.fn.popover.Constructor.prototype;
       proto.show = Bootstrap_Popover_show;
-      proto.hide = Bootstrap_Popover_hide(proto.hide);
-      return proto.destroy = Bootstrap_Popover_destroy;
+      return proto.hide = Bootstrap_Popover_hide(proto.hide);
     };
     monkeyPatch();
     Popover = {
