@@ -111,6 +111,11 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
 
       $ROOT.on 'click', '.action.changeHeading', changeHeading
 
+      # Stop mousedown events from propagating to aloha's handler, which will
+      # cause the editor to deactivate.
+      $ROOT.on 'mousedown', ".action", (evt) ->
+        evt.stopPropagation()
+
       Aloha.bind 'aloha-editable-activated', (event, data) ->
         squirreledEditable = data.editable
 
