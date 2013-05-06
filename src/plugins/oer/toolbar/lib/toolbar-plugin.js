@@ -151,6 +151,9 @@
           return $newEl.bind('click', headingFunc);
         };
         $ROOT.on('click', '.action.changeHeading', changeHeading);
+        $ROOT.on('mousedown', ".action", function(evt) {
+          return evt.stopPropagation();
+        });
         Aloha.bind('aloha-editable-activated', function(event, data) {
           return squirreledEditable = data.editable;
         });
