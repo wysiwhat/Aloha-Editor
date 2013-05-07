@@ -61,12 +61,16 @@ form#linkModal:focus {
     font-size:90%;
 
 }
-
-.validURL {
+.validURL input {
     border-color:black;
     border-width:medium;
 }
-.invalidURL {
+.invalidURL input {
+    border-color:red;
+    border-width:medium;
+}
+
+.invalidURL input[type=text] {
     border-color:red;
     border-width:medium;
 }
