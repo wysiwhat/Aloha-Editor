@@ -31,19 +31,19 @@ define [
     init: () ->
       # Load up specific classes to listen to or use the default
       types = @settings.types
-      for className, hasTitle of types
+      jQuery.map types, (hasTitle, className) ->
 
         semanticBlock.activateHandler(className, (element) ->
           if hasTitle
             titleElement = element.children('.title')
 
             if titleElement.length
-              title = titleElement.text() # Titles may contain markup `.children` instead?
+              title = titleElement.html()
               titleElement.remove()
             else
               title = ''
 
-          type = element.data('type') or className
+          type = element.attr('data-type') or className
 
           body = element.children()
           element.children().remove()
@@ -51,7 +51,7 @@ define [
           if hasTitle
             titleContainer = jQuery(TITLE_CONTAINER)
             titleContainer.find('.title').text(title)
-            titleContainer.find('.type').text(type)
+            titleContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
             titleContainer.prependTo(element)
             titleContainer.children('.title').aloha()
 
@@ -61,7 +61,6 @@ define [
           .append(body)
           .appendTo(element)
           .aloha()
-
         )
         semanticBlock.deactivateHandler(className, (element) ->
           body = element.children('.body').children()

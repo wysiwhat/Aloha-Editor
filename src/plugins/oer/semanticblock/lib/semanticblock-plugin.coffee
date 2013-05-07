@@ -91,8 +91,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.unwrap()
 
   bindEvents = (element) ->
-    return  if element.data('noteEventsInitialized')
-    element.data 'noteEventsInitialized', true
+    return  if element.data('oerBlocksInitialized')
+    element.data 'oerBlocksInitialized', true
     event = undefined
     i = undefined
     i = 0
@@ -116,9 +116,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           jQuery('#canvas').addClass 'aloha-block-dropzone'
           jQuery(ui.helper).addClass 'dragging'
 
-        stop: (e, ui) ->
-          jQuery('#canvas').removeClass 'aloha-block-dropzone'
-
         refreshPositions: true
 
 
@@ -135,6 +132,11 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
+        
+        if $root.is('.aloha-block-blocklevel-sortable') and not $root.parents('.aloha-editable').length
+          $root.sortable 'option', 'stop', (e, ui) ->
+            $el = jQuery(ui.item)
+            $el.addClass 'aloha-oer-block'
 
     insertAtCursor: (template) ->
       element = blockTemplate.clone().append(template)
