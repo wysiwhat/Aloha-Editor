@@ -273,17 +273,16 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       $('body').on 'mousedown.bubble', '.popover', (evt) ->
         evt.stopPropagation()
 
-    stopAll: (editable) ->
+    stopAll: (editable) =>
       # Remove all events and close all bubbles
-      jQuery(editable.obj).undelegate(@selector, '.bubble')
+      jQuery(editable.obj).off('.bubble', @selector)
       $nodes = jQuery(editable.obj).find(@selector)
-      $nodes.removeData('aloha-bubble-timer')
-      $nodes.removeData('aloha-bubble-selected')
-      $nodes.popover('destroy')
+      this.stopOne($nodes)
 
     stopOne: ($nodes) ->
       $nodes.removeData('aloha-bubble-timer')
       $nodes.removeData('aloha-bubble-selected')
+      $nodes.trigger 'hide'
       $nodes.popover('destroy')
 
   findMarkup = (range=Aloha.Selection.getRangeObject(), selector) ->

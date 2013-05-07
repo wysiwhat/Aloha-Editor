@@ -69,6 +69,7 @@ There are 3 variables that are stored on each element;
 
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   define('popover', ['aloha', 'jquery'], function(Aloha, jQuery) {
     var Bootstrap_Popover__position, Bootstrap_Popover_hide, Bootstrap_Popover_show, Helper, Popover, bindHelper, findMarkup, monkeyPatch, selectionChangeHandler;
@@ -163,6 +164,7 @@ There are 3 variables that are stored on each element;
     Helper = (function() {
 
       function Helper(cfg) {
+        this.stopAll = __bind(this.stopAll, this);
         this.hover = false;
         jQuery.extend(this, cfg);
         if (this.focus || this.blur) {
@@ -279,16 +281,15 @@ There are 3 variables that are stored on each element;
 
       Helper.prototype.stopAll = function(editable) {
         var $nodes;
-        jQuery(editable.obj).undelegate(this.selector, '.bubble');
+        jQuery(editable.obj).off('.bubble', this.selector);
         $nodes = jQuery(editable.obj).find(this.selector);
-        $nodes.removeData('aloha-bubble-timer');
-        $nodes.removeData('aloha-bubble-selected');
-        return $nodes.popover('destroy');
+        return this.stopOne($nodes);
       };
 
       Helper.prototype.stopOne = function($nodes) {
         $nodes.removeData('aloha-bubble-timer');
         $nodes.removeData('aloha-bubble-selected');
+        $nodes.trigger('hide');
         return $nodes.popover('destroy');
       };
 
