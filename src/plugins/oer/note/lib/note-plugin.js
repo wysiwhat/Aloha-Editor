@@ -34,11 +34,19 @@
             return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + className + " here.").append(body).appendTo(element).aloha();
           });
           semanticBlock.deactivateHandler(className, function(element) {
-            var body, title;
-            body = element.children('.body').children();
+            var body, bodyElement, title, titleElement;
+            bodyElement = element.children('.body');
+            body = bodyElement.children();
+            if (body === bodyElement.attr('placeholder')) {
+              body = '';
+            }
             element.children('.body').remove();
             if (hasTitle) {
-              title = element.children('.title-container').children('.title').text();
+              titleElement = element.children('.title-container').children('.title');
+              title = titleElement.text();
+              if (title === titleElement.attr('placeholder')) {
+                title = '';
+              }
               element.children('.title-container').remove();
               jQuery("<div>").addClass('title').text(title).prependTo(element);
             }

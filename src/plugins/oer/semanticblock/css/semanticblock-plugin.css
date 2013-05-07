@@ -16,6 +16,8 @@
     position: relative;
     padding: 10px 0 10px;
     margin: 10px 0 10px 0;
+}
+.semantic-container.focused {
     border: 1px solid #ccc;
 }
 
@@ -38,8 +40,11 @@
 .semantic-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
 }
-.semantic-container > .aloha-block-handle {
+.semantic-container.focused > .aloha-block-handle {
     display: block !important; /* override the default aloha display logic for handles */
+}
+.semantic-container > .aloha-block-handle {
+    display: none !important; /* override the default aloha display logic for handles */
 }
 
 .semantic-container .semantic-controls {
@@ -53,8 +58,11 @@
     height: 100%;
     display: none; 
 }
-.semantic-container > .semantic-controls {
+.semantic-container.focused > .semantic-controls {
     display: block;
+}
+.semantic-container > .semantic-controls {
+    display: none;
 }
 
 .semantic-controls button:hover {

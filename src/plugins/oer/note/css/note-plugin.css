@@ -35,7 +35,3 @@
 .semantic-container > .note > .title-container .title.placeholder {
     display: inline;
 }
-
-
-.note[data-type=note] > .title:before {content: '\25A0  Note'}
-.note[data-type=aside] > .title:before {content: '\25A0  Aside'}

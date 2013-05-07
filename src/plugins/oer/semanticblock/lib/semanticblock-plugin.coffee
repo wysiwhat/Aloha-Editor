@@ -29,23 +29,22 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     callback: ->
       jQuery(this).parents('.semantic-container').data 'dragging', false
   ,
-    name: 'mouseover'
-    selector: '.aloha-oer-block'
-    callback: ->
-      activate jQuery(this)
-  ,
-    name: 'mouseleave'
-    selector: '.semantic-container'
-    callback: ->
-      deactivate jQuery(this).children('.aloha-oer-block')  unless jQuery(this).data('dragging')
-  ,
     name: 'click'
     selector: '.semantic-container .semantic-delete'
     callback: (e) ->
       e.preventDefault()
       jQuery(this).parents('.semantic-container').first().slideUp 'slow', ->
         jQuery(this).remove()
-
+  ,
+    name: 'mouseover'
+    selector: '.semantic-container'
+    callback: ->
+      jQuery(this).addClass('focused')
+  ,
+    name: 'mouseout'
+    selector: '.semantic-container'
+    callback: ->
+      jQuery(this).removeClass('focused')
   ,
     name: 'click'
     selector: '[placeholder]'
@@ -71,6 +70,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
   activate = (element) ->
     unless element.parent('.semantic-container').length
+      element.addClass 'aloha-oer-block'
       element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
       type = undefined
       for type of activateHandlers
@@ -80,14 +80,15 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
   deactivate = (element) ->
     if element.parent('.semantic-container').length
-      element.find('[placeholder]').trigger 'click'
+      element.removeClass 'aloha-oer-block ui-draggable'
+      element.removeAttr 'style'
+
       type = undefined
       for type of deactivateHandlers
         if element.hasClass(type)
           deactivateHandlers[type] element
           break
       element.siblings('.semantic-controls').remove()
-      BlockManager.getBlock(element.parent('.semantic-container').get(0)).unblock()
       element.unwrap()
 
   bindEvents = (element) ->
@@ -102,26 +103,14 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       i++
 
   Aloha.ready ->
-    jQuery('.semantic-drag-source').children().each ->
-      element = jQuery(this)
-      element.draggable
-        connectToSortable: jQuery('#canvas')
-        revert: 'invalid'
-        helper: ->
-          helper = jQuery(blockDragHelper).clone()
-          helper.find('.title').text 'im a helper'
-          helper
-
-        start: (e, ui) ->
-          jQuery('#canvas').addClass 'aloha-block-dropzone'
-          jQuery(ui.helper).addClass 'dragging'
-
-        refreshPositions: true
-
-
     bindEvents jQuery(document)
 
   Plugin.create 'semanticblock',
+
+    makeClean: (content) ->
+      for type of deactivateHandlers
+        content.find('.aloha-oer-block.'+type).each ->
+          deactivate jQuery(this)
 
     init: ->
       Aloha.bind 'aloha-editable-created', (e, params) =>
@@ -134,9 +123,27 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
         
         if $root.is('.aloha-block-blocklevel-sortable') and not $root.parents('.aloha-editable').length
+
+          # setting up these drag sources may break if there is more than one top level editable on the page
+          jQuery('.semantic-drag-source').children().each ->
+            element = jQuery(this)
+            element.draggable
+              connectToSortable: $root
+              revert: 'invalid'
+              helper: ->
+                helper = jQuery(blockDragHelper).clone()
+                helper.find('.title').text 'im a helper'
+                helper
+
+              start: (e, ui) ->
+                $root.addClass 'aloha-block-dropzone'
+                jQuery(ui.helper).addClass 'dragging'
+
+              refreshPositions: true
+
           $root.sortable 'option', 'stop', (e, ui) ->
             $el = jQuery(ui.item)
-            $el.addClass 'aloha-oer-block'
+            activate $el
 
     insertAtCursor: (template) ->
       element = blockTemplate.clone().append(template)
@@ -144,14 +151,14 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.addClass 'semantic-temp'
       GENTICS.Utils.Dom.insertIntoDOM element, range, Aloha.activeEditable.obj
       element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      element.addClass 'aloha-oer-block'
+      activate element
 
     appendElement: (element, target) ->
       element = blockTemplate.clone().append(element)
       element.addClass 'semantic-temp'
       target.append element
       element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      element.addClass 'aloha-oer-block'
+      activate element
 
     activateHandler: (type, handler) ->
       activateHandlers[type] = handler

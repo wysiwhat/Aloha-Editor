@@ -63,11 +63,21 @@ define [
           .aloha()
         )
         semanticBlock.deactivateHandler(className, (element) ->
-          body = element.children('.body').children()
+          bodyElement = element.children('.body')
+          body = bodyElement.children()
+
+          if body == bodyElement.attr('placeholder')
+            body = ''
+
           element.children('.body').remove()
 
           if hasTitle
-            title = element.children('.title-container').children('.title').text()
+            titleElement = element.children('.title-container').children('.title')
+            title = titleElement.text()
+
+            if title == titleElement.attr('placeholder')
+              title = ''
+
             element.children('.title-container').remove()
             jQuery("<div>").addClass('title').text(title).prependTo(element)
 
