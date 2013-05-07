@@ -212,7 +212,7 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
               content: =>
                 @populator.bind($node)($node, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 
-      $el.on 'show', @selector, (evt) =>
+      $el.on 'show.bubble', @selector, (evt) =>
         $node = jQuery(evt.target)
         movePopover = () ->
           that = $node.data('popover')
@@ -231,7 +231,7 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
         # As long as the popover is open  move it around if the document changes ($el updates)
         clearInterval($node.data('aloha-bubble-move-timer'))
         $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL))
-      $el.on 'hide', @selector, (evt) =>
+      $el.on 'hide.bubble', @selector, (evt) =>
         $node = jQuery(evt.target)
         clearTimeout($node.data('aloha-bubble-timer'))
         clearInterval($node.data('aloha-bubble-move-timer'))

@@ -207,7 +207,7 @@ There are 3 variables that are stored on each element;
             }
           });
         };
-        $el.on('show', this.selector, function(evt) {
+        $el.on('show.bubble', this.selector, function(evt) {
           var $node, movePopover;
           $node = jQuery(evt.target);
           movePopover = function() {
@@ -230,7 +230,7 @@ There are 3 variables that are stored on each element;
           clearInterval($node.data('aloha-bubble-move-timer'));
           return $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL));
         });
-        $el.on('hide', this.selector, function(evt) {
+        $el.on('hide.bubble', this.selector, function(evt) {
           var $node;
           $node = jQuery(evt.target);
           clearTimeout($node.data('aloha-bubble-timer'));
