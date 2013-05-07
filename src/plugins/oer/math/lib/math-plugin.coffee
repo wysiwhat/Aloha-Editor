@@ -121,14 +121,6 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
           # a math meta-element needs to followed by a non-breaking space in a span
           $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement)
 
-    ###
-    MathJax.Hub.Queue ->
-      jQuery.each MathJax.Hub.getAllJax(), (i, jax) ->
-        $el = jQuery "##{ jax.inputID }"
-        # `$el` is the `span` added by MathJax. We are interested in its parent, the `math-element`
-        squirrelMath $el.parent()
-    ###
-
   insertMath = () ->
     $el = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera">&#160;</span></span>') # nbsp
     range = Aloha.Selection.getRangeObject()
@@ -375,12 +367,6 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
       # Make sure the math element is never editable
       $el.contentEditable(false)
 
-      # Select (in the browser) the entire math
-      #range = rangy.createRange()
-      #range.selectNode($el[0])
-      #sel = rangy.getSelection()
-      #sel.setSingleRange(range)
-
       # Update what Aloha thinks is the selection
       # Can't just use Aloha.Selection.updateSelection because the thing that was clicked isn't editable
       # and setSelection will just silently return without triggering the selection update.
@@ -393,8 +379,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
       Aloha.trigger('aloha-selection-changed', range)
 
       # Since the click is on the math-element or its children
-      # (the math element is just a little horizontal bar but its children stick out above and below it)
-      # Don't handle the same event for each child
+      # (the math element is just a little horizontal bar but its children
+      # stick out above and below it). Don't handle the same event for each
+      # child.
       evt.stopPropagation()
 
     editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
