@@ -146,6 +146,7 @@
         var element;
         element = jQuery(this);
         return element.draggable({
+          connectToSortable: jQuery('#canvas'),
           revert: 'invalid',
           helper: function() {
             var helper;
