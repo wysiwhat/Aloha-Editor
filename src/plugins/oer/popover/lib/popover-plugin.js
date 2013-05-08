@@ -292,9 +292,9 @@ There are 3 variables that are stored on each element;
         var $nodes;
 
         jQuery('body').off('mousedown.bubble', '.popover');
-        jQuery(editable.obj).off('.bubble', this.selector);
         $nodes = jQuery(editable.obj).find(this.selector);
-        return this.stopOne($nodes);
+        this.stopOne($nodes);
+        return jQuery(editable.obj).off('.bubble', this.selector);
       };
 
       Helper.prototype.stopOne = function($nodes) {

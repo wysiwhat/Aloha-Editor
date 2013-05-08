@@ -277,9 +277,9 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     stopAll: (editable) =>
       # Remove all event handlers and close all bubbles
       jQuery('body').off 'mousedown.bubble', '.popover'
-      jQuery(editable.obj).off('.bubble', @selector)
       $nodes = jQuery(editable.obj).find(@selector)
       this.stopOne($nodes)
+      jQuery(editable.obj).off('.bubble', @selector)
 
     stopOne: ($nodes) ->
       $nodes.trigger 'hide'
