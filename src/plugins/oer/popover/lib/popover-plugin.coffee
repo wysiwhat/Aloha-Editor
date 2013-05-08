@@ -196,15 +196,16 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       makePopovers = ($nodes) =>
         $nodes.each (i, node) =>
           $node = jQuery(node)
-          if @focus
-            $node.on 'shown-popover', =>
-              @focus.bind($node[0])($node.data('popover').$tip)
-          if @blur
-            $node.on 'hide-popover', =>
-              @blur.bind($node[0])($node.data('popover').$tip)
 
           # Make sure we don't create more than one popover for an element.
           if not $node.data('popover')
+            if @focus
+              $node.on 'shown-popover', =>
+                @focus.bind($node[0])($node.data('popover').$tip)
+            if @blur
+              $node.on 'hide-popover', =>
+                @blur.bind($node[0])($node.data('popover').$tip)
+
             $node.popover
               html: true # bootstrap changed the default for this config option so set it to HTML
               placement: @placement or 'bottom'
@@ -281,9 +282,8 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       this.stopOne($nodes)
 
     stopOne: ($nodes) ->
-      $nodes.removeData('aloha-bubble-timer')
-      $nodes.removeData('aloha-bubble-selected')
       $nodes.trigger 'hide'
+      $nodes.removeData('aloha-bubble-selected')
       $nodes.popover('destroy')
 
   findMarkup = (range=Aloha.Selection.getRangeObject(), selector) ->
