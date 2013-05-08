@@ -39,7 +39,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'mouseover'
     selector: '.semantic-container'
     callback: ->
-      jQuery(this).addClass('focused')
+      jQuery(this).parents('.semantic-container').removeClass('focused')
+      jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
   ,
     name: 'mouseout'
     selector: '.semantic-container'
@@ -152,7 +153,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       activate element
 
     appendElement: (element, target) ->
-      element = blockTemplate.clone().append(element)
       element.addClass 'semantic-temp'
       target.append element
       element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')

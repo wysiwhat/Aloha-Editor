@@ -20,12 +20,7 @@
 }
 
 .note {
-    padding: 20px;
     min-height: 50px;
-    margin: 10px 50px 10px 50px;
-    border: 1px solid #333;
-    border-top-color: #ccc;
-    border-left-color: #ccc;
 }
 
 .note .title.placeholder {

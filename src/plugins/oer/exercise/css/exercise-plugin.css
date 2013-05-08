@@ -1,10 +1,25 @@
+.semantic-drag-source .exercise > * {
+    display: none;
+}
+.semantic-drag-source .exercise:hover {
+    background: #DDD;
+}
+.semantic-drag-source .exercise {
+    margin: 5px;
+    padding: 5px 0 5px 10px;
+    border: 1px solid black;
+    min-height: 0;
+    height: 20px;
+    width: 155px;
+    border-radius: 5px;
+    background: #EEE;
+}
+.semantic-drag-source .exercise:before {
+    content: "Exercise";
+}
 
 .exercise {
-    padding: 20px;
-    margin: 10px 50px 10px 50px;
-    border: 1px solid #333;
-    border-top-color: #ccc;
-    border-left-color: #ccc;
+    min-height: 50px;
 }
 
 .semantic-container .exercise .solution-placeholder {
@@ -17,17 +32,13 @@
     display: block; 
 }
 
-.semantic-container .exercise .solution-toggle {
-    position: absolute;
-    left: 50%;
-    margin-bottom: 10px;
-}
-.semantic-container .exercise .solution-controlls {
+.exercise .solution-controls {
     text-align: center;
 }
-.semantic-container .exercise .solution-controlls a {
+.exercise .solution-controls a {
     text-decoration: none;
-}
-.semantic-container .exercise .solution-controlls a:visited {
     color: blue !important;
+}
+.exercise .solution-controls .solution-toggle {
+    text-transform: uppercase;
 }

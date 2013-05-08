@@ -2,36 +2,88 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!exercise/css/exercise-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
-    var SOLUTION_TEMPLATE, TEMPLATE;
-    TEMPLATE = '<div class="exercise">\n    <div class="title-container dropdown">\n        <a class="type" data-toggle="dropdown">Exercise</a>\n        <ul class="dropdown-menu">\n            <li><a href="">Exercise</a></li>\n            <li><a href="">Homework</a></li>\n            <li><a href="">Problem</a></li>\n            <li><a href="">Question</a></li>\n            <li><a href="">Task</a></li>\n        </ul>\n        <span class="title" semantic-editable placeholder="Add a title (optional)"></span>\n    </div>\n    <div class="body" semantic-editable placeholder="Type the text of your exercise here."></div>\n    <div class="solution-placeholder">Click to add an Answer/Solution</div>\n    <div class="solution-controlls" style="display: none">\n        <a href="">[SHOW SOLUTION]</a>\n    </div>\n</div>';
-    SOLUTION_TEMPLATE = '<div class="solution">\n    <div class="title-container dropdown">\n        <a class="type" data-toggle="dropdown">Solution</a>\n        <ul class="dropdown-menu">\n            <li><a href="">Solution</a></li>\n            <li><a href="">Answer</a></li>\n        </ul>\n    </div>\n    <div class="body" semantic-editable placeholder="Type your solution here."></div>\n    <div class="solution-controlls">\n        <a href="">[HIDE SOLUTION]</a>\n    </div>\n</div> ';
+    var SOLUTION_TEMPLATE, SOLUTION_TYPE_CONTAINER, TEMPLATE, TYPE_CONTAINER;
+    TEMPLATE = '<div class="exercise" data-type="exercise">\n    <div class="problem"></div>\n</div>';
+    SOLUTION_TEMPLATE = '<div class="solution">\n</div> ';
+    TYPE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n        <li><a href="">Exercise</a></li>\n        <li><a href="">Homework</a></li>\n        <li><a href="">Problem</a></li>\n        <li><a href="">Question</a></li>\n        <li><a href="">Task</a></li>\n    </ul>\n</div>';
+    SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n        <li><a href="">Answer</a></li>\n        <li><a href="">Solution</a></li>\n    </ul>\n</div>';
     return Plugin.create('exercise', {
       init: function() {
-        semanticBlock.registerEvent('click', '.exercise .solution-placeholder', function() {
-          $(this).hide();
-          return semanticBlock.appendElement($(SOLUTION_TEMPLATE), $(this).parent());
-        });
-        semanticBlock.registerEvent('click', '.exercise .semantic-delete', function() {
-          return $(this).parents('.semantic-container').first().siblings('.solution-placeholder').removeAttr('style');
-        });
-        semanticBlock.registerEvent('click', '.exercise .solution-controlls a', function(e) {
-          var container, controlls;
-          e.preventDefault();
-          controlls = $(this).parent();
-          if (controlls.parent().is('.solution')) {
-            container = controlls.parents('.semantic-container').first();
-            return container.slideUp('slow', function() {
-              return container.siblings('.solution-controlls').show();
-            });
-          } else {
-            controlls.hide();
-            return controlls.siblings('.semantic-container').slideDown('slow');
+        semanticBlock.activateHandler('exercise', function(element) {
+          var problem, solutions, type, typeContainer;
+          type = element.attr('data-type') || 'exercise';
+          problem = element.children('.problem');
+          solutions = element.children('.solution');
+          element.children().remove();
+          typeContainer = jQuery(TYPE_CONTAINER);
+          typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+          typeContainer.prependTo(element);
+          problem.attr('placeholder', "Type the text of your problem here.").appendTo(element).aloha();
+          jQuery('<div>').addClass('solutions').appendTo(element);
+          jQuery('<div>').addClass('solution-controls').append('<a class="add-solution">Click here to add an answer/solution</a>').append('<a class="solution-toggle"></a>').appendTo(element);
+          if (!solutions.length) {
+            return element.children('.solution-controls').children('.solution-toggle').hide();
           }
         });
-        return UI.adopt('insertExercise', Button, {
-          click: function(a, b, c) {
+        semanticBlock.deactivateHandler('exercise', function(element) {
+          var problem, solutions;
+          problem = element.children('.problem');
+          solutions = element.children('.solutions').children();
+          if (problem.text() === problem.attr('placeholder')) {
+            problem.text('');
+          }
+          element.children().remove();
+          jQuery("<div>").addClass('problem').html(problem.html()).appendTo(element);
+          return element.append(solutions);
+        });
+        semanticBlock.activateHandler('solution', function(element) {
+          var body, type, typeContainer;
+          type = element.attr('data-type') || 'solution';
+          body = element.children();
+          element.children().remove();
+          typeContainer = jQuery(SOLUTION_TYPE_CONTAINER);
+          typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+          typeContainer.prependTo(element);
+          return jQuery('<div>').addClass('body').append(body).appendTo(element).aloha();
+        });
+        semanticBlock.deactivateHandler('solution', function(element) {
+          var content;
+          content = element.children('.body');
+          element.children().remove();
+          return element.append(content.html());
+        });
+        UI.adopt('insertExercise', Button, {
+          click: function() {
             return semanticBlock.insertAtCursor(TEMPLATE);
           }
+        });
+        semanticBlock.registerEvent('click', '.exercise .solution-controls a.add-solution', function() {
+          var controls, exercise;
+          exercise = $(this).parents('.exercise').first();
+          controls = exercise.children('.solution-controls');
+          controls.children('.add-solution').hide();
+          controls.children('.solution-toggle').text('hide solution').show();
+          return semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'));
+        });
+        semanticBlock.registerEvent('click', '.exercise .solution-controls a.solution-toggle', function() {
+          var controls, exercise, solutions;
+          exercise = $(this).parents('.exercise').first();
+          controls = exercise.children('.solution-controls');
+          solutions = exercise.children('.solutions');
+          return solutions.slideToggle(function() {
+            if (solutions.is(':visible')) {
+              return controls.children('.solution-toggle').text('hide solution');
+            } else {
+              return controls.children('.solution-toggle').text('show solution');
+            }
+          });
+        });
+        return semanticBlock.registerEvent('click', '.exercise .semantic-delete', function() {
+          var controls, exercise;
+          exercise = $(this).parents('.exercise').first();
+          controls = exercise.children('.solution-controls');
+          controls.children('.add-solution').show();
+          return controls.children('.solution-toggle').hide();
         });
       }
     });

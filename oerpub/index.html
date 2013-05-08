@@ -193,6 +193,7 @@
                                 // Microsoft.XMLDOM
                                 var html = (new XMLSerializer()).serializeToString(
                                     $html.append($body).get(0));
+                                console.log(html);
                                 if(save_url !== null){
                                     $.post(save_url,
                                             {html: html}, function(data, statustext){
@@ -383,6 +384,10 @@
                         <div class="semantic-drag-source">
                             <div class="note" data-type="note">
                                 <div class="title"></div>
+                            </div>
+
+                            <div class="exercise" data-type="exercise">
+                                <div class="problem"></div>
                             </div>
                         </div>
 

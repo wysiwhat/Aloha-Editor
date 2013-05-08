@@ -76,8 +76,13 @@
     padding: 0;
 }
 
-.aloha-oer-block .body {
-  padding: 20px 10px 15px 10px;
+.aloha-oer-block {
+  padding: 20px 10px 5px 20px;
+  min-height: 50px;
+  margin: 10px 50px 10px 50px;
+  border: 1px solid #333;
+  border-top-color: #ccc;
+  border-left-color: #ccc;
 }
 
 .aloha-oer-block .type:before {
@@ -88,6 +93,10 @@
 .semantic-container > * > .title-container .type:before {
     content: "\25BE";
     margin-right: 3px;
+}
+
+.semantic-container .title-container {
+    margin-bottom: 10px;
 }
 
 .aloha-oer-block .type {

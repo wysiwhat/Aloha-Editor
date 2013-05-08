@@ -52,7 +52,10 @@
         name: 'mouseover',
         selector: '.semantic-container',
         callback: function() {
-          return jQuery(this).addClass('focused');
+          jQuery(this).parents('.semantic-container').removeClass('focused');
+          if (!jQuery(this).find('.focused').length) {
+            return jQuery(this).addClass('focused');
+          }
         }
       }, {
         name: 'mouseout',
@@ -208,7 +211,6 @@
         return activate(element);
       },
       appendElement: function(element, target) {
-        element = blockTemplate.clone().append(element);
         element.addClass('semantic-temp');
         target.append(element);
         element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
