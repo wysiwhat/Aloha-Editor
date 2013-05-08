@@ -270,11 +270,12 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
 
       # Stop mousedown events inside a popover from propagating up to
       # aloha, causing the editor to deactivate and the popover to close.
-      $('body').on 'mousedown.bubble', '.popover', (evt) ->
+      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
         evt.stopPropagation()
 
     stopAll: (editable) =>
-      # Remove all events and close all bubbles
+      # Remove all event handlers and close all bubbles
+      jQuery('body').off 'mousedown.bubble', '.popover'
       jQuery(editable.obj).off('.bubble', @selector)
       $nodes = jQuery(editable.obj).find(@selector)
       this.stopOne($nodes)
