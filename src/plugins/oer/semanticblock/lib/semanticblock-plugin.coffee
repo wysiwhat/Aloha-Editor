@@ -47,19 +47,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).removeClass('focused')
   ,
     name: 'click'
-    selector: '[placeholder]'
-    callback: ->
-      jQuery(this).removeClass 'placeholder'
-      jQuery(this).text ''  if jQuery(this).attr('placeholder') is jQuery(this).text()
-  ,
-    name: 'blur'
-    selector: '[placeholder]'
-    callback: ->
-      unless jQuery(this).text()
-        jQuery(this).text jQuery(this).attr('placeholder')
-        jQuery(this).addClass 'placeholder'
-  ,
-    name: 'click'
     selector: '.aloha-oer-block .title-container li a'
     callback: (e) ->
       e.preventDefault()
@@ -113,6 +100,17 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           deactivate jQuery(this)
 
     init: ->
+      Aloha.bind 'aloha-editable-activated', (e, params) =>
+        element = jQuery(params.editable.obj)
+        if element.attr('placeholder')
+          element.removeClass 'placeholder'
+          element.text '' if element.attr('placeholder') is element.text()
+      Aloha.bind 'aloha-editable-deactivated', (e, params) =>
+        element = jQuery(params.editable.obj)
+        if element.attr('placeholder') and element.text() == ''
+          element.text element.attr('placeholder')
+          element.addClass 'placeholder'
+        
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
         # Add a `.aloha-oer-block` to all registered classes

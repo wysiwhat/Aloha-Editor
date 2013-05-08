@@ -62,24 +62,6 @@
         }
       }, {
         name: 'click',
-        selector: '[placeholder]',
-        callback: function() {
-          jQuery(this).removeClass('placeholder');
-          if (jQuery(this).attr('placeholder') === jQuery(this).text()) {
-            return jQuery(this).text('');
-          }
-        }
-      }, {
-        name: 'blur',
-        selector: '[placeholder]',
-        callback: function() {
-          if (!jQuery(this).text()) {
-            jQuery(this).text(jQuery(this).attr('placeholder'));
-            return jQuery(this).addClass('placeholder');
-          }
-        }
-      }, {
-        name: 'click',
         selector: '.aloha-oer-block .title-container li a',
         callback: function(e) {
           e.preventDefault();
@@ -156,6 +138,24 @@
       },
       init: function() {
         var _this = this;
+        Aloha.bind('aloha-editable-activated', function(e, params) {
+          var element;
+          element = jQuery(params.editable.obj);
+          if (element.attr('placeholder')) {
+            element.removeClass('placeholder');
+            if (element.attr('placeholder') === element.text()) {
+              return element.text('');
+            }
+          }
+        });
+        Aloha.bind('aloha-editable-deactivated', function(e, params) {
+          var element;
+          element = jQuery(params.editable.obj);
+          if (element.attr('placeholder') && element.text() === '') {
+            element.text(element.attr('placeholder'));
+            return element.addClass('placeholder');
+          }
+        });
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, cls;
           $root = params.obj;
