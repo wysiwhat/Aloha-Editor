@@ -202,8 +202,7 @@ define [
       newRange.select()
       newRange
 
-  selector = 'a'
-
+  selector = 'a:not(.aloha-ephemera)'
 
   # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st
   shortUrl = (linkurl, l) ->
