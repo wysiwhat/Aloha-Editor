@@ -188,17 +188,17 @@ There are 3 variables that are stored on each element;
             var $node;
 
             $node = jQuery(node);
-            if (_this.focus) {
-              $node.on('shown-popover', function() {
-                return _this.focus.bind($node[0])($node.data('popover').$tip);
-              });
-            }
-            if (_this.blur) {
-              $node.on('hide-popover', function() {
-                return _this.blur.bind($node[0])($node.data('popover').$tip);
-              });
-            }
             if (!$node.data('popover')) {
+              if (_this.focus) {
+                $node.on('shown-popover', function() {
+                  return _this.focus.bind($node[0])($node.data('popover').$tip);
+                });
+              }
+              if (_this.blur) {
+                $node.on('hide-popover', function() {
+                  return _this.blur.bind($node[0])($node.data('popover').$tip);
+                });
+              }
               return $node.popover({
                 html: true,
                 placement: _this.placement || 'bottom',
@@ -298,9 +298,8 @@ There are 3 variables that are stored on each element;
       };
 
       Helper.prototype.stopOne = function($nodes) {
-        $nodes.removeData('aloha-bubble-timer');
-        $nodes.removeData('aloha-bubble-selected');
         $nodes.trigger('hide');
+        $nodes.removeData('aloha-bubble-selected');
         return $nodes.popover('destroy');
       };
 
