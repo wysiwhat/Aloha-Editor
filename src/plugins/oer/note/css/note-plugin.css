@@ -23,6 +23,10 @@
     min-height: 50px;
 }
 
+.note .body {
+  margin: 10px;
+}
+
 .note .title.placeholder {
     display: none;
 }

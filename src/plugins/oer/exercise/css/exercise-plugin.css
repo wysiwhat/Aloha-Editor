@@ -22,6 +22,10 @@
     min-height: 50px;
 }
 
+.exercise .problem {
+  margin: 10px;
+}
+
 .semantic-container .exercise .solution-placeholder {
     color: #AAA;
     padding: 5px;
