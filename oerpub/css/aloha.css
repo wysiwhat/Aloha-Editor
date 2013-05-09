@@ -1,5 +1,9 @@
 /* candidate for a oerpub plugin? */
 
+body {
+    background-color: #CCCCCC;
+}
+
 figure {
     counter-increment: figure;
 }
