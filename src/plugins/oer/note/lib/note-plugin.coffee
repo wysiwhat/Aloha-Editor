@@ -30,7 +30,7 @@ define [
   Plugin.create('note', {
     init: () ->
       # Load up specific classes to listen to or use the default
-      types = @settings.types
+      types = @settings.types or {note: true}
       jQuery.map types, (hasTitle, className) ->
 
         semanticBlock.activateHandler(className, (element) ->

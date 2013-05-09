@@ -8,7 +8,9 @@
     return Plugin.create('note', {
       init: function() {
         var types;
-        types = this.settings.types;
+        types = this.settings.types || {
+          note: true
+        };
         return jQuery.map(types, function(hasTitle, className) {
           semanticBlock.activateHandler(className, function(element) {
             var body, title, titleContainer, titleElement, type;
