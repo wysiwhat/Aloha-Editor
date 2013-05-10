@@ -8,13 +8,15 @@ define [
   'popover',
   'ui/ui',
   'aloha/console',
+  'aloha/ephemera',
   'css!assorted/css/link.css'
 ], (
   Aloha,
   jQuery,
   Popover,
   UI,
-  console
+  console,
+  Ephemera
 ) ->
 
   DIALOG_HTML = '''
@@ -73,6 +75,8 @@ define [
       <br/>
   '''
 
+  # have ephemera remove the attribute that bootstrap inserts for tooltips
+  Ephemera.attributes('data-original-title')
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj
@@ -202,8 +206,7 @@ define [
       newRange.select()
       newRange
 
-  selector = 'a'
-
+  selector = 'a:not(.aloha-ephemera)'
 
   # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st
   shortUrl = (linkurl, l) ->
