@@ -7,7 +7,7 @@
       return pluginManager.plugins.semanticblock;
     }
     blockTemplate = jQuery('<div class="semantic-container"></div>');
-    blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete"><i class="icon-remove"></i></button><button><i class="icon-cog"></i></button></div>');
+    blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete"><i class="icon-remove"></i></button></div>');
     blockDragHelper = jQuery('<div class="semantic-drag-helper"><div class="title"></div><div class="body">Drag me to the desired location in the document</div></div>');
     activateHandlers = {};
     deactivateHandlers = {};
