@@ -119,7 +119,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         classes.push ".#{cls}" for cls of activateHandlers
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
-          $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
+          activate $el if not $el.parents('.semantic-drag-source').length
         
         if $root.is('.aloha-block-blocklevel-sortable') and not $root.parents('.aloha-editable').length
 

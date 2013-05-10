@@ -169,8 +169,8 @@
           $root.find(classes.join()).each(function(i, el) {
             var $el;
             $el = jQuery(el);
-            if (!$el.parents('.semantic-drag-source')[0]) {
-              return $el.addClass('aloha-oer-block');
+            if (!$el.parents('.semantic-drag-source').length) {
+              return activate($el);
             }
           });
           if ($root.is('.aloha-block-blocklevel-sortable') && !$root.parents('.aloha-editable').length) {
