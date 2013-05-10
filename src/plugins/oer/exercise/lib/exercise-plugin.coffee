@@ -137,6 +137,6 @@ define [
           exercise = $(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
           controls.children('.add-solution').show()
-          controls.children('.solution-toggle').hide()
+          controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
         )
     })
