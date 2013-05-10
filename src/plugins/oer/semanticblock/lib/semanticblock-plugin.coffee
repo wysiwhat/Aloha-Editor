@@ -120,7 +120,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
-        
+          activate $el
+
         if $root.is('.aloha-block-blocklevel-sortable') and not $root.parents('.aloha-editable').length
 
           # setting up these drag sources may break if there is more than one top level editable on the page

@@ -170,8 +170,9 @@
             var $el;
             $el = jQuery(el);
             if (!$el.parents('.semantic-drag-source')[0]) {
-              return $el.addClass('aloha-oer-block');
+              $el.addClass('aloha-oer-block');
             }
+            return activate($el);
           });
           if ($root.is('.aloha-block-blocklevel-sortable') && !$root.parents('.aloha-editable').length) {
             jQuery('.semantic-drag-source').children().each(function() {
