@@ -57,7 +57,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   insertElement = (element) ->
 
   activate = (element) ->
-    unless element.parent('.semantic-container').length
+    unless element.parent('.semantic-container').length or element.is('.semantic-container')
       element.addClass 'aloha-oer-block'
       element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
       type = undefined
@@ -67,7 +67,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           break
 
   deactivate = (element) ->
-    if element.parent('.semantic-container').length
+    if element.parent('.semantic-container').length or element.is('.semantic-container')
       element.removeClass 'aloha-oer-block ui-draggable'
       element.removeAttr 'style'
 
@@ -111,7 +111,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         if element.attr('placeholder') and element.text() == ''
           element.text element.attr('placeholder')
           element.addClass 'placeholder'
-        
+
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
         # Add a `.aloha-oer-block` to all registered classes

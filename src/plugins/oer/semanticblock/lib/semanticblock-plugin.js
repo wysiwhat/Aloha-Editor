@@ -76,7 +76,7 @@
     insertElement = function(element) {};
     activate = function(element) {
       var type, _results;
-      if (!element.parent('.semantic-container').length) {
+      if (!(element.parent('.semantic-container').length || element.is('.semantic-container'))) {
         element.addClass('aloha-oer-block');
         element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock();
         type = void 0;
@@ -94,7 +94,7 @@
     };
     deactivate = function(element) {
       var type;
-      if (element.parent('.semantic-container').length) {
+      if (element.parent('.semantic-container').length || element.is('.semantic-container')) {
         element.removeClass('aloha-oer-block ui-draggable');
         element.removeAttr('style');
         type = void 0;
