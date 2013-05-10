@@ -98,9 +98,14 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
     $mml.wrap '<span class="mathml-wrapper aloha-ephemera-wrapper"></span>'
     $el.append $mml.parent()
 
-  Aloha.bind 'aloha-editable-activated', (evt, ed) ->
+  Aloha.bind 'aloha-editable-created', (evt, editable) ->
+    # Bind ctrl+m to math insert/mathify
+    editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
+      insertMath()
+      evt.preventDefault()
+
     # STEP1
-    $maths = ed.editable.obj.find('math')
+    $maths = editable.obj.find('math')
     $maths.wrap '<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>'
 
     # TODO: Explicitly call Mathjax Typeset
@@ -121,13 +126,59 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
           # a math meta-element needs to followed by a non-breaking space in a span
           $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement)
 
-    ###
-    MathJax.Hub.Queue ->
-      jQuery.each MathJax.Hub.getAllJax(), (i, jax) ->
-        $el = jQuery "##{ jax.inputID }"
-        # `$el` is the `span` added by MathJax. We are interested in its parent, the `math-element`
-        squirrelMath $el.parent()
-    ###
+    # What to when user clicks on math
+    jQuery(editable.obj).on 'click.matheditor', '.math-element, .math-element *', (evt) ->
+      $el = jQuery(@)
+
+      $el = $el.parents('.math-element') if not $el.is('.math-element')
+
+      # Make sure the math element is never editable
+      $el.contentEditable(false)
+
+      # Update what Aloha thinks is the selection
+      # Can't just use Aloha.Selection.updateSelection because the thing that was clicked isn't editable
+      # and setSelection will just silently return without triggering the selection update.
+      range = new GENTICS.Utils.RangeObject()
+      range.startContainer = range.endContainer = $el[0]
+      range.startOffset = range.endOffset = 0
+      Aloha.Selection.rangeObject = range
+
+      #evt.target = evt.currentTarget = $el[0]
+      Aloha.trigger('aloha-selection-changed', range)
+
+      # Since the click is on the math-element or its children
+      # (the math element is just a little horizontal bar but its children
+      # stick out above and below it). Don't handle the same event for each
+      # child.
+      evt.stopPropagation()
+
+    editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
+      jQuery(e.target).tooltip('destroy')
+      $el = jQuery(e.target).closest('.math-element')
+      # Though the tooltip was bound to the editor and delegates
+      # to these items, you still have to clean it up youself
+      $el.trigger('hide').tooltip('destroy').remove()
+      Aloha.activeEditable.smartContentChange {type: 'block-change'}
+      e.preventDefault()
+    )
+
+    # Add hlpful tooltips
+    if jQuery.ui and jQuery.ui.tooltip
+      # Use jq.ui tooltip
+      editable.obj.tooltip(
+        items: ".math-element",
+        content: -> 'Click anywhere in math to edit it',
+        template: TOOLTIP_TEMPLATE)
+    else
+      # This requires a custom version of jquery-ui, to avoid the conflict
+      # between the two .toolbar plugins. This one assumes bootstrap
+      # tooltip
+      editable.obj.tooltip(
+        selector: '.math-element'
+        placement: 'top'
+        title: 'Click anywhere in math to edit it'
+        trigger: 'hover',
+        template: TOOLTIP_TEMPLATE)
 
   insertMath = () ->
     $el = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera">&#160;</span></span>') # nbsp
@@ -357,72 +408,6 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oe
             if encoding of LANGUAGES
               return { 'mimeType': encoding, 'formula': formula }
     return { 'mimeType': mimeType, 'formula': formula }
-
-  Aloha.bind 'aloha-editable-created', (e, editable) ->
-    # Bind ctrl+m to math insert/mathify
-    editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
-      insertMath()
-      evt.preventDefault()
-
-  Aloha.bind 'aloha-editable-activated', (event, data) ->
-    editable = data.editable
-
-    jQuery(editable.obj).on 'click.matheditor', '.math-element, .math-element *', (evt) ->
-      $el = jQuery(@)
-
-      $el = $el.parents('.math-element') if not $el.is('.math-element')
-
-      # Make sure the math element is never editable
-      $el.contentEditable(false)
-
-      # Select (in the browser) the entire math
-      #range = rangy.createRange()
-      #range.selectNode($el[0])
-      #sel = rangy.getSelection()
-      #sel.setSingleRange(range)
-
-      # Update what Aloha thinks is the selection
-      # Can't just use Aloha.Selection.updateSelection because the thing that was clicked isn't editable
-      # and setSelection will just silently return without triggering the selection update.
-      range = new GENTICS.Utils.RangeObject()
-      range.startContainer = range.endContainer = $el[0]
-      range.startOffset = range.endOffset = 0
-      Aloha.Selection.rangeObject = range
-
-      #evt.target = evt.currentTarget = $el[0]
-      Aloha.trigger('aloha-selection-changed', range)
-
-      # Since the click is on the math-element or its children
-      # (the math element is just a little horizontal bar but its children stick out above and below it)
-      # Don't handle the same event for each child
-      evt.stopPropagation()
-
-    editable.obj.on('click.matheditor', '.math-element-destroy', (e) ->
-      jQuery(e.target).tooltip('destroy')
-      $el = jQuery(e.target).closest('.math-element')
-      # Though the tooltip was bound to the editor and delegates
-      # to these items, you still have to clean it up youself
-      $el.trigger('hide').tooltip('destroy').remove()
-      Aloha.activeEditable.smartContentChange {type: 'block-change'}
-      e.preventDefault()
-    )
-
-    if jQuery.ui and jQuery.ui.tooltip
-      # Use jq.ui tooltip
-      editable.obj.tooltip(
-        items: ".math-element",
-        content: -> 'Click anywhere in math to edit it',
-        template: TOOLTIP_TEMPLATE)
-    else
-      # This requires a custom version of jquery-ui, to avoid the conflict
-      # between the two .toolbar plugins. This one assumes bootstrap
-      # tooltip
-      editable.obj.tooltip(
-        selector: '.math-element'
-        placement: 'top'
-        title: 'Click anywhere in math to edit it'
-        trigger: 'hover',
-        template: TOOLTIP_TEMPLATE)
 
   SELECTOR = '.math-element' # ,.MathJax[role="textbox"][aria-readonly="true"],.MathJax_Display[role="textbox"][aria-readonly="true"]'
   Popover.register
