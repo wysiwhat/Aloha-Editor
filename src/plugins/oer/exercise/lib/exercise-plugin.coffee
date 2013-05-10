@@ -117,7 +117,6 @@ define [
           exercise = $(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
 
-          controls.children('.add-solution').hide()
           controls.children('.solution-toggle').text('hide solution').show()
 
           semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'))

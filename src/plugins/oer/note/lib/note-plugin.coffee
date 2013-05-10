@@ -14,7 +14,7 @@ define [
         </div>
   '''
   TITLE_CONTAINER = '''
-        <div class="title-container dropdown">
+        <div class="type-container dropdown">
             <a class="type" data-toggle="dropdown"></a>
             <span class="title" placeholder="Add a title (optional)"></span>
             <ul class="dropdown-menu">
@@ -72,13 +72,13 @@ define [
           element.children('.body').remove()
 
           if hasTitle
-            titleElement = element.children('.title-container').children('.title')
+            titleElement = element.children('.type-container').children('.title')
             title = titleElement.text()
 
             if title == titleElement.attr('placeholder')
               title = ''
 
-            element.children('.title-container').remove()
+            element.children('.type-container').remove()
             jQuery("<div>").addClass('title').text(title).prependTo(element)
 
           element.append(body)

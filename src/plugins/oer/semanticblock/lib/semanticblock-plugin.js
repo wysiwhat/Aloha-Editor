@@ -65,10 +65,10 @@
         }
       }, {
         name: 'click',
-        selector: '.aloha-oer-block .title-container li a',
+        selector: '.aloha-oer-block .type-container li a',
         callback: function(e) {
           e.preventDefault();
-          jQuery(this).parents('.title-container').first().children('.type').text(jQuery(this).text());
+          jQuery(this).parents('.type-container').first().children('.type').text(jQuery(this).text());
           return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
         }
       }

@@ -61,7 +61,6 @@
           var controls, exercise;
           exercise = $(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
-          controls.children('.add-solution').hide();
           controls.children('.solution-toggle').text('hide solution').show();
           return semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'));
         });

@@ -90,12 +90,12 @@
     margin-right: 3px;
 }
 
-.semantic-container > * > .title-container .type:before {
+.semantic-container > * > .type-container .type:before {
     content: "\25BE";
     margin-right: 3px;
 }
 
-.semantic-container .title-container {
+.semantic-container .type-container {
     margin-bottom: 10px;
 }
 
@@ -105,7 +105,7 @@
     text-decoration: none;
 }
 
-.aloha-oer-block .title-container li {
+.aloha-oer-block .type-container li {
     list-style-type: none !important; 
 }
 
