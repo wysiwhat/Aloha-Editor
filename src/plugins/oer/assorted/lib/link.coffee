@@ -5,7 +5,7 @@
 define [
   'aloha',
   'jquery',
-  'popover',
+  'popover/popover-plugin',
   'ui/ui',
   'aloha/console',
   'aloha/ephemera',
