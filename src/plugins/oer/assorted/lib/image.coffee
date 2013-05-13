@@ -15,7 +15,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose a file</a> OR <a class="upload-url-link">get file from the Web</a>
+            <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>
             <div class="placeholder preview hide">
               <h4>Preview</h4>
               <img class="preview-image"/>
@@ -25,7 +25,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         </div>
         <div class="image-alt">
           <div class="forminfo">
-            Please provide a description of this image for the visually impaired.
+            <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
           </div>
           <div>
             <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>
@@ -33,7 +33,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>
         <button class="btn action cancel">Cancel</button>
       </div>
     </form>'''
@@ -82,7 +82,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       setImageSource = (href) ->
         imageSource = href
-        $submit.removeClass('disabled')
+        $submit.removeAttr('disabled')
 
       # Uses the File API to render a preview of the image
       # and updates the modal's imageSource
