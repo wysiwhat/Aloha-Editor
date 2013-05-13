@@ -8,13 +8,15 @@ define [
   'popover',
   'ui/ui',
   'aloha/console',
+  'aloha/ephemera',
   'css!assorted/css/link.css'
 ], (
   Aloha,
   jQuery,
   Popover,
   UI,
-  console
+  console,
+  Ephemera
 ) ->
 
   DIALOG_HTML = '''
@@ -73,6 +75,7 @@ define [
       <br/>
   '''
 
+  Ephemera.attributes('data-original-title')
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj
