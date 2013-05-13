@@ -1,6 +1,7 @@
 define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
     jQuery, Aloha, Plugin, Ui, PubSub) ->
 
+  squirreledEditable = null
   $ROOT = jQuery('body') # Could also be configured to some other div
 
   makeItemRelay = (slot) ->
@@ -89,9 +90,9 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
     init: ->
 
       toolbar = @
-      squirreledEditable = null
 
       changeHeading = (evt) ->
+        evt.preventDefault()
         $el = jQuery(@)
         hTag = $el.attr('data-tagname')
         rangeObject = Aloha.Selection.getRangeObject()
@@ -105,7 +106,6 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
         $newEl.addClass($oldEl.attr('class'))
         $newEl.bind 'click', headingFunc
-        evt.preventDefault()
         # $newEl.attr('id', $oldEl.attr('id))
         # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
 

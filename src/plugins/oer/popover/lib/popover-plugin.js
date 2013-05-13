@@ -358,10 +358,10 @@ There are 3 variables that are stored on each element;
         if (!$el.is(helper.selector)) {
           $el = $el.parents(helper.selector);
         }
-        nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector);
-        nodes = nodes.not($el);
-        nodes.trigger('hide');
         if (Aloha.activeEditable) {
+          nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector);
+          nodes = nodes.not($el);
+          nodes.trigger('hide');
           enteredLinkScope = selectionChangeHandler(rangeObject, helper.selector);
           if (insideScope !== enteredLinkScope) {
             insideScope = enteredLinkScope;

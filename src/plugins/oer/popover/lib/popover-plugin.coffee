@@ -329,12 +329,12 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       $el = jQuery(rangeObject.getCommonAncestorContainer())
       $el = $el.parents(helper.selector) if not $el.is(helper.selector)
 
-      # Hide other tooltips of the same type
-      nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
-      nodes = nodes.not($el)
-      nodes.trigger 'hide'
-
       if Aloha.activeEditable
+        # Hide other tooltips of the same type
+        nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
+        nodes = nodes.not($el)
+        nodes.trigger 'hide'
+
         enteredLinkScope = selectionChangeHandler(rangeObject, helper.selector)
         if insideScope isnt enteredLinkScope
           insideScope = enteredLinkScope
