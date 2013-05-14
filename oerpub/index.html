@@ -62,6 +62,7 @@
                                     oer/toolbar,
                                     oer/popover,
                                     oer/format,
+                                    common/contenthandler,
                                     common/paste,
                                     common/block,
                                     common/list,
@@ -97,7 +98,6 @@
                 // is one of the section heading tags
                 function getClosestHeadingParent(ele) {
                     while(ele != null) {
-                        console.log(ele);
                         if(ele.tagName && possibleHeadings.indexOf(ele.tagName.toUpperCase()) != -1) {
                             break;
                         }
@@ -107,7 +107,6 @@
                         }
                         ele = ele.parentNode;
                     }
-                    console.log(ele);
                     return ele;
                 }
 
@@ -179,6 +178,12 @@
                                 $html.attr('xmlns:bib',  'http://bibtexml.sf.net/');
                                 $html.attr('xmlns:data', 'http://dev.w3.org/html5/spec/#custom');
 
+                                // Build simple header with title.
+                                var $head = $('<head />'),
+                                    title = editor.obj.find('>div.title').text();
+                                $('<title/>').text(title).appendTo($head);
+                                $html.append($head);
+
                                 var $body = $('<body />');
                                 $body.attr('class', 'content');
                                 $body.append(editor.getContents());
@@ -242,7 +247,10 @@
                         // Fetch the preview
                         $('#statusmessage').data('message')('Loading preview...');
                         Aloha.jQuery.get(body_url, function(data){
-                            var $editable = Aloha.jQuery('#canvas').html(data);
+                            var d = document.createElement('html');
+                            d.innerHTML = data;
+                            var $editable = Aloha.jQuery('#canvas').html(
+                                $('body > *', d));
 
                             // Remove the pyramid debug toolbar from the preview
                             // if it exists. This code should do nothing in production
