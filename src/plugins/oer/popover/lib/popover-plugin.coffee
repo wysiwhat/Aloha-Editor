@@ -88,7 +88,7 @@ There are 3 variables that are stored on each element;
 
 ###
 
-define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
+define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
 
 
   # This position code was refactored out because it is also used to move the
