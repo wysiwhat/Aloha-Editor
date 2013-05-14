@@ -2,7 +2,7 @@
 # * -----------------
 # * This plugin handles when the insertImage button is clicked and provides a bubble next to an image when it is selected
 #
-define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
+define ['aloha', 'jquery', 'popover', 'image/image-plugin', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, Image, UI) ->
 
   # This will be prefixed with Aloha.settings.baseUrl
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
@@ -226,9 +226,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       xhr.send(f)
 
 
-  Aloha.bind 'aloha-image-selected', (event, target) ->
+  Aloha.bind 'aloha-image-selected', (event) ->
       # Hide other tooltips of the same type
-      $el = jQuery(target)
+      $el = jQuery(Image.imageObj)
       nodes = jQuery(Aloha.activeEditable.obj).find(selector)
       nodes = nodes.not($el)
       nodes.trigger 'hide'
