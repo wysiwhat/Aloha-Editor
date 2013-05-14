@@ -46,3 +46,6 @@
 .exercise .solution-controls .solution-toggle {
     text-transform: uppercase;
 }
+.exercise .solution-controls .solution-toggle:before {
+    content: " | ";
+}

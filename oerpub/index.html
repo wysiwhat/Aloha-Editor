@@ -193,7 +193,6 @@
                                 // Microsoft.XMLDOM
                                 var html = (new XMLSerializer()).serializeToString(
                                     $html.append($body).get(0));
-                                console.log(html);
                                 if(save_url !== null){
                                     $.post(save_url,
                                             {html: html}, function(data, statustext){

@@ -3,7 +3,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   # hack to accomodate multiple executions
   return pluginManager.plugins.semanticblock  if pluginManager.plugins.semanticblock
   blockTemplate = jQuery('<div class="semantic-container"></div>')
-  blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete"><i class="icon-remove"></i></button><button><i class="icon-cog"></i></button></div>')
+  blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete"><i class="icon-remove"></i></button></div>')
   blockDragHelper = jQuery('<div class="semantic-drag-helper"><div class="title"></div><div class="body">Drag me to the desired location in the document</div></div>')
   activateHandlers = {}
   deactivateHandlers = {}
@@ -48,10 +48,10 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).removeClass('focused')
   ,
     name: 'click'
-    selector: '.aloha-oer-block .title-container li a'
+    selector: '.aloha-oer-block .type-container li a'
     callback: (e) ->
       e.preventDefault()
-      jQuery(this).parents('.title-container').first().children('.type').text jQuery(this).text()
+      jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
       jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
   ]
   insertElement = (element) ->
