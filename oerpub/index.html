@@ -55,6 +55,7 @@
                     tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
             <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
                     tal:attributes="src string:${request.application_url}/bootstrap/docs/assets/js/bootstrap.js"> <!-- xhtml workaround --></script>
+
             <script type="text/javascript" src="/Aloha-Editor/src/lib/aloha.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
                 data-aloha-plugins="common/ui,
@@ -74,14 +75,19 @@
                                     common/undo,
                                     oer/undobutton,
                                     oer/genericbutton"> <!-- xhtml workaround --></script>
-
             <script type="text/javascript"
                     tal:content="string:var body_url = '${body_url}';">
                     var body_url = '/Aloha-Editor/oerpub/sandbox/index.html';</script>
             <script type="text/javascript"
                     tal:content="string:var save_url = '${request.route_url('preview_save')}';">
                     var save_url = null;</script>
+            <!--Google Picker Includes -->
+            <script src="http://www.google.com/jsapi"></script> 
+            <script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/image-dialog.js" tal:attributes="src string:${request.application_url}/aloha/src/plugins/oer/assorted/lib/image-dialog.js"></script>
+            <script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/aloha-helper.js" tal:attributes="src string:${request.application_url}/aloha/src/plugins/oer/assorted/lib/aloha-helper.js"></script>
+            <!--<script type="text/javascript" src="/Aloha-Editor/src/plugins/oer/assorted/lib/gpickerdialog.js"></script>-->
             <script type="text/javascript">
+
 
                 // HTML elements which are the options in the heading drop down
                 var headingChoices = null;
@@ -203,13 +209,6 @@
                                         }
                                         PubSub.pub('swordpushweb.saved');
                                     });
-                                } else {
-                                    $('#statusmessage').data('message')('Saved');
-                                    GenericButton.getButtons()["save"].enable(false);
-                                    $('.btn.save').html('Saved');
-                                    if (callback_function) {
-                                        callback_function();
-                                    }
                                 }
                             }
                         }
@@ -264,14 +263,15 @@
                             // editor.isModified().
                             window.setInterval(savePreview, 30000);
 
-                            setInterval(function() {
-                                var editor = Aloha.getEditableById('canvas');
-                                if (editor.isModified()) {
+
+                            // Bind a handler for the changed event
+                            var editor = Aloha.getEditableById('canvas');
+                            Aloha.bind('aloha-smart-content-changed', function(){
+                                if(editor.isModified()){
                                     $('.btn.save').html('Save');
                                     GenericButton.getButtons()["save"].enable(true);
                                 }
-                            }, 250);
-
+                            });
                             // Binds the function to all headers, paragraphs, and pre tags
                             Aloha.jQuery(":header, p, pre").bind('click', headingFunc);
                             Aloha.jQuery('#canvas').bind('keyup', recursiveHeadingFunc);
@@ -345,7 +345,7 @@
                       <span class="separator"> </span>
                       <div class="btn-group">
                         <button class="btn action insertImage-oer" rel="tooltip" title="Insert Image"><i class="icon-image-insert"></i></button>
-                        <button class="btn action insertVideo-oer" rel="tooltip" title="Insert Video"><i class="icon-image-insert"></i></button>
+                        <button class="btn action insertVideo-oer" rel="tooltip" title="Insert Video"><i class="icon-video-insert"></i></button>
                         <button class="btn action createTable" rel="tooltip" title="Create Table"><i class="icon-table-insert"></i></button>
                         <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Table Operations">
                           <span class="caret"></span>
