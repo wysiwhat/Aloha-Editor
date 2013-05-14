@@ -203,19 +203,19 @@
         });
       },
       insertAtCursor: function(template) {
-        var element, range;
-        element = blockTemplate.clone().append(template);
+        var $element, range;
+        $element = jQuery(template);
         range = Aloha.Selection.getRangeObject();
-        element.addClass('semantic-temp');
-        GENTICS.Utils.Dom.insertIntoDOM(element, range, Aloha.activeEditable.obj);
-        element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
-        return activate(element);
+        $element.addClass('semantic-temp');
+        GENTICS.Utils.Dom.insertIntoDOM($element, range, Aloha.activeEditable.obj);
+        $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
+        return activate($element);
       },
-      appendElement: function(element, target) {
-        element.addClass('semantic-temp');
-        target.append(element);
-        element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
-        return activate(element);
+      appendElement: function($element, target) {
+        $element.addClass('semantic-temp');
+        target.append($element);
+        $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
+        return activate($element);
       },
       activateHandler: function(type, handler) {
         return activateHandlers[type] = handler;

@@ -146,18 +146,18 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
             activate $el
 
     insertAtCursor: (template) ->
-      element = blockTemplate.clone().append(template)
+      $element = jQuery(template)
       range = Aloha.Selection.getRangeObject()
-      element.addClass 'semantic-temp'
-      GENTICS.Utils.Dom.insertIntoDOM element, range, Aloha.activeEditable.obj
-      element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      activate element
+      $element.addClass 'semantic-temp'
+      GENTICS.Utils.Dom.insertIntoDOM $element, range, Aloha.activeEditable.obj
+      $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
+      activate $element
 
-    appendElement: (element, target) ->
-      element.addClass 'semantic-temp'
-      target.append element
-      element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
-      activate element
+    appendElement: ($element, target) ->
+      $element.addClass 'semantic-temp'
+      target.append $element
+      $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
+      activate $element
 
     activateHandler: (type, handler) ->
       activateHandlers[type] = handler
