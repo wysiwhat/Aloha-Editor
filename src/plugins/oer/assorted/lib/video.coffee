@@ -105,14 +105,17 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     encodedUrl = encodeURIComponent(inputurl)
     jQuery.ajax({
             url: """http://www.slideshare.net/api/oembed/2?url=#{encodedUrl}&format=jsonp""",
-            async:false,
+            async:true,
             dataType: 'jsonp',
             success: (result, status, statusObject) -> 
               id = result.slideshow_id
               if inputurl == inputbox.value
-                inputbox.style.class = 'validURL'
+                inputbox.className = 'validURL'
                 lastKnownUrlId = id
                 lastWorkingEmbedder = SLIDESHARE_ID
+                return true
+            error: (result, status, statusObject) ->
+              return false
             })
     
     lastWorkingEmbedder = -1
@@ -130,7 +133,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
     return [ ]
 
   concord_url_validator = (url) ->
-    concordLabUrl = 'lab.concord.org/examples/interactives/interactives.html#interactives/samples/'
+    concordLabUrl = 'lab.concord.org/examples/interactives/embeddable.html#interactives/basic-examples/'
     if url.indexOf(concordLabUrl) != -1
       offset = url.indexOf(concordLabUrl)
       offset = offset + concordLabUrl.length
@@ -147,7 +150,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   concord_embed_code_generator = (id) ->
     return jQuery("""<iframe style="width:925px; height:575px" width="925" height="575" frameborder="no" scrolling="no" 
-      src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/#{id}.json"></iframe>""")
+      src="http://lab.concord.org/examples/interactives/embeddable.html#interactives/basic-examples/#{id}.json"></iframe>""")
 
   concord_query_generator = (queryTerms) -> 
     false
