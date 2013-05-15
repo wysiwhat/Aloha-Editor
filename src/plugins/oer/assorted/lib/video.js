@@ -1,7 +1,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], function(Aloha, jQuery, Popover, UI) {
-    var CONCORD_ID, DIALOG_HTML, SLIDESHARE_ID, VIMEO_ID, YOUTUBE_ID, active_embedder, active_embedder_value, checkURL, concord_embed_code_generator, concord_embedder, concord_query_generator, concord_search_results_generator, concord_url_validator, embedder, embedders, getTimeString, lastKnownUrlId, lastWorkingEmbedder, selector, showModalDialog, slideshare_embed_code_generator, slideshare_embedder, slideshare_query_generator, slideshare_search_results_generator, slideshare_url_validator, vimeo_embed_code_generator, vimeo_embedder, vimeo_query_generator, vimeo_search_results_generator, vimeo_url_validator, youtube_embed_code_generator, youtube_embedder, youtube_query_generator, youtube_search_results_generator, youtube_url_validator;
+    var CONCORD_ID, DIALOG_HTML, SLIDESHARE_ID, VIMEO_ID, YOUTUBE_ID, active_embedder, active_embedder_value, checkURL, concord_embed_code_generator, concord_embedder, concord_query_generator, concord_search_results_generator, concord_url_validator, embedder, embedders, getTimeString, lastKnownUrlId, lastWorkingEmbedder, showModalDialog, slideshare_embed_code_generator, slideshare_embedder, slideshare_query_generator, slideshare_search_results_generator, slideshare_url_validator, vimeo_embed_code_generator, vimeo_embedder, vimeo_query_generator, vimeo_search_results_generator, vimeo_url_validator, youtube_embed_code_generator, youtube_embedder, youtube_query_generator, youtube_search_results_generator, youtube_url_validator;
     embedder = function(url_validator, embed_code_generator, query_generator, search_results_generator) {
       var result;
       this.embed_code_gen = embed_code_generator;
@@ -59,9 +59,9 @@
       }
       return eleList;
     };
-    /* 
+    /*
     
-    Vimeo Plugin
+      Vimeo Plugin
     */
     vimeo_url_validator = function(url) {
       var c, intRegex, offset, videoIdStr, _i, _len;
@@ -93,22 +93,30 @@
     vimeo_search_results_generator = function(responseObj) {
       return [];
     };
+    /*
+    
+      Slideshare Plugin
+    */
     slideshare_url_validator = function(inputurl, inputbox) {
       var encodedUrl;
       if (inputurl.indexOf('slideshare.net') === -1) return false;
       encodedUrl = encodeURIComponent(inputurl);
       jQuery.ajax({
         url: "http://www.slideshare.net/api/oembed/2?url=" + encodedUrl + "&format=jsonp",
-        async: false,
+        async: true,
         dataType: 'jsonp',
         success: function(result, status, statusObject) {
           var id;
           id = result.slideshow_id;
           if (inputurl === inputbox.value) {
-            inputbox.style["class"] = 'validURL';
+            inputbox.className = 'validURL';
             lastKnownUrlId = id;
-            return lastWorkingEmbedder = SLIDESHARE_ID;
+            lastWorkingEmbedder = SLIDESHARE_ID;
+            return true;
           }
+        },
+        error: function(result, status, statusObject) {
+          return false;
         }
       });
       lastWorkingEmbedder = -1;
@@ -123,9 +131,13 @@
     slideshare_search_results_generator = function(responseObj) {
       return [];
     };
+    /*
+    
+      Concord Plugin
+    */
     concord_url_validator = function(url) {
       var concordLabUrl, id, offset, post;
-      concordLabUrl = 'lab.concord.org/examples/interactives/interactives.html#interactives/samples/';
+      concordLabUrl = 'lab.concord.org/examples/interactives/embeddable.html#interactives/basic-examples/';
       if (url.indexOf(concordLabUrl) !== -1) {
         offset = url.indexOf(concordLabUrl);
         offset = offset + concordLabUrl.length;
@@ -143,7 +155,7 @@
       return false;
     };
     concord_embed_code_generator = function(id) {
-      return jQuery("<iframe style=\"width:925px; height:575px\" width=\"925\" height=\"575\" frameborder=\"no\" scrolling=\"no\" \nsrc=\"http://lab.concord.org/examples/interactives/embeddable.html#interactives/samples/" + id + ".json\"></iframe>");
+      return jQuery("<iframe style=\"width:925px; height:575px\" width=\"925\" height=\"575\" frameborder=\"no\" scrolling=\"no\" \nsrc=\"http://lab.concord.org/examples/interactives/embeddable.html#interactives/basic-examples/" + id + ".json\"></iframe>");
     };
     concord_query_generator = function(queryTerms) {
       return false;
@@ -342,7 +354,6 @@
         }
       });
     };
-    selector = 'img';
     return UI.adopt('insertVideo-oer', null, {
       click: function() {
         var promise;
