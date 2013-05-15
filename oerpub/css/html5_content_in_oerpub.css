@@ -493,56 +493,6 @@ math{
   font-size: 140%;
 }
 
-/* ========== note ========== */
-
-[semantic-drag-source] {
-    position: relative;
-}
-[semantic-drag-source] > span {
-    position: absolute;
-    top: 3px;
-    left: 10px;
-    pointer-events: none;
-}
-[semantic-drag-source] .semantic-container > * {
-    display: none !important;
-}
-[semantic-drag-source] .semantic-container {
-    border-radius: 5px;
-    padding: 4px 0 4px 20px;
-    background: #EEE;
-    color: black;
-    height: 20px;
-}
-
-.semantic-drag-helper {
-    border-radius: 5px;
-    margin: 10px;
-    padding: 4px 20px 4px 20px;
-    background: white;
-    border: 1px solid black;
-    width: 300px;
-    height: 50px;
-    max-width: 300px;
-    max-height: 50px;
-}
-
-.semantic-drag-helper .title,
-.semantic-drag-helper .body {
-    display: inline;
-}
-.semantic-drag-helper .title:before {
-    content: "\25A0";
-    margin-right: 3px;
-}
-.semantic-drag-helper .title:after {
-    content: ":";
-    margin-right: 10px;
-}
-.semantic-drag-helper .title {
-    color: #369;
-}
-
 .footnote-reference{
   vertical-align: .5em;
   line-height: .1em;
