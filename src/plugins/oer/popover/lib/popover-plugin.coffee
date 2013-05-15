@@ -157,11 +157,8 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       @$element.trigger('hide-popover')
       originalHide.bind(@)()
       @$element.trigger('hidden-popover')
-
-  # There's a bug in bootstrap's destroy(). It says this.hide().$element.off(...)
-  # But it should be this.hide().off(...)
-  Bootstrap_Popover_destroy = () ->
-    @hide().off('.' + @type).removeData(@type)
+      # return this
+      @
 
   # Apply the monkey patch
   monkeyPatch = () ->
@@ -169,7 +166,6 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     proto = jQuery.fn.popover.Constructor.prototype
     proto.show = Bootstrap_Popover_show
     proto.hide = Bootstrap_Popover_hide(proto.hide)
-    proto.destroy = Bootstrap_Popover_destroy
   monkeyPatch()
 
 
@@ -200,15 +196,16 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       makePopovers = ($nodes) =>
         $nodes.each (i, node) =>
           $node = jQuery(node)
-          if @focus
-            $node.on 'shown-popover', =>
-              @focus.bind($node[0])($node.data('popover').$tip)
-          if @blur
-            $node.on 'hide-popover', =>
-              @blur.bind($node[0])($node.data('popover').$tip)
 
           # Make sure we don't create more than one popover for an element.
           if not $node.data('popover')
+            if @focus
+              $node.on 'shown-popover', =>
+                @focus.bind($node[0])($node.data('popover').$tip)
+            if @blur
+              $node.on 'hide-popover', =>
+                @blur.bind($node[0])($node.data('popover').$tip)
+
             $node.popover
               html: true # bootstrap changed the default for this config option so set it to HTML
               placement: @placement or 'bottom'
@@ -216,7 +213,7 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
               content: =>
                 @populator.bind($node)($node, @) # Can't quite decide whether the populator code should use @ or the 1st arg.
 
-      $el.on 'show', @selector, (evt) =>
+      $el.on 'show.bubble', @selector, (evt) =>
         $node = jQuery(evt.target)
         movePopover = () ->
           that = $node.data('popover')
@@ -235,7 +232,7 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
         # As long as the popover is open  move it around if the document changes ($el updates)
         clearInterval($node.data('aloha-bubble-move-timer'))
         $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL))
-      $el.on 'hide', @selector, (evt) =>
+      $el.on 'hide.bubble', @selector, (evt) =>
         $node = jQuery(evt.target)
         clearTimeout($node.data('aloha-bubble-timer'))
         clearInterval($node.data('aloha-bubble-move-timer'))
@@ -271,16 +268,21 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
                     $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) ## (STATE_WO) -> (STATE_*)
 
               $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) if not $node.data('aloha-bubble-timer')
-    stopAll: (editable) ->
-      # Remove all events and close all bubbles
-      jQuery(editable.obj).undelegate(@selector, '.bubble')
+
+      # Stop mousedown events inside a popover from propagating up to
+      # aloha, causing the editor to deactivate and the popover to close.
+      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
+        evt.stopPropagation()
+
+    stopAll: (editable) =>
+      # Remove all event handlers and close all bubbles
+      jQuery('body').off 'mousedown.bubble', '.popover'
       $nodes = jQuery(editable.obj).find(@selector)
-      $nodes.removeData('aloha-bubble-timer')
-      $nodes.removeData('aloha-bubble-selected')
-      $nodes.popover('destroy')
+      this.stopOne($nodes)
+      jQuery(editable.obj).off('.bubble', @selector)
 
     stopOne: ($nodes) ->
-      $nodes.removeData('aloha-bubble-timer')
+      $nodes.trigger 'hide'
       $nodes.removeData('aloha-bubble-selected')
       $nodes.popover('destroy')
 
@@ -327,12 +329,12 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       $el = jQuery(rangeObject.getCommonAncestorContainer())
       $el = $el.parents(helper.selector) if not $el.is(helper.selector)
 
-      # Hide other tooltips of the same type
-      nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
-      nodes = nodes.not($el)
-      nodes.trigger 'hide'
-
       if Aloha.activeEditable
+        # Hide other tooltips of the same type
+        nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
+        nodes = nodes.not($el)
+        nodes.trigger 'hide'
+
         enteredLinkScope = selectionChangeHandler(rangeObject, helper.selector)
         if insideScope isnt enteredLinkScope
           insideScope = enteredLinkScope
