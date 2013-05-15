@@ -1,6 +1,7 @@
-# Aloha Video Plugin
+# Aloha Media Plugin
 # * -----------------
-# * This plugin handles when the insertVideo button is clicked
+# * This plugin handles media insertion
+# The plugin currently supports slides, concord simulations, vimeo and youtube videos
 #
 define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
 
@@ -55,7 +56,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       videoLengthString = getTimeString(video.media$group.yt$duration.seconds)
       idTokens = video.id.$t.split(':')
       videoId = idTokens[idTokens.length-1]
-      # newEntry = jQuery('<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id='+videoId+'><table><tr><td width=20% rowspan=3><img src='+thumbnailUrl+' /></td><td><b>'+videoTitle+'</b></td></tr><tr><td>'+videoDescription+'</td></tr><tr><td>Duration: '+videoLengthString+'</td></tr></table></div>')
       newEntry = jQuery("""<div style="width:100%;border-bottom: 1px solid black;" class="search-result" id="#{videoId}"><table>
         <tr><td width=20% rowspan=3><img src="#{thumbnailUrl}"/></td>
         <td><b>#{videoTitle}</b></td></tr><tr><td>#{videoDescription}</td></tr>
@@ -63,7 +63,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
       eleList.push(newEntry)
     return eleList
 
-  ### 
+  ###
 
   Vimeo Plugin 
 
@@ -96,7 +96,12 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
   vimeo_search_results_generator = (responseObj) ->
     return [ ]
+  
+  ###
 
+  Slideshare Plugin 
+
+  ###
   
   slideshare_url_validator = (inputurl, inputbox) ->
     if inputurl.indexOf('slideshare.net') == -1
@@ -132,6 +137,11 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   slideshare_search_results_generator = (responseObj) ->
     return [ ]
 
+  ###
+
+  Concord Plugin 
+
+  ###
   concord_url_validator = (url) ->
     concordLabUrl = 'lab.concord.org/examples/interactives/embeddable.html#interactives/basic-examples/'
     if url.indexOf(concordLabUrl) != -1
@@ -158,6 +168,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   concord_search_results_generator = (responseObj) ->
     return [ ]
 
+  # Instantiates all the embedders
   youtube_embedder = new embedder(youtube_url_validator, youtube_embed_code_generator, youtube_query_generator, youtube_search_results_generator)
   vimeo_embedder = new embedder(vimeo_url_validator, vimeo_embed_code_generator, vimeo_query_generator, vimeo_search_results_generator)
   slideshare_embedder = new embedder(slideshare_url_validator, slideshare_embed_code_generator, slideshare_query_generator, slideshare_search_results_generator)
@@ -173,6 +184,7 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
   active_embedder = youtube_embedder
   active_embedder_value = 'youtube'
   
+  # Checks if URL is recognized by any of the embedders
   checkURL = (url, inputbox) ->
     for embedder in embedders
       if (embedder.url_validator(url, inputbox)) 
@@ -266,27 +278,8 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
                 active_embedder = embedders[index]
                 break
               index = index + 1
-              
-      # If we're editing an image pull in the src.
-      # It will be undefined if this is a new image.
-      #
-      # This variable is updated when one of the following occurs:
-      # * selects an image from the filesystem
-      # * enters a URL (TODO: Verify it's an image)
-      # * drops an image into the drop div
-
-      # $el might not be an image, it might be a placeholder for a future image
-      # if $el.is('img')
-      #   # On submit $el.attr('src') will point to what is set in this variable
-      #   # preserve the alt text if editing an image
-      #   videoSource = $el.attr('src')
-      #   imageAltText = $el.attr('alt')
-      # else
-      #   videoSource = ''
-      #   imageAltText = ''
 
       videoSource = ''
-      # dialog.find('[name=alt]').val(imageAltText)
       # Checks if the URL is a valid one -- i.e. if one of the embedders can parse and generate embedded html for it
       # Retrieves embedder which can matches the format of the URL
       if checkURL(videoSource, $uploadUrl)
@@ -308,24 +301,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
           callback(reader.result) if callback
         reader.readAsDataURL(file)
 
-      # Add click handlers
-      # dialog.find('.upload-image-link').on 'click', (evt) ->
-      #   evt.preventDefault()
-      #   $placeholder.hide()
-      #   $uploadUrl.hide()
-
-      # dialog.find('.upload-url-link').on 'click', (evt) ->
-      #   evt.preventDefault()
-      #   $placeholder.hide()
-      #   $uploadUrl.show()
-
       $uploadUrl.on 'change', () ->
-        # $previewImg = $placeholder.find('img')
         url = $uploadUrl.val()
         setvideoSource(url)
-        # if settings.image.preview
-        #   $previewImg.attr 'src', url
-        #   $placeholder.show()
 
       # On save update the actual video element. Use the submit event because this
       # allows the use of html5 validation.
@@ -333,12 +311,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
 
       dialog.on 'click', '.btn.btn-primary.action.insert', (evt) =>
         evt.preventDefault() # Don't submit the form
-        # if $el.is('img')
-        #   $el.attr 'src', videoSource
-        #   $el.attr 'alt', dialog.find('[name=alt]').val()
-        # else
-        # Embeds the video into the page
-        #mediaWrapper = jQuery('<div class="media"></div>')
         if videoSource.length == 0
           # Use search results
           for child in $searchResults.children()
@@ -352,8 +324,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
             return
           mediaElement = embedders[lastWorkingEmbedder].embed_code_gen(lastKnownUrlId)
 
-        #mediaWrapper.append(mediaElement)
-        #AlohaInsertIntoDom(mediaWrapper)
         AlohaInsertIntoDom(mediaElement)
         dialog.modal('hide')
 
@@ -388,9 +358,6 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         dialog.modal('hide')
 
       dialog.on 'hidden', (event) ->
-        # If hidden without being confirmed/cancelled, reject
-        # if deferred.state()=='pending'
-          # deferred.reject(target: $el[0])
         # Clean up after dialog was hidden
         dialog.remove()
 
@@ -401,101 +368,16 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
               dialog.find('.modal-header h3').text(title)
             dialog.modal 'show'
 
-  selector = 'img'
-
-  # populator = ($el, pover) ->
-  #     # When a click occurs, the activeEditable is cleared so squirrel it
-  #     editable = Aloha.activeEditable
-  #     $bubble = jQuery '''
-  #       <div class="link-popover-details">
-  #           <a class="change">
-  #             <img src="''' + Aloha.settings.baseUrl + '''/../plugins/oerpub/assorted/img/edit-link-03.png" />
-  #             <span title="Change the image's properties">Edit image...</span>
-  #           </a>
-  #           &nbsp; | &nbsp;
-  #           <a class="remove">
-  #             <img src="''' + Aloha.settings.baseUrl + '''/../plugins/oerpub/assorted/img/unlink-link-02.png" />
-  #             <span title="Delete the image">Delete</span>
-  #           </a>
-  #       </div>'''
-
-  #     href = $el.attr('src')
-  #     $bubble.find('.change').on 'click', ->
-  #       # unsquirrel the activeEditable
-  #       Aloha.activeEditable = editable
-  #       promise = showModalDialog($el)
- 
-  #       promise.done (data)->
-  #         # Uploading if a local file was chosen
-  #         if data.files.length
-  #           jQuery(data.target).addClass('aloha-image-uploading')
-  #           uploadImage data.files[0], (url) ->
-  #             jQuery(data.target).attr('src', url).removeClass(
-  #               'aloha-image-uploading')
-  #       promise.show('Edit image')
-
-  #     $bubble.find('.remove').on 'click', ->
-  #       pover.stopOne($el)
-  #       $el.remove()
-  #     $bubble.contents()
-
-
-  # uploadImage = (file, callback) ->
-  #   # plugin = @
-  #   settings = Aloha.require('assorted/assorted-plugin').settings
-  #   xhr = new XMLHttpRequest()
-  #   if xhr.upload
-  #     if not settings.image.uploadurl
-  #       throw new Error("uploadurl not defined")
-
-  #     xhr.onload = () ->
-  #       if settings.image.parseresponse
-  #         url = parseresponse(xhr)
-  #       else
-  #         url = JSON.parse(xhr.response).url
-  #       callback(url)
-
-  #     xhr.open("POST", settings.image.uploadurl, true)
-  #     xhr.setRequestHeader("Cache-Control", "no-cache")
-  #     f = new FormData()
-  #     f.append(settings.image.uploadfield or 'upload', file, file.name)
-  #     xhr.send(f)
-
-
-  # Aloha.bind 'aloha-image-selected', (event, target) ->
-  #     # Hide other tooltips of the same type
-  #     $el = jQuery(target)
-  #     nodes = jQuery(Aloha.activeEditable.obj).find(selector)
-  #     nodes = nodes.not($el)
-  #     nodes.trigger 'hide'
-  #     $el.trigger 'show'
-  #     $el.data('aloha-bubble-selected', true)
-  #     $el.off('.bubble')
+  #selector = 'img'
 
   UI.adopt 'insertVideo-oer', null,
     click: () ->
+      # Code to add a placeholder element
       # newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')    
       # GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
       promise = showModalDialog(null)
 
       ## Add code here to handle video uploading. This is not currently supported ##
-      # promise.done (data)->
-      #   # Uploading if a local file was chosen
-      #   if data.files.length
-      #     newEl.addClass('aloha-image-uploading')
-      #     uploadImage data.files[0], (url) ->
-      #       jQuery(data.target).attr('src', url)
-      #       newEl.removeClass('aloha-image-uploading')
-
-      # promise.fail (data) ->
-      #   # Clean up placeholder if needed
-      #   $target = jQuery(data.target)
-      #   if not $target.is('img')
-      #     $target.remove()
 
       # Finally show the dialog
       promise.show()
-
-  # Return config
-  # selector: selector
-  # populator: populator
