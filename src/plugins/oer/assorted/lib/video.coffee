@@ -248,14 +248,9 @@ define ['aloha', 'jquery', 'popover', 'ui/ui', 'css!assorted/css/image.css'], (A
         currentVal = target.value
         valid = checkURL(currentVal, target)
         if(valid) 
-            target.style.class = 'validURL'
+            target.className = 'validURL'
         else
-            # jQuery(this).addClass('invalidURL')
-            jQuery(this).attr('class', 'invalidURL')
-            target.style.class = 'invalidURL'
-            target.class = 'invalidURL'
             target.className = 'invalidURL'
-            # target.style.borderColor = 'Red';
 
       for radio in dialog.find('#media-sites')
         radio.onclick = (event) ->
