@@ -70,7 +70,7 @@ form#linkModal:focus {
     border-width:medium;
 }
 
-.invalidURL input[type=text] {
+.invalidURL input[type="text"] {
     border-color:red;
     border-width:medium;
 }
