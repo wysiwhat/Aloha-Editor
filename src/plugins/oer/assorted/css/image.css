@@ -61,16 +61,18 @@ form#linkModal:focus {
     font-size:90%;
 
 }
-.validURL input {
-    border-color:black;
-    border-width:medium;
+#linkModal input[type="text"][class="validURL"] {
+    border: 2px solid #00FF00;
+    outline-color: #00FF00;
 }
-.invalidURL input {
-    border-color:red;
-    border-width:medium;
+#linkModal input[type="text"][class="validURL"]:focus {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
 
-.invalidURL input[type="text"] {
-    border-color:red;
-    border-width:medium;
+#linkModal input[type="text"][class="invalidURL"] {
+    border: 2px solid red;
+    outline-color: red;
+}
+#linkModal input[type="text"][class="invalidURL"]:focus {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
