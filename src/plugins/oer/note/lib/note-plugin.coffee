@@ -5,8 +5,8 @@ define [
   'aloha/ephemera'
   'ui/ui'
   'ui/button'
-    'semanticblock/semanticblock-plugin'
-    'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
+  'semanticblock/semanticblock-plugin'
+  'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
   TITLE_CONTAINER = '''
         <div class="type-container dropdown">
@@ -22,7 +22,7 @@ define [
         </div>
   '''
 
-  Plugin.create('note', {
+  Plugin.create 'note',
     init: () ->
       # Load up specific classes to listen to or use the default
       types = @settings.types or {note: true}
@@ -100,4 +100,3 @@ define [
         if 'note' == className
           UI.adopt "insertNote", Button,
             click: -> semanticBlock.insertAtCursor(newTemplate.clone())
-    })
