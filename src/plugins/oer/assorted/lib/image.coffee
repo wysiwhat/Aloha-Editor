@@ -2,7 +2,7 @@
 # * -----------------
 # * This plugin handles when the insertImage button is clicked and provides a bubble next to an image when it is selected
 #
-define ['aloha', 'jquery', 'popover/popover-plugin', 'image/image-plugin', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, Image, UI) ->
+define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'semanticblock/semanticblock-plugin', 'css!assorted/css/image.css'], (Aloha, jQuery, AlohaPlugin, Image, UI, semanticBlock) ->
 
   # This will be prefixed with Aloha.settings.baseUrl
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
@@ -63,6 +63,7 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'image/image-plugin', 'ui/u
         # preserve the alt text if editing an image
         imageSource = $el.attr('src')
         imageAltText = $el.attr('alt')
+        dialog.find('.action.insert').removeAttr('disabled')
       else
         imageSource = ''
         imageAltText = ''
@@ -165,45 +166,6 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'image/image-plugin', 'ui/u
               dialog.find('.modal-header h3').text(title)
             dialog.modal 'show'
 
-  selector = 'img'
-
-  populator = ($el, pover) ->
-      # When a click occurs, the activeEditable is cleared so squirrel it
-      editable = Aloha.activeEditable
-      $bubble = jQuery '''
-        <div class="link-popover-details">
-            <a class="change">
-              <img src="''' + Aloha.settings.baseUrl + '''/../plugins/oer/assorted/img/edit-link-03.png" />
-              <span title="Change the image's properties">Edit image...</span>
-            </a>
-            &nbsp; | &nbsp;
-            <a class="remove">
-              <img src="''' + Aloha.settings.baseUrl + '''/../plugins/oer/assorted/img/unlink-link-02.png" />
-              <span title="Delete the image">Delete</span>
-            </a>
-        </div>'''
-
-      href = $el.attr('src')
-      $bubble.find('.change').on 'click', ->
-        # unsquirrel the activeEditable
-        Aloha.activeEditable = editable
-        promise = showModalDialog($el)
- 
-        promise.done (data)->
-          # Uploading if a local file was chosen
-          if data.files.length
-            jQuery(data.target).addClass('aloha-image-uploading')
-            uploadImage data.files[0], (url) ->
-              jQuery(data.target).attr('src', url).removeClass(
-                'aloha-image-uploading')
-        promise.show('Edit image')
-
-      $bubble.find('.remove').on 'click', ->
-        pover.stopOne($el)
-        $el.remove()
-      $bubble.contents()
-
-
   uploadImage = (file, callback) ->
     plugin = @
     settings = Aloha.require('assorted/assorted-plugin').settings
@@ -224,18 +186,6 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'image/image-plugin', 'ui/u
       f = new FormData()
       f.append(settings.image.uploadfield or 'upload', file, file.name)
       xhr.send(f)
-
-
-  Aloha.bind 'aloha-image-selected', (event) ->
-      # Hide other tooltips of the same type
-      $el = jQuery(Image.imageObj)
-      nodes = jQuery(Aloha.activeEditable.obj).find(selector)
-      nodes = nodes.not($el)
-      nodes.trigger 'hide'
-      $el.trigger 'show'
-      $el.data('aloha-bubble-selected', true)
-      $el.off('.bubble')
-
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
@@ -260,6 +210,41 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'image/image-plugin', 'ui/u
       # Finally show the dialog
       promise.show()
 
+  $('body').bind 'aloha-image-resize', ->
+    img = Image.imageObj
+    wrapper = img.parents('.image-wrapper')
+    if wrapper.length
+      wrapper.css('width', img.css('width'))
+
+  setEditText = (wrapper) ->
+    alt = wrapper.children('img').attr('alt')
+    editDiv = wrapper.children('.image-edit')
+    if alt
+        editDiv.html('<i class="icon-edit"></i>').addClass('passive')
+    else
+        editDiv.html('<i class="icon-warning-sign"></i> Description missing').removeClass('passive')
+ 
+  activate = (element) ->
+    wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
+    edit = $('<div class="image-edit">')
+    element.children('img').wrap(wrapper)
+    setEditText element.children('.image-wrapper').prepend(edit)
+
+  deactivate = (element) ->
+    wrapper = element.children('.image-wrapper')
+    img = wrapper.find('img')
+    element.children().remove()
+    element.append(img)
+
   # Return config
-  selector: selector
-  populator: populator
+  AlohaPlugin.create('oer-image', {
+    init: () ->
+      semanticBlock.activateHandler('media', activate)
+      semanticBlock.deactivateHandler('media', deactivate)
+      semanticBlock.registerEvent 'click', '.aloha-oer-block .image-edit', ->
+        img = $(this).siblings('img')
+        promise = showModalDialog(img)
+        promise.done (data)->
+          setEditText img.parent()
+        promise.show('Edit image')
+  })
