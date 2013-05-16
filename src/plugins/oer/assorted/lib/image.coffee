@@ -2,7 +2,7 @@
 # * -----------------
 # * This plugin handles when the insertImage button is clicked and provides a bubble next to an image when it is selected
 #
-define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, UI) ->
+define ['aloha', 'jquery', 'popover', 'image/image-plugin', 'ui/ui', 'css!assorted/css/image.css'], (Aloha, jQuery, Popover, Image, UI) ->
 
   # This will be prefixed with Aloha.settings.baseUrl
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
@@ -15,7 +15,7 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose a file</a> OR <a class="upload-url-link">get file from the Web</a>
+            <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>
             <div class="placeholder preview hide">
               <h4>Preview</h4>
               <img class="preview-image"/>
@@ -25,7 +25,7 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/
         </div>
         <div class="image-alt">
           <div class="forminfo">
-            Please provide a description of this image for the visually impaired.
+            <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
           </div>
           <div>
             <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>
@@ -33,7 +33,7 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary action insert">Save</button>
+        <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>
         <button class="btn action cancel">Cancel</button>
       </div>
     </form>'''
@@ -82,7 +82,7 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/
 
       setImageSource = (href) ->
         imageSource = href
-        $submit.removeClass('disabled')
+        $submit.removeAttr('disabled')
 
       # Uses the File API to render a preview of the image
       # and updates the modal's imageSource
@@ -226,9 +226,9 @@ define ['aloha', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!assorted/css/
       xhr.send(f)
 
 
-  Aloha.bind 'aloha-image-selected', (event, target) ->
+  Aloha.bind 'aloha-image-selected', (event) ->
       # Hide other tooltips of the same type
-      $el = jQuery(target)
+      $el = jQuery(Image.imageObj)
       nodes = jQuery(Aloha.activeEditable.obj).find(selector)
       nodes = nodes.not($el)
       nodes.trigger 'hide'
