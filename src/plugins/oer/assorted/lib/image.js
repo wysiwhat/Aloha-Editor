@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'semanticblock/semanticblock-plugin', 'css!assorted/css/image.css'], function(Aloha, jQuery, AlohaPlugin, Image, UI, semanticBlock) {
-    var DIALOG_HTML, WARNING_IMAGE_PATH, activate, deactivate, setEditText, showModalDialog, uploadImage;
+    var DIALOG_HTML, WARNING_IMAGE_PATH, activate, deactivate, setEditText, setWidth, showModalDialog, uploadImage;
     WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png';
     DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.\n      </div>\n      <div>\n        <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
@@ -15,13 +15,10 @@
       $uploadImage = dialog.find('.upload-image-input').hide();
       $uploadUrl = dialog.find('.upload-url-input').hide();
       $submit = dialog.find('.action.insert');
-      if ($el.is('img')) {
-        imageSource = $el.attr('src');
-        imageAltText = $el.attr('alt');
+      imageSource = $el.attr('src');
+      imageAltText = $el.attr('alt');
+      if (imageSource) {
         dialog.find('.action.insert').removeAttr('disabled');
-      } else {
-        imageSource = '';
-        imageAltText = '';
       }
       dialog.find('[name=alt]').val(imageAltText);
       if (/^https?:\/\//.test(imageSource)) {
@@ -45,9 +42,7 @@
         var reader;
         reader = new FileReader();
         reader.onloadend = function() {
-          if ($img) {
-            $img.attr('src', reader.result);
-          }
+          $img.attr('src', reader.result);
           setImageSource(reader.result);
           if (callback) {
             return callback(reader.result);
@@ -93,18 +88,10 @@
       });
       deferred = $.Deferred();
       dialog.on('submit', function(evt) {
-        var img;
         evt.preventDefault();
-        if ($el.is('img')) {
-          $el.attr('src', imageSource);
-          $el.attr('alt', dialog.find('[name=alt]').val());
-        } else {
-          img = jQuery('<img/>');
-          img.attr('src', imageSource);
-          img.attr('alt', dialog.find('[name=alt]').val());
-          $el.replaceWith(img);
-          $el = img;
-        }
+        $el.attr('src', imageSource);
+        $el.attr('alt', dialog.find('[name=alt]').val());
+        setEditText($el.parent());
         deferred.resolve({
           target: $el[0],
           files: $uploadImage[0].files
@@ -162,9 +149,10 @@
     };
     UI.adopt('insertImage-oer', null, {
       click: function() {
-        var newEl, promise;
-        newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>');
-        GENTICS.Utils.Dom.insertIntoDOM(newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj);
+        var newEl, promise, template;
+        template = $('<div class="media"><img /></div>');
+        semanticBlock.insertAtCursor(template);
+        newEl = template.find('img');
         promise = showModalDialog(newEl);
         promise.done(function(data) {
           if (data.files.length) {
@@ -186,13 +174,15 @@
       }
     });
     $('body').bind('aloha-image-resize', function() {
-      var img, wrapper;
-      img = Image.imageObj;
-      wrapper = img.parents('.image-wrapper');
-      if (wrapper.length) {
-        return wrapper.css('width', img.css('width'));
-      }
+      return setWidth(Image.imageObj);
     });
+    setWidth = function(image) {
+      var wrapper;
+      wrapper = image.parents('.image-wrapper');
+      if (wrapper.length) {
+        return wrapper.css('width', image.css('width'));
+      }
+    };
     setEditText = function(wrapper) {
       var alt, editDiv;
       alt = wrapper.children('img').attr('alt');
@@ -208,7 +198,10 @@
       wrapper = $('<div class="image-wrapper">').css('width', element.css('width'));
       edit = $('<div class="image-edit">');
       element.children('img').wrap(wrapper);
-      return setEditText(element.children('.image-wrapper').prepend(edit));
+      setEditText(element.children('.image-wrapper').prepend(edit));
+      return element.find('img').load(function() {
+        return setWidth($(this));
+      });
     };
     deactivate = function(element) {
       var img, wrapper;

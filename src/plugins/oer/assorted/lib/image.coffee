@@ -57,16 +57,13 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       # * enters a URL (TODO: Verify it's an image)
       # * drops an image into the drop div
 
-      # $el might not be an image, it might be a placeholder for a future image
-      if $el.is('img')
-        # On submit $el.attr('src') will point to what is set in this variable
-        # preserve the alt text if editing an image
-        imageSource = $el.attr('src')
-        imageAltText = $el.attr('alt')
+      # On submit $el.attr('src') will point to what is set in this variable
+      # preserve the alt text if editing an image
+      imageSource = $el.attr('src')
+      imageAltText = $el.attr('alt')
+
+      if imageSource
         dialog.find('.action.insert').removeAttr('disabled')
-      else
-        imageSource = ''
-        imageAltText = ''
 
       dialog.find('[name=alt]').val(imageAltText)
 
@@ -90,8 +87,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       loadLocalFile = (file, $img, callback) ->
         reader = new FileReader()
         reader.onloadend = () ->
-          if $img
-            $img.attr('src', reader.result)
+          $img.attr('src', reader.result)
           # If we get an image then update the modal's imageSource
           setImageSource(reader.result)
           callback(reader.result) if callback
@@ -135,15 +131,11 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       deferred = $.Deferred()
       dialog.on 'submit', (evt) =>
         evt.preventDefault() # Don't submit the form
-        if $el.is('img')
-          $el.attr 'src', imageSource
-          $el.attr 'alt', dialog.find('[name=alt]').val()
-        else
-          img = jQuery('<img/>')
-          img.attr 'src', imageSource
-          img.attr 'alt', dialog.find('[name=alt]').val()
-          $el.replaceWith(img)
-          $el = img
+
+        $el.attr 'src', imageSource
+        $el.attr 'alt', dialog.find('[name=alt]').val()
+        setEditText $el.parent()
+
         deferred.resolve(target: $el[0], files: $uploadImage[0].files)
         dialog.modal('hide')
 
@@ -189,8 +181,9 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
-      newEl = jQuery('<span class="aloha-ephemera image-placeholder"> </span>')
-      GENTICS.Utils.Dom.insertIntoDOM newEl, Aloha.Selection.getRangeObject(), Aloha.activeEditable.obj
+      template = $('<div class="media"><img /></div>')
+      semanticBlock.insertAtCursor(template)
+      newEl = template.find('img')
       promise = showModalDialog(newEl)
 
       promise.done (data)->
@@ -211,10 +204,13 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       promise.show()
 
   $('body').bind 'aloha-image-resize', ->
-    img = Image.imageObj
-    wrapper = img.parents('.image-wrapper')
+    setWidth Image.imageObj
+
+  setWidth = (image) ->
+    wrapper = image.parents('.image-wrapper')
     if wrapper.length
-      wrapper.css('width', img.css('width'))
+      wrapper.css('width', image.css('width'))
+    
 
   setEditText = (wrapper) ->
     alt = wrapper.children('img').attr('alt')
@@ -229,6 +225,8 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     edit = $('<div class="image-edit">')
     element.children('img').wrap(wrapper)
     setEditText element.children('.image-wrapper').prepend(edit)
+    element.find('img').load ->
+      setWidth $(this)
 
   deactivate = (element) ->
     wrapper = element.children('.image-wrapper')
