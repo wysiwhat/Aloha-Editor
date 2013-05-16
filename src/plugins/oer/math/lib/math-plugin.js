@@ -2,7 +2,7 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  define(['aloha', 'aloha/plugin', 'jquery', 'popover', 'ui/ui', 'css!../../../oer/math/css/math.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
+  define(['aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
     var EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, SELECTOR, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, findFormula, getEncoding, getMathFor, insertMath, makeCloseIcon, squirrelMath, triggerMathJax;
 
     EDITOR_HTML = '<div class="math-editor-dialog">\n    <div class="math-container">\n        <pre><span></span><br></pre>\n        <textarea type="text" class="formula" rows="1"\n                  placeholder="Insert your math notation here"></textarea>\n    </div>\n    <div class="footer">\n      <span>This is:</span>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath\n      </label>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/tex"> LaTeX\n      </label>\n      <label class="radio inline mime-type-mathml">\n          <input type="radio" name="mime-type" value="math/mml"> MathML\n      </label>\n      <button class="btn btn-primary done">Done</button>\n    </div>\n</div>';
@@ -76,7 +76,7 @@
           }
           makeCloseIcon($mathElement);
           if (!$mathElement.next().is('.aloha-ephemera-wrapper')) {
-            return $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement);
+            return jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement);
           }
         });
       });
@@ -134,7 +134,7 @@
         $el.trigger('show');
         return makeCloseIcon($el);
       } else {
-        $tail = $('<span class="aloha-ephemera-wrapper">&#160;</span>');
+        $tail = jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>');
         formula = range.getText();
         $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open + formula + LANGUAGES['math/asciimath'].close);
         GENTICS.Utils.Dom.removeRange(range);
@@ -194,7 +194,7 @@
       $editor = jQuery(EDITOR_HTML);
       $editor.find('.done').on('click', function() {
         if (!$span.next().is('.aloha-ephemera-wrapper')) {
-          $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span);
+          jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span);
         }
         return $span.trigger('hide');
       });
@@ -224,7 +224,7 @@
           $span.prepend($mathPoint);
         }
         if (LANGUAGES[mimeType].raw) {
-          $formula = $(formula);
+          $formula = jQuery(formula);
           $mathPoint.text('').append($formula);
         } else {
           formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close;
