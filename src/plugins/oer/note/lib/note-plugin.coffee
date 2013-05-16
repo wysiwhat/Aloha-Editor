@@ -1,64 +1,102 @@
 define [
-	'aloha'
-	'aloha/plugin'
-	'jquery'
-	'aloha/ephemera'
-	'ui/ui'
-	'ui/button'], (Aloha, Plugin, jQuery, Ephemera, UI, Button) ->
+  'aloha'
+  'aloha/plugin'
+  'jquery'
+  'aloha/ephemera'
+  'ui/ui'
+  'ui/button'
+  'semanticblock/semanticblock-plugin'
+  'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
-	NEW_NOTE_TEMPLATE = '''
-		<div class="note">
-			<h2 class="title">Note Title</h2>
-			<p>Replace this with the body of the note</p>
-		</div>
-	'''
+  TITLE_CONTAINER = '''
+        <div class="type-container dropdown">
+            <a class="type" data-toggle="dropdown"></a>
+            <span class="title" placeholder="Add a title (optional)"></span>
+            <ul class="dropdown-menu">
+                <li><a href="">Note</a></li>
+                <li><a href="">Aside</a></li>
+                <li><a href="">Warning</a></li>
+                <li><a href="">Tip</a></li>
+                <li><a href="">Important</a></li>
+            </ul>
+        </div>
+  '''
 
-	UI.adopt 'insertNote', Button,
-		click: (a, b, c) ->
-			# The action for creating a new note
-      range = Aloha.Selection.getRangeObject()
-      $newNote = jQuery(NEW_NOTE_TEMPLATE)
-      # Insert the note into the DOM
-      $newNote.addClass('aloha-new-note')
-      GENTICS.Utils.Dom.insertIntoDOM $newNote,
-        range,
-        Aloha.activeEditable.obj
-      $newNote = Aloha.jQuery('.aloha-new-note')
-      $newNote.removeClass('aloha-new-note')
-      enable($newNote)
+  Plugin.create 'note',
+    init: () ->
+      # Load up specific classes to listen to or use the default
+      types = @settings.types or {note: true}
+      jQuery.map types, (hasTitle, className) ->
 
-  # ## Enable Editing a Note
-  # Cleans up a Note (`.note`) and prepares it for editing by:
-  #
-  # 1. Makes sure there is a title
-  # 2. Collects all other children into a `.body` div
-  # 3. Enables aloha on the title
-  # 4. Enables aloha on the body (all the other children)
-  # 5. Register the note with the block plugin (so it can be moved around)
-	enable = ($note) ->
-		# Pull out the title (as long as it's the 1st element)
-		$title = $note.children(':not(.aloha-block-handle)').first()
-		# If there is no title, prepend one
-		$title = jQuery('<h1 class="title"></h1>').prependTo $note if not $title.is('.title')
+        # These 2 variables should be moved into the config so other note-ish classes
+        # can define what the element name is that is generated for the note and
+        # for the title.
+        #
+        # Maybe they could eventually be functions so titles for inline notes generate
+        # a `span` instead of a `div` for example.
+        tagName = 'div'
+        titleTagName = 'div'
+        newTemplate = jQuery("<#{tagName}></#{tagName}")
+        newTemplate.addClass(className)
+        newTemplate.attr('data-type', className)
+        if hasTitle
+          newTemplate.append("<#{titleTagName} class='title'></#{titleTagName}")
 
-		# Move all the other children into an editable body div
-		$body = $note.find('.body')
-		if not $body[0]
-			$body = jQuery('<div class="body aloha-ephemera-wrapper"></div>')
-			# Fill the new body element with the original children
-			$note.children().not($title).appendTo $body
-		# Mark that the body div should be unwrapped
-		# TODO: a Div cannot have both a class of "aloha-editable" and "aloha-ephemera-wrapper"
-		# Ephemera.markWrapper($body)
-		$body.appendTo($note)
+        semanticBlock.activateHandler(className, (element) ->
+          if hasTitle
+            titleElement = element.children('.title')
 
-		$title.aloha()
-		$body.aloha()
+            if titleElement.length
+              title = titleElement.html()
+              titleElement.remove()
+            else
+              title = ''
 
-		# After setting up the editable children, enable the block
-		$note.alohaBlock()
+          type = element.attr('data-type') or className
 
+          body = element.children()
+          element.children().remove()
 
-	Aloha.bind 'aloha-editable-activated', (evt, props) ->
-		props.editable.obj.find('.note').each (i, note) ->
-			enable(jQuery(note))
+          if hasTitle
+            titleContainer = jQuery(TITLE_CONTAINER)
+            titleContainer.find('.title').text(title)
+            titleContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
+            titleContainer.prependTo(element)
+            titleContainer.children('.title').aloha()
+
+          # Create the body and add some placeholder text
+          $('<div>').addClass('body')
+          .attr('placeholder', "Type the text of your #{className} here.")
+          .append(body)
+          .appendTo(element)
+          .aloha()
+        )
+        semanticBlock.deactivateHandler(className, (element) ->
+          bodyElement = element.children('.body')
+          body = bodyElement.children()
+
+          if body == bodyElement.attr('placeholder')
+            body = ''
+
+          element.children('.body').remove()
+
+          if hasTitle
+            titleElement = element.children('.type-container').children('.title')
+            title = titleElement.text()
+
+            if title == titleElement.attr('placeholder')
+              title = ''
+
+            element.children('.type-container').remove()
+            jQuery("<div>").addClass('title').text(title).prependTo(element)
+
+          element.append(body)
+        )
+        # Add a listener
+        UI.adopt "insert-#{className}", Button,
+          click: -> semanticBlock.insertAtCursor(newTemplate.clone())
+
+        # For legacy toolbars listen to 'insertNote'
+        if 'note' == className
+          UI.adopt "insertNote", Button,
+            click: -> semanticBlock.insertAtCursor(newTemplate.clone())
