@@ -136,6 +136,7 @@
         toolbar = this;
         changeHeading = function(evt) {
           var $el, $newEl, $oldEl, hTag, rangeObject;
+          evt.preventDefault();
           $el = jQuery(this);
           hTag = $el.attr('data-tagname');
           rangeObject = Aloha.Selection.getRangeObject();
@@ -147,8 +148,7 @@
           $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer());
           $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer());
           $newEl.addClass($oldEl.attr('class'));
-          $newEl.bind('click', headingFunc);
-          return evt.preventDefault();
+          return $newEl.bind('click', headingFunc);
         };
         $ROOT.on('click', '.action.changeHeading', changeHeading);
         $ROOT.on('mousedown', ".action", function(evt) {

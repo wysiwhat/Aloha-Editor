@@ -5,16 +5,18 @@
 define [
   'aloha',
   'jquery',
-  'popover',
+  'popover/popover-plugin',
   'ui/ui',
   'aloha/console',
+  'aloha/ephemera',
   'css!assorted/css/link.css'
 ], (
   Aloha,
   jQuery,
   Popover,
   UI,
-  console
+  console,
+  Ephemera
 ) ->
 
   DIALOG_HTML = '''
@@ -73,6 +75,7 @@ define [
       <br/>
   '''
 
+  Ephemera.attributes('data-original-title')
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj
@@ -202,6 +205,9 @@ define [
       newRange.select()
       newRange
 
+  # Don't match links that are marked as ephemera. These are generally UI
+  # elements added by other plugins that are removed when the document is
+  # serialized and should never constitute a real link.
   selector = 'a:not(.aloha-ephemera)'
 
   # see http://stackoverflow.com/questions/10903002/shorten-url-for-display-with-beginning-and-end-preserved-firebug-net-panel-st

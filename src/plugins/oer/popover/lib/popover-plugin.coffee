@@ -88,7 +88,7 @@ There are 3 variables that are stored on each element;
 
 ###
 
-define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
+define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
 
 
   # This position code was refactored out because it is also used to move the
@@ -329,12 +329,12 @@ define 'popover', [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       $el = jQuery(rangeObject.getCommonAncestorContainer())
       $el = $el.parents(helper.selector) if not $el.is(helper.selector)
 
-      # Hide other tooltips of the same type
-      nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
-      nodes = nodes.not($el)
-      nodes.trigger 'hide'
-
       if Aloha.activeEditable
+        # Hide other tooltips of the same type
+        nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector)
+        nodes = nodes.not($el)
+        nodes.trigger 'hide'
+
         enteredLinkScope = selectionChangeHandler(rangeObject, helper.selector)
         if insideScope isnt enteredLinkScope
           insideScope = enteredLinkScope
