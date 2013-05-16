@@ -143,7 +143,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
           $root.sortable 'option', 'stop', (e, ui) ->
             $el = jQuery(ui.item)
-            activate $el
+            activate $el if $el.is(classes.join())
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
