@@ -182,7 +182,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
-      template = $('<div class="media"><img /></div>')
+      template = $('<p><div class="media"><img /></div></p>')
       semanticBlock.insertAtCursor(template)
       newEl = template.find('img')
       promise = showModalDialog(newEl)
