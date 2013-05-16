@@ -5,8 +5,8 @@ define [
   'aloha/ephemera'
   'ui/ui'
   'ui/button'
-    'semanticblock/semanticblock-plugin'
-    'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
+  'semanticblock/semanticblock-plugin'
+  'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
   TITLE_CONTAINER = '''
         <div class="type-container dropdown">
