@@ -141,6 +141,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
+        $el.parents('.semantic-container').remove() unless imageSource
         deferred.reject(target: $el[0])
         dialog.modal('hide')
 

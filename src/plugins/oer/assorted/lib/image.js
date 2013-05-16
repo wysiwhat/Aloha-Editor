@@ -100,6 +100,9 @@
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
+        if (!imageSource) {
+          $el.parents('.semantic-container').remove();
+        }
         deferred.reject({
           target: $el[0]
         });
