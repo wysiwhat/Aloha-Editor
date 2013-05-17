@@ -182,7 +182,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
-      template = $('<p><div class="media"><img /></div></p>')
+      template = $('<div class="media"><img /></div>')
       semanticBlock.insertAtCursor(template)
       newEl = template.find('img')
       promise = showModalDialog(newEl)
@@ -194,12 +194,6 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
           uploadImage data.files[0], (url) ->
             jQuery(data.target).attr('src', url)
             newEl.removeClass('aloha-image-uploading')
-
-      promise.fail (data) ->
-        # Clean up placeholder if needed
-        $target = jQuery(data.target)
-        if not $target.is('img')
-          $target.remove()
 
       # Finally show the dialog
       promise.show()

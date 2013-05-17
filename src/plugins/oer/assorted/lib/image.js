@@ -153,7 +153,7 @@
     UI.adopt('insertImage-oer', null, {
       click: function() {
         var newEl, promise, template;
-        template = $('<p><div class="media"><img /></div></p>');
+        template = $('<div class="media"><img /></div>');
         semanticBlock.insertAtCursor(template);
         newEl = template.find('img');
         promise = showModalDialog(newEl);
@@ -164,13 +164,6 @@
               jQuery(data.target).attr('src', url);
               return newEl.removeClass('aloha-image-uploading');
             });
-          }
-        });
-        promise.fail(function(data) {
-          var $target;
-          $target = jQuery(data.target);
-          if (!$target.is('img')) {
-            return $target.remove();
           }
         });
         return promise.show();
