@@ -24,20 +24,34 @@
   plugins:
     # All the plugins we use in Aloha
     load: [
-      'oer/toolbar'
       'common/ui'
-      'common/format'
+      'oer/toolbar'
+      'oer/popover'
+      'oer/format'
+      'common/contenthandler'
       'common/paste'
       'common/block'
       'common/list'
-      'common/table'
-      'extra/draganddropfiles'
-      'common/image'
+      'oer/table'
       'oer/popover'
       'oer/math'
+      'extra/draganddropfiles'
+      'common/image'
       'oer/assorted'
+      'oer/title'
+      'common/undo'
+      'oer/undobutton'
+      'oer/genericbutton'
+      'oer/semanticblock'
+      'oer/exercise'
       'oer/note'
     ]
+
+    note:
+      types:
+        'note': true
+        'noteish': true
+        'noteish-notitle': false
 
     # This whole thing is what's needed to:
     #

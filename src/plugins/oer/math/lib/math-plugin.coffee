@@ -124,7 +124,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         makeCloseIcon $mathElement
         if not $mathElement.next().is '.aloha-ephemera-wrapper'
           # a math meta-element needs to followed by a non-breaking space in a span
-          $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement)
+          jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement)
 
     # What to when user clicks on math
     jQuery(editable.obj).on 'click.matheditor', '.math-element, .math-element *', (evt) ->
@@ -190,7 +190,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
       makeCloseIcon($el)
     else
       # a math meta-element needs to followed by a non-breaking space in a span
-      $tail = $('<span class="aloha-ephemera-wrapper">&#160;</span>')
+      $tail = jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>')
       # Assume the user highlighted ASCIIMath (by putting the text in backticks)
       formula = range.getText()
       $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open +
@@ -246,7 +246,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
     $editor.find('.done').on 'click', =>
       if not $span.next().is '.aloha-ephemera-wrapper'
         # a math meta-element needs to followed by a non-breaking space in a span
-        $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span)
+        jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span)
       $span.trigger 'hide'
     $editor.find('.remove').on 'click', =>
       $span.trigger 'hide'
@@ -285,7 +285,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         $span.prepend $mathPoint
 
       if LANGUAGES[mimeType].raw
-        $formula = $(formula)
+        $formula = jQuery(formula)
         $mathPoint.text('').append($formula)
       else
         formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close

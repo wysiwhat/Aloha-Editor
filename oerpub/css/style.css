@@ -54,6 +54,9 @@
 .aloha-block.title:focus,
 .aloha-block.title:hover {
     outline: none !important;
-    box-shadow: none !important;
     padding: 0;
+}
+
+.aloha-block {
+    box-shadow: none !important;
 }

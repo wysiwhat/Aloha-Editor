@@ -53,6 +53,7 @@ figure figcaption::before {
 /* Toolbar icons */
 .toolbar {
   background-color: whiteSmoke;
+  height: 40px;
   opacity: 0.95;
   position: fixed;
   top: 0;
@@ -75,6 +76,9 @@ figure figcaption::before {
   box-shadow: none;
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
+}
+.toolbar .btn.btn-text {
+  padding: 5px;
 }
 .toolbar .btn-toolbar {
   margin: 3px 0;

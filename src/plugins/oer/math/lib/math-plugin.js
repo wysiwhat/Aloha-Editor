@@ -76,7 +76,7 @@
           }
           makeCloseIcon($mathElement);
           if (!$mathElement.next().is('.aloha-ephemera-wrapper')) {
-            return $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement);
+            return jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($mathElement);
           }
         });
       });
@@ -134,7 +134,7 @@
         $el.trigger('show');
         return makeCloseIcon($el);
       } else {
-        $tail = $('<span class="aloha-ephemera-wrapper">&#160;</span>');
+        $tail = jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>');
         formula = range.getText();
         $el.find('.mathjax-wrapper').text(LANGUAGES['math/asciimath'].open + formula + LANGUAGES['math/asciimath'].close);
         GENTICS.Utils.Dom.removeRange(range);
@@ -194,7 +194,7 @@
       $editor = jQuery(EDITOR_HTML);
       $editor.find('.done').on('click', function() {
         if (!$span.next().is('.aloha-ephemera-wrapper')) {
-          $('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span);
+          jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span);
         }
         return $span.trigger('hide');
       });
@@ -224,7 +224,7 @@
           $span.prepend($mathPoint);
         }
         if (LANGUAGES[mimeType].raw) {
-          $formula = $(formula);
+          $formula = jQuery(formula);
           $mathPoint.text('').append($formula);
         } else {
           formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close;
