@@ -75,6 +75,7 @@ define [
       <br/>
   '''
 
+  # have ephemera remove the attribute that bootstrap inserts for tooltips
   Ephemera.attributes('data-original-title')
 
   showModalDialog = ($el) ->
