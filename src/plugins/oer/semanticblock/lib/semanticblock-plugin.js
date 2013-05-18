@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'css!semanticblock/css/semanticblock-plugin.css'], function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button) {
-    var activate, activateHandlers, bindEvents, blockControls, blockDragHelper, blockTemplate, deactivate, deactivateHandlers, insertElement, pluginEvents;
+    var activate, activateHandlers, bindEvents, blockControls, blockDragHelper, blockTemplate, cleanIds, deactivate, deactivateHandlers, insertElement, pluginEvents;
     if (pluginManager.plugins.semanticblock) {
       return pluginManager.plugins.semanticblock;
     }
@@ -125,19 +125,34 @@
       }
       return _results;
     };
+    cleanIds = function(content) {
+      var element, elements, i, id, ids, _i, _ref, _results;
+      elements = content.find('[id]');
+      ids = {};
+      _results = [];
+      for (i = _i = 0, _ref = elements.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        element = jQuery(elements[i]);
+        id = element.attr('id');
+        if (ids[id]) {
+          _results.push(element.attr('id', ''));
+        } else {
+          _results.push(ids[id] = element);
+        }
+      }
+      return _results;
+    };
     Aloha.ready(function() {
       return bindEvents(jQuery(document));
     });
     return Plugin.create('semanticblock', {
       makeClean: function(content) {
-        var type, _results;
-        _results = [];
+        var type;
         for (type in deactivateHandlers) {
-          _results.push(content.find('.aloha-oer-block.' + type).each(function() {
+          content.find('.aloha-oer-block.' + type).each(function() {
             return deactivate(jQuery(this));
-          }));
+          });
         }
-        return _results;
+        return cleanIds(content);
       },
       init: function() {
         var _this = this;

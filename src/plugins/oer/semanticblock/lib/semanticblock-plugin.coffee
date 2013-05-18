@@ -90,6 +90,18 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.on event.name, event.selector, event.callback
       i++
 
+  cleanIds = (content) ->
+    elements = content.find('[id]')
+    ids = {}
+
+    for i in [0..elements.length]
+      element = jQuery(elements[i])
+      id = element.attr('id')
+      if ids[id]
+        element.attr('id', '')
+      else
+        ids[id] = element
+
   Aloha.ready ->
     bindEvents jQuery(document)
 
@@ -99,6 +111,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       for type of deactivateHandlers
         content.find('.aloha-oer-block.'+type).each ->
           deactivate jQuery(this)
+      cleanIds(content)
 
     init: ->
       Aloha.bind 'aloha-editable-activated', (e, params) =>
