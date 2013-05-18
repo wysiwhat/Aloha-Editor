@@ -36,6 +36,7 @@ form#linkModal:focus {
 }
 
 .media.aloha-oer-block {
+    display: block;
     border: 0;
 }
 .media.aloha-oer-block .image-wrapper {

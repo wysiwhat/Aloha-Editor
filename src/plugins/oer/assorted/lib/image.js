@@ -155,7 +155,7 @@
     UI.adopt('insertImage-oer', null, {
       click: function() {
         var newEl, promise, template;
-        template = $('<div class="media"><img /></div>');
+        template = $('<span class="media"><img /></span>');
         semanticBlock.insertAtCursor(template);
         newEl = template.find('img');
         promise = showModalDialog(newEl);
@@ -192,21 +192,23 @@
       }
     };
     activate = function(element) {
-      var edit, wrapper;
+      var edit, img, wrapper;
       wrapper = $('<div class="image-wrapper">').css('width', element.css('width'));
       edit = $('<div class="image-edit">');
-      element.children('img').wrap(wrapper);
+      img = element.find('img');
+      element.children().remove();
+      img.appendTo(element).wrap(wrapper);
       setEditText(element.children('.image-wrapper').prepend(edit));
       return element.find('img').load(function() {
         return setWidth($(this));
       });
     };
     deactivate = function(element) {
-      var img, wrapper;
-      wrapper = element.children('.image-wrapper');
-      img = wrapper.find('img');
+      var img;
+      img = element.find('img');
       element.children().remove();
-      return element.append(img);
+      element.append(img);
+      return element.parents('.semantic-container').wrap('<p>');
     };
     return AlohaPlugin.create('oer-image', {
       init: function() {

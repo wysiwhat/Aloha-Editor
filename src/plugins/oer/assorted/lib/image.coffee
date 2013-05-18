@@ -182,7 +182,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
-      template = $('<div class="media"><img /></div>')
+      template = $('<span class="media"><img /></span>')
       semanticBlock.insertAtCursor(template)
       newEl = template.find('img')
       promise = showModalDialog(newEl)
@@ -218,16 +218,23 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
     edit = $('<div class="image-edit">')
-    element.children('img').wrap(wrapper)
+
+    img = element.find('img')
+    element.children().remove()
+
+    img.appendTo(element).wrap(wrapper)
+
     setEditText element.children('.image-wrapper').prepend(edit)
     element.find('img').load ->
       setWidth $(this)
 
   deactivate = (element) ->
-    wrapper = element.children('.image-wrapper')
-    img = wrapper.find('img')
+    img = element.find('img')
     element.children().remove()
     element.append(img)
+
+    # wrap the whole thing in a paragraph just so it passes the server's validation rules
+    element.parents('.semantic-container').wrap('<p>')
 
   # Return config
   AlohaPlugin.create('oer-image', {
