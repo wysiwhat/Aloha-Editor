@@ -48,10 +48,16 @@
     ]
 
     note:
-      types:
-        'note': true
-        'noteish': true
-        'noteish-notitle': false
+      types: [
+        { label: 'Note',      cls: 'note', hasTitle: true }
+        { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' }
+        { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
+        { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
+        { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
+
+        { label: 'Noteish',   cls: 'noteish', hasTitle: true }
+        { label: 'Noteish (no Title)', cls: 'noteish-notitle', hasTitle: false }
+      ]
 
     # This whole thing is what's needed to:
     #

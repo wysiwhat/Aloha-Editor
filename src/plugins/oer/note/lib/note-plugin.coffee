@@ -26,23 +26,32 @@ define [
     init: () ->
       # Load up specific classes to listen to or use the default
       types = @settings.types or {note: true}
-      jQuery.map types, (hasTitle, className) ->
+      jQuery.each types, (i, type) ->
+        className = type.cls or throw 'BUG Invalid configuration of not plugin. cls required!'
+        typeName = type.type
+        hasTitle = !!type.hasTitle
+        label = type.label or throw 'BUG Invalid configuration of not plugin. label required!'
 
-        # These 2 variables should be moved into the config so other note-ish classes
-        # can define what the element name is that is generated for the note and
+        # These 2 variables allow other note-ish classes
+        # to define what the element name is that is generated for the note and
         # for the title.
         #
         # Maybe they could eventually be functions so titles for inline notes generate
         # a `span` instead of a `div` for example.
-        tagName = 'div'
-        titleTagName = 'div'
+        tagName = type.tagName or 'div'
+        titleTagName = type.titleTagName or 'div'
+
+        selector = ".#{className}:not([data-type])"
+        selector = ".#{className}[data-type='#{typeName}']" if typeName
+
+
         newTemplate = jQuery("<#{tagName}></#{tagName}")
         newTemplate.addClass(className)
-        newTemplate.attr('data-type', className)
+        newTemplate.attr('data-type', typeName) if typeName
         if hasTitle
           newTemplate.append("<#{titleTagName} class='title'></#{titleTagName}")
 
-        semanticBlock.activateHandler(className, (element) ->
+        semanticBlock.activateHandler(selector, (element) ->
           if hasTitle
             titleElement = element.children('.title')
 
@@ -71,7 +80,7 @@ define [
           .appendTo(element)
           .aloha()
         )
-        semanticBlock.deactivateHandler(className, (element) ->
+        semanticBlock.deactivateHandler(selector, (element) ->
           bodyElement = element.children('.body')
           body = bodyElement.children()
 
@@ -93,10 +102,10 @@ define [
           element.append(body)
         )
         # Add a listener
-        UI.adopt "insert-#{className}", Button,
+        UI.adopt "insert-#{className}#{typeName}", Button,
           click: -> semanticBlock.insertAtCursor(newTemplate.clone())
 
         # For legacy toolbars listen to 'insertNote'
-        if 'note' == className
+        if 'note' == className and not typeName
           UI.adopt "insertNote", Button,
             click: -> semanticBlock.insertAtCursor(newTemplate.clone())

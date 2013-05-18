@@ -10,18 +10,32 @@
         types = this.settings.types || {
           note: true
         };
-        return jQuery.map(types, function(hasTitle, className) {
-          var newTemplate, tagName, titleTagName;
-          tagName = 'div';
-          titleTagName = 'div';
+        return jQuery.each(types, function(i, type) {
+          var className, hasTitle, label, newTemplate, selector, tagName, titleTagName, typeName;
+          className = type.cls || (function() {
+            throw 'BUG Invalid configuration of not plugin. cls required!';
+          })();
+          typeName = type.type;
+          hasTitle = !!type.hasTitle;
+          label = type.label || (function() {
+            throw 'BUG Invalid configuration of not plugin. label required!';
+          })();
+          tagName = type.tagName || 'div';
+          titleTagName = type.titleTagName || 'div';
+          selector = "." + className + ":not([data-type])";
+          if (typeName) {
+            selector = "." + className + "[data-type='" + typeName + "']";
+          }
           newTemplate = jQuery("<" + tagName + "></" + tagName);
           newTemplate.addClass(className);
-          newTemplate.attr('data-type', className);
+          if (typeName) {
+            newTemplate.attr('data-type', typeName);
+          }
           if (hasTitle) {
             newTemplate.append("<" + titleTagName + " class='title'></" + titleTagName);
           }
-          semanticBlock.activateHandler(className, function(element) {
-            var body, title, titleContainer, titleElement, type;
+          semanticBlock.activateHandler(selector, function(element) {
+            var body, title, titleContainer, titleElement;
             if (hasTitle) {
               titleElement = element.children('.title');
               if (titleElement.length) {
@@ -43,7 +57,7 @@
             }
             return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + className + " here.").append(body).appendTo(element).aloha();
           });
-          semanticBlock.deactivateHandler(className, function(element) {
+          semanticBlock.deactivateHandler(selector, function(element) {
             var body, bodyElement, title, titleElement;
             bodyElement = element.children('.body');
             body = bodyElement.children();
@@ -62,12 +76,12 @@
             }
             return element.append(body);
           });
-          UI.adopt("insert-" + className, Button, {
+          UI.adopt("insert-" + className + typeName, Button, {
             click: function() {
               return semanticBlock.insertAtCursor(newTemplate.clone());
             }
           });
-          if ('note' === className) {
+          if ('note' === className && !typeName) {
             return UI.adopt("insertNote", Button, {
               click: function() {
                 return semanticBlock.insertAtCursor(newTemplate.clone());
