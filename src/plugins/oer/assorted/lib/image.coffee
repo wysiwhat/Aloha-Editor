@@ -87,7 +87,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       loadLocalFile = (file, $img, callback) ->
         reader = new FileReader()
         reader.onloadend = () ->
-          $img.attr('src', reader.result)
+          $img.attr('src', reader.result) if $img
           # If we get an image then update the modal's imageSource
           setImageSource(reader.result)
           callback(reader.result) if callback

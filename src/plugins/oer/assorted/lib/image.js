@@ -42,7 +42,9 @@
         var reader;
         reader = new FileReader();
         reader.onloadend = function() {
-          $img.attr('src', reader.result);
+          if ($img) {
+            $img.attr('src', reader.result);
+          }
           setImageSource(reader.result);
           if (callback) {
             return callback(reader.result);
