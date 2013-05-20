@@ -2,11 +2,13 @@
 (function() {
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
-    var TITLE_CONTAINER;
-    TITLE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <span class="title" placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n        <li><a href="">Note</a></li>\n        <li><a href="">Aside</a></li>\n        <li><a href="">Warning</a></li>\n        <li><a href="">Tip</a></li>\n        <li><a href="">Important</a></li>\n    </ul>\n</div>';
+    var TITLE_CONTAINER, notishClasses;
+    TITLE_CONTAINER = jQuery('<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <span class="title" placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n    </ul>\n</div>');
+    notishClasses = {};
     return Plugin.create('note', {
       init: function() {
-        var types;
+        var types,
+          _this = this;
         types = this.settings.types || {
           note: true
         };
@@ -26,6 +28,7 @@
           if (typeName) {
             selector = "." + className + "[data-type='" + typeName + "']";
           }
+          notishClasses[className] = true;
           newTemplate = jQuery("<" + tagName + "></" + tagName);
           newTemplate.addClass(className);
           if (typeName) {
@@ -49,9 +52,37 @@
             body = element.children();
             element.children().remove();
             if (hasTitle) {
-              titleContainer = jQuery(TITLE_CONTAINER);
+              titleContainer = TITLE_CONTAINER.clone();
+              jQuery.each(_this.settings.types, function(i, foo) {
+                var $option;
+                $option = jQuery('<li><a href=""></a></li>');
+                $option.appendTo(titleContainer.find('.dropdown-menu'));
+                $option = $option.children('a');
+                $option.text(foo.label);
+                return $option.on('click', function() {
+                  var $newTitle, key;
+                  if (foo.hasTitle) {
+                    if (!element.find('> .type-container > .title')[0]) {
+                      $newTitle = jQuery("<" + (foo.titleTagName || 'span') + " class='title'></" + (foo.titleTagName || 'span'));
+                      element.children('.type-container').append($newTitle);
+                      $newTitle.aloha();
+                    }
+                  } else {
+                    element.find('> .type-container > .title').remove();
+                  }
+                  if (foo.type) {
+                    element.attr('data-type', foo.type);
+                  } else {
+                    element.removeAttr('data-type');
+                  }
+                  for (key in notishClasses) {
+                    element.removeClass(key);
+                  }
+                  return element.addClass(foo.cls);
+                });
+              });
               titleContainer.find('.title').text(title);
-              titleContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+              titleContainer.find('.type').text(label);
               titleContainer.prependTo(element);
               titleContainer.children('.title').aloha();
             }

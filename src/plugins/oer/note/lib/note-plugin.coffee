@@ -8,25 +8,24 @@ define [
   'semanticblock/semanticblock-plugin'
   'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
-  TITLE_CONTAINER = '''
+  TITLE_CONTAINER = jQuery('''
         <div class="type-container dropdown">
             <a class="type" data-toggle="dropdown"></a>
             <span class="title" placeholder="Add a title (optional)"></span>
             <ul class="dropdown-menu">
-                <li><a href="">Note</a></li>
-                <li><a href="">Aside</a></li>
-                <li><a href="">Warning</a></li>
-                <li><a href="">Tip</a></li>
-                <li><a href="">Important</a></li>
             </ul>
         </div>
-  '''
+  ''')
+
+  # Find all classes that could mean something is "notish"
+  # so they can be removed when the type is changed from the dropdown.
+  notishClasses = {}
 
   Plugin.create 'note',
     init: () ->
       # Load up specific classes to listen to or use the default
       types = @settings.types or {note: true}
-      jQuery.each types, (i, type) ->
+      jQuery.each types, (i, type) =>
         className = type.cls or throw 'BUG Invalid configuration of not plugin. cls required!'
         typeName = type.type
         hasTitle = !!type.hasTitle
@@ -44,6 +43,8 @@ define [
         selector = ".#{className}:not([data-type])"
         selector = ".#{className}[data-type='#{typeName}']" if typeName
 
+        notishClasses[className] = true
+
 
         newTemplate = jQuery("<#{tagName}></#{tagName}")
         newTemplate.addClass(className)
@@ -51,7 +52,7 @@ define [
         if hasTitle
           newTemplate.append("<#{titleTagName} class='title'></#{titleTagName}")
 
-        semanticBlock.activateHandler(selector, (element) ->
+        semanticBlock.activateHandler(selector, (element) =>
           if hasTitle
             titleElement = element.children('.title')
 
@@ -67,9 +68,40 @@ define [
           element.children().remove()
 
           if hasTitle
-            titleContainer = jQuery(TITLE_CONTAINER)
+            titleContainer = TITLE_CONTAINER.clone()
+            # Add dropdown elements for each possible type
+            jQuery.each @settings.types, (i, foo) =>
+              $option = jQuery('<li><a href=""></a></li>')
+              $option.appendTo(titleContainer.find('.dropdown-menu'))
+              $option = $option.children('a')
+              $option.text(foo.label)
+              $option.on 'click', =>
+                # Remove the title if this type does not have one
+                # The title was moved into `.type-container` for some reason
+                if foo.hasTitle
+                  # If there is no `.title` element then add one in and enable it as an Aloha block
+                  if not element.find('> .type-container > .title')[0]
+                    $newTitle = jQuery("<#{foo.titleTagName or 'span'} class='title'></#{foo.titleTagName or 'span'}")
+                    element.children('.type-container').append($newTitle)
+                    $newTitle.aloha()
+
+                else
+                  element.find('> .type-container > .title').remove()
+
+                # Remove the `data-type` if this type does not have one
+                if foo.type
+                  element.attr('data-type', foo.type)
+                else
+                  element.removeAttr('data-type')
+
+                # Remove all notish class names and then add this one in
+                for key of notishClasses
+                  element.removeClass key
+                element.addClass(foo.cls)
+
+
             titleContainer.find('.title').text(title)
-            titleContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
+            titleContainer.find('.type').text(label)
             titleContainer.prependTo(element)
             titleContainer.children('.title').aloha()
 
