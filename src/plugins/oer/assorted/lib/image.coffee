@@ -232,6 +232,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     img = element.find('img')
     element.children().remove()
     element.append(img)
+    element.attr('data-alt', img.attr('alt') || img.attr('src'))
 
     # wrap the whole thing in a paragraph just so it passes the server's validation rules
     element.parents('.semantic-container').wrap('<p>')

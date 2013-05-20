@@ -208,6 +208,7 @@
       img = element.find('img');
       element.children().remove();
       element.append(img);
+      element.attr('data-alt', img.attr('alt') || img.attr('src'));
       return element.parents('.semantic-container').wrap('<p>');
     };
     return AlohaPlugin.create('oer-image', {
