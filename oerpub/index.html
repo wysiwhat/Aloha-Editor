@@ -329,12 +329,17 @@
                             // editor.isModified().
                             window.setInterval(savePreview, 30000);
 
+                            var redrawTocTimeout = false;
                             setInterval(function() {
                                 var editor = Aloha.getEditableById('canvas');
+
                                 if (editor.isModified()) {
 
-                                    // redraw the table of contents
-                                    fluid.tableOfContents("#editor", {selectors: {tocContainer: $('.flc-toc-tocContainer')}}); 
+                                    // redraw the table of contents, but not more than once every second
+                                    if (!redrawTocTimeout) {
+                                        redrawTocTimeout = setTimeout(function() {redrawTocTimeout = false}, 1000);
+                                        fluid.tableOfContents("#editor", {selectors: {tocContainer: $('.flc-toc-tocContainer')}});
+                                    }
 
                                     // activate the save button
                                     $('.btn.save').html('Save');
