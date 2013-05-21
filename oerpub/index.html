@@ -35,6 +35,9 @@
             <script src="/Aloha-Editor/oerpub/js/jquery-ui-1.9.0.custom-aloha.js"
                     tal:replace="nothing"> <!-- xhtml --></script>
 
+            <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> <!-- xhtml workaround --></script>
+            <script type="text/javascript" src="/Aloha-Editor/oerpub/js/infusion/MyInfusion.js"> <!-- xhtml workaround --></script>
+
             <!-- Mathjax -->
             <script type="text/javascript"
                     src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&amp;delayStartupUntil=configured"
@@ -52,7 +55,7 @@
               },
               AsciiMath: { noErrors: { disabled: true } }
             });</script>
-
+            
             <script type="text/javascript" src="/Aloha-Editor/oerpub/js/aloha-settings.js"
                     tal:attributes="src string:${request.static_url('oerpub.rhaptoslabs.swordpushweb:static/aloha-settings.js')}"> <!-- xhtml workaround --></script>
             <script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"
@@ -150,6 +153,28 @@
                 }
 
                 Aloha.ready(function(){
+
+                    fluid.pageEnhancer({
+                        gradeNames: ["fluid.uiEnhancer.defaultActions"],
+                        tocTemplate: "/Aloha-Editor/oerpub/js/infusion/components/tableOfContents/html/TableofContents.html"
+                        
+                    });
+
+                    fluid.uiOptions.fatPanel('.flc-uiOptions-fatPanel', {
+                        gradeNames: ["fluid.uiOptions.TransformDefaultPanelsOptions"],
+                        prefix: "/Aloha-Editor/oerpub/js/infusion/components/uiOptions/html/",
+                        templateLoader: {
+                            options: {
+                                gradeNames: ["fluid.uiOptions.defaultTemplateLoader"]
+                            }
+                        }, 
+                        uiOptions: {
+                            options: {
+                                gradeNames: ["fluid.uiOptions.defaultSettingsPanels"]
+                            }
+                        } 
+                        
+                    });
 
                     headingChoices = Aloha.jQuery('.changeHeading');
                     for(var i = 0; i < headingChoices.length; i++) {
@@ -378,6 +403,17 @@
                           <li><a href="#" class="action insertExercise">Exercise</a></li>
                         </ul>
                       </div>
+                    </div>
+    
+
+                    <div class="flc-uiOptions-fatPanel fl-uiOptions-fatPanel">
+                        <div class="flc-slidingPanel-panel flc-uiOptions-iframe"></div>
+                        <div class="fl-panelBar">
+                            <span class="fl-uio-tabs">
+                                <button id="reset" class="flc-uiOptions-reset fl-uiOptions-reset">Reset</button>
+                                <button id="show-hide" class="flc-slidingPanel-toggleButton fl-uiOptions-showHide">Show/Hide</button>
+                            </span>
+                        </div>
                     </div>
                 </div><!-- / ".toolbar" -->
                 </metal:toolbar>
