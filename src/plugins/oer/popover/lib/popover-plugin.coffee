@@ -322,7 +322,12 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     Aloha.bind 'aloha-editable-deactivated', (event, data) ->
       helper.stopAll(data.editable)
       insideScope = false
-      enteredLinkScope = false
+
+    Aloha.bind 'aloha-editable-created', (evt, editable) ->
+      # When a popover is hidden, the next selection change should
+      # do the right thing.
+      editable.obj.on 'hidden-popover', helper.selector, () ->
+        insideScope = false
 
     Aloha.bind 'aloha-selection-changed', (event, rangeObject) ->
       # Hide all popovers except for the current one maybe?
