@@ -348,8 +348,12 @@ There are 3 variables that are stored on each element;
       });
       Aloha.bind('aloha-editable-deactivated', function(event, data) {
         helper.stopAll(data.editable);
-        insideScope = false;
-        return enteredLinkScope = false;
+        return insideScope = false;
+      });
+      Aloha.bind('aloha-editable-created', function(evt, editable) {
+        return editable.obj.on('hidden-popover', helper.selector, function() {
+          return insideScope = false;
+        });
       });
       Aloha.bind('aloha-selection-changed', function(event, rangeObject) {
         var $el, nodes;
