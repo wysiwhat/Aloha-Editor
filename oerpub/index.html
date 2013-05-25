@@ -247,10 +247,9 @@
                         // Fetch the preview
                         $('#statusmessage').data('message')('Loading preview...');
                         Aloha.jQuery.get(body_url, function(data){
-                            var d = document.createElement('html');
-                            d.innerHTML = data;
+                            var $d = Aloha.jQuery('<div />').html(data);
                             var $editable = Aloha.jQuery('#canvas').html(
-                                $('body > *', d));
+                                $d.find('> *'));
 
                             // Remove the pyramid debug toolbar from the preview
                             // if it exists. This code should do nothing in production
