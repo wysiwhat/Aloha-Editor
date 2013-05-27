@@ -168,6 +168,10 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     proto.hide = Bootstrap_Popover_hide(proto.hide)
   monkeyPatch()
 
+  # Stop mousedown events inside a popover from propagating up to
+  # aloha, causing the editor to deactivate and the popover to close.
+  jQuery('body').on 'mousedown', '.popover', (evt) ->
+    evt.stopPropagation()
 
   Popover =
     MILLISECS: 2000
@@ -318,11 +322,6 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       insideScope = false
 
     Aloha.bind 'aloha-editable-created', (evt, editable) ->
-      # Stop mousedown events inside a popover from propagating up to
-      # aloha, causing the editor to deactivate and the popover to close.
-      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
-        evt.stopPropagation()
-
       # When a popover is hidden, the next selection change should
       # do the right thing.
       editable.obj.on 'hidden-popover', helper.selector, () ->

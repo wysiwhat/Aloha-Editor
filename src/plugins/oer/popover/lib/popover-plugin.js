@@ -157,6 +157,9 @@ There are 3 variables that are stored on each element;
       return proto.hide = Bootstrap_Popover_hide(proto.hide);
     };
     monkeyPatch();
+    jQuery('body').on('mousedown', '.popover', function(evt) {
+      return evt.stopPropagation();
+    });
     Popover = {
       MILLISECS: 2000,
       MOVE_INTERVAL: 100,
@@ -347,9 +350,6 @@ There are 3 variables that are stored on each element;
         return insideScope = false;
       });
       Aloha.bind('aloha-editable-created', function(evt, editable) {
-        jQuery('body').off('mousedown.bubble', '.popover').on('mousedown.bubble', '.popover', function(evt) {
-          return evt.stopPropagation();
-        });
         return editable.obj.on('hidden-popover', helper.selector, function() {
           return insideScope = false;
         });
