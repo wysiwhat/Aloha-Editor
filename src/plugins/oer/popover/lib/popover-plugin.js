@@ -248,7 +248,7 @@ There are 3 variables that are stored on each element;
             return $node.removeData('aloha-bubble-visible');
           }
         });
-        $el.on('mouseenter.bubble', this.selector, function(evt) {
+        return $el.on('mouseenter.bubble', this.selector, function(evt) {
           var $node;
 
           $node = jQuery(evt.target);
@@ -283,15 +283,11 @@ There are 3 variables that are stored on each element;
             });
           }
         });
-        return jQuery('body').off('mousedown.bubble', '.popover').on('mousedown.bubble', '.popover', function(evt) {
-          return evt.stopPropagation();
-        });
       };
 
       Helper.prototype.stopAll = function(editable) {
         var $nodes;
 
-        jQuery('body').off('mousedown.bubble', '.popover');
         $nodes = jQuery(editable.obj).find(this.selector);
         this.stopOne($nodes);
         return jQuery(editable.obj).off('.bubble', this.selector);
@@ -351,6 +347,9 @@ There are 3 variables that are stored on each element;
         return insideScope = false;
       });
       Aloha.bind('aloha-editable-created', function(evt, editable) {
+        jQuery('body').off('mousedown.bubble', '.popover').on('mousedown.bubble', '.popover', function(evt) {
+          return evt.stopPropagation();
+        });
         return editable.obj.on('hidden-popover', helper.selector, function() {
           return insideScope = false;
         });
