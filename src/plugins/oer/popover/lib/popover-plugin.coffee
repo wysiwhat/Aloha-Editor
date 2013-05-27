@@ -269,14 +269,8 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
 
               $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) if not $node.data('aloha-bubble-timer')
 
-      # Stop mousedown events inside a popover from propagating up to
-      # aloha, causing the editor to deactivate and the popover to close.
-      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
-        evt.stopPropagation()
-
     stopAll: (editable) =>
       # Remove all event handlers and close all bubbles
-      jQuery('body').off 'mousedown.bubble', '.popover'
       $nodes = jQuery(editable.obj).find(@selector)
       this.stopOne($nodes)
       jQuery(editable.obj).off('.bubble', @selector)
@@ -324,6 +318,11 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       insideScope = false
 
     Aloha.bind 'aloha-editable-created', (evt, editable) ->
+      # Stop mousedown events inside a popover from propagating up to
+      # aloha, causing the editor to deactivate and the popover to close.
+      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
+        evt.stopPropagation()
+
       # When a popover is hidden, the next selection change should
       # do the right thing.
       editable.obj.on 'hidden-popover', helper.selector, () ->
