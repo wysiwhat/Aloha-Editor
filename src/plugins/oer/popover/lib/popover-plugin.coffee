@@ -168,6 +168,10 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
     proto.hide = Bootstrap_Popover_hide(proto.hide)
   monkeyPatch()
 
+  # Stop mousedown events inside a popover from propagating up to
+  # aloha, causing the editor to deactivate and the popover to close.
+  jQuery('body').on 'mousedown', '.popover', (evt) ->
+    evt.stopPropagation()
 
   Popover =
     MILLISECS: 2000
@@ -269,14 +273,8 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
 
               $node.data('aloha-bubble-timer', delayTimeout($node, 'hide', Popover.MILLISECS / 2)) if not $node.data('aloha-bubble-timer')
 
-      # Stop mousedown events inside a popover from propagating up to
-      # aloha, causing the editor to deactivate and the popover to close.
-      jQuery('body').off('mousedown.bubble', '.popover').on 'mousedown.bubble', '.popover', (evt) ->
-        evt.stopPropagation()
-
     stopAll: (editable) =>
       # Remove all event handlers and close all bubbles
-      jQuery('body').off 'mousedown.bubble', '.popover'
       $nodes = jQuery(editable.obj).find(@selector)
       this.stopOne($nodes)
       jQuery(editable.obj).off('.bubble', @selector)
