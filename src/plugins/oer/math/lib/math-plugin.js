@@ -214,20 +214,20 @@
       }
       keyTimeout = null;
       keyDelay = function() {
-        var $mathPoint, formulaWrapped;
+        var $mathPoint, formulaWrapped, type;
 
         formula = jQuery(this).val();
-        mimeType = $editor.find('input[name=mime-type]:checked').val();
+        type = $editor.find('input[name=mime-type]:checked').val();
         $mathPoint = $span.children('.mathjax-wrapper');
         if (!$mathPoint[0]) {
           $mathPoint = jQuery('<span class="mathjax-wrapper aloha-ephemera"></span>');
           $span.prepend($mathPoint);
         }
-        if (LANGUAGES[mimeType].raw) {
+        if (LANGUAGES[type].raw) {
           $formula = jQuery(formula);
           $mathPoint.text('').append($formula);
         } else {
-          formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close;
+          formulaWrapped = LANGUAGES[type].open + formula + LANGUAGES[type].close;
           $mathPoint.text(formulaWrapped);
         }
         triggerMathJax($span, function() {
@@ -235,8 +235,8 @@
 
           $mathml = $span.find('math');
           if ($mathml[0]) {
-            if (__indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, mimeType) >= 0) {
-              addAnnotation($span, formula, mimeType);
+            if (__indexOf.call(MATHML_ANNOTATION_MIME_ENCODINGS, type) >= 0) {
+              addAnnotation($span, formula, type);
             }
             makeCloseIcon($span);
           }
