@@ -375,7 +375,6 @@ There are 3 variables that are stored on each element;
               $el = $el.parents(helper.selector).eq(0);
             }
             if (enteredLinkScope) {
-              console.log("selector is " + helper.selector);
               $el.trigger('show');
               $el.data('aloha-bubble-selected', true);
               $el.off('.bubble');
