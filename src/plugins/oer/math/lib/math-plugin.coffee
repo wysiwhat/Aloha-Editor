@@ -277,25 +277,25 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
     keyDelay = () ->
       # Try and parse it as ASCIIMath
       formula = jQuery(@).val() # $span.data('math-formula')
-      mimeType = $editor.find('input[name=mime-type]:checked').val()
+      type = $editor.find('input[name=mime-type]:checked').val()
 
       $mathPoint = $span.children('.mathjax-wrapper')
       if not $mathPoint[0]
         $mathPoint = jQuery('<span class="mathjax-wrapper aloha-ephemera"></span>')
         $span.prepend $mathPoint
 
-      if LANGUAGES[mimeType].raw
+      if LANGUAGES[type].raw
         $formula = jQuery(formula)
         $mathPoint.text('').append($formula)
       else
-        formulaWrapped = LANGUAGES[mimeType].open + formula + LANGUAGES[mimeType].close
+        formulaWrapped = LANGUAGES[type].open + formula + LANGUAGES[type].close
         $mathPoint.text(formulaWrapped)
       triggerMathJax $span, ->
         # Save the Edited text into the math annotation element
         $mathml = $span.find('math')
         if $mathml[0]
-          if mimeType in MATHML_ANNOTATION_MIME_ENCODINGS
-            addAnnotation $span, formula, mimeType
+          if type in MATHML_ANNOTATION_MIME_ENCODINGS
+            addAnnotation $span, formula, type
           makeCloseIcon($span)
         Aloha.activeEditable.smartContentChange {type: 'block-change'}
 
