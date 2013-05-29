@@ -350,7 +350,7 @@
                       <span class="separator"> </span>
                       <div class="btn-group">
                         <button class="btn action insertImage-oer" rel="tooltip" title="Insert Image"><i class="icon-image-insert"></i></button>
-                        <button class="btn action insertVideo-oer" rel="tooltip" title="Insert Video"><i class="icon-image-insert"></i></button>
+                        <!--<button class="btn action insertVideo-oer" rel="tooltip" title="Insert Video"><i class="icon-image-insert"></i></button>-->
                         <button class="btn action createTable" rel="tooltip" title="Create Table"><i class="icon-table-insert"></i></button>
                         <button class="btn dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Table Operations">
                           <span class="caret"></span>
@@ -379,21 +379,6 @@
                         </ul>
                       </div>
                     </div>
-
-                    <div style="margin-top: 20px;">
-                        <h4>Drag to add a new ...</h4>
-
-                        <div class="semantic-drag-source">
-                            <div class="note" data-type="note">
-                                <div class="title"></div>
-                            </div>
-
-                            <div class="exercise" data-type="exercise">
-                                <div class="problem"></div>
-                            </div>
-                        </div>
-
-                    </div>
                 </div><!-- / ".toolbar" -->
                 </metal:toolbar>
 
@@ -402,7 +387,7 @@
                         <metal:editor define-macro="editor">
                         <div id="statusmessage"></div>
                         <div id="editor">
-                            <div id="canvas" style="margin-left: 200px;"></div>
+                            <div id="canvas"></div>
                         </div>
                         </metal:editor>
                     </div>
