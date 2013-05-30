@@ -9,7 +9,7 @@ define [
   'css!note/css/note-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
   TYPE_CONTAINER = jQuery '''
-      <span class="type-container dropdown">
+      <span class="type-container dropdown aloha-ephemera">
           <a class="type" data-toggle="dropdown"></a>
           <ul class="dropdown-menu">
           </ul>
