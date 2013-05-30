@@ -77,6 +77,9 @@
         callback: function() {
           var $el;
           $el = jQuery(this);
+          if (!$el.text().trim()) {
+            $el.empty();
+          }
           return $el.toggleClass('aloha-empty', $el.is(':empty'));
         }
       }

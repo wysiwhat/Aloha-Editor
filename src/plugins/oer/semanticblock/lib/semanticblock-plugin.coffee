@@ -61,6 +61,10 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     selector: '[placeholder]'
     callback: ->
       $el = jQuery @
+      # If the element does not contain any text (just empty paragraphs)
+      # Clear the contents so `:empty` is true
+      $el.empty() if not $el.text().trim()
+
       $el.toggleClass 'aloha-empty', $el.is(':empty')
   ]
   insertElement = (element) ->
