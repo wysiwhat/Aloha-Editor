@@ -65,6 +65,8 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       if imageSource
         dialog.find('.action.insert').removeAttr('disabled')
 
+      editing = Boolean(imageSource)
+
       dialog.find('[name=alt]').val(imageAltText)
 
       if /^https?:\/\//.test(imageSource)
@@ -141,7 +143,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
-        $el.parents('.semantic-container').remove() unless imageSource
+        $el.parents('.semantic-container').remove() unless editing
         deferred.reject(target: $el[0])
         dialog.modal('hide')
 
