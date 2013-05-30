@@ -71,6 +71,14 @@
           jQuery(this).parents('.type-container').first().children('.type').text(jQuery(this).text());
           return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
         }
+      }, {
+        name: 'blur',
+        selector: '[placeholder]',
+        callback: function() {
+          var $el;
+          $el = jQuery(this);
+          return $el.toggleClass('aloha-empty', $el.is(':empty'));
+        }
       }
     ];
     insertElement = function(element) {};
@@ -140,22 +148,9 @@
       init: function() {
         var _this = this;
         Aloha.bind('aloha-editable-activated', function(e, params) {
-          var element;
-          element = jQuery(params.editable.obj);
-          if (element.attr('placeholder')) {
-            element.removeClass('placeholder');
-            if (element.attr('placeholder') === element.text()) {
-              return element.text('');
-            }
-          }
-        });
-        Aloha.bind('aloha-editable-deactivated', function(e, params) {
-          var element;
-          element = jQuery(params.editable.obj);
-          if (element.attr('placeholder') && element.text() === '') {
-            element.text(element.attr('placeholder'));
-            return element.addClass('placeholder');
-          }
+          var $root;
+          $root = jQuery(params.editable.obj);
+          return $root.find('[placeholder]:empty').addClass('aloha-empty');
         });
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, selector;

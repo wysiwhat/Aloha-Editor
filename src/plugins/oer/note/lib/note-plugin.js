@@ -93,24 +93,21 @@
             }
             return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + className + " here.").append(body).appendTo(element).aloha();
           });
-          semanticBlock.deactivateHandler(selector, function(element) {
-            var body, bodyElement, title, titleElement;
-            bodyElement = element.children('.body');
-            body = bodyElement.children();
-            if (body === bodyElement.attr('placeholder')) {
-              body = '';
-            }
-            element.children('.body').remove();
+          semanticBlock.deactivateHandler(selector, function($element) {
+            var $body, $title, $typeContainer;
+            $body = $element.children('.body');
+            $body = $body.children();
+            $element.children('.body').remove();
             if (hasTitle) {
-              titleElement = element.children('.type-container').children('.title');
-              title = titleElement.text();
-              if (title === titleElement.attr('placeholder')) {
-                title = '';
+              $typeContainer = $element.children('.type-container');
+              $title = $typeContainer.children('.title');
+              if (!$title[0]) {
+                $title = jQuery("<" + titleTagName + "></" + titleTagName + ">");
+                $title.addClass('title');
+                $title.prependTo(typeContainer);
               }
-              element.children('.type-container').remove();
-              jQuery("<div>").addClass('title').text(title).prependTo(element);
             }
-            return element.append(body);
+            return $element.append($body);
           });
           UI.adopt("insert-" + className + typeName, Button, {
             click: function() {

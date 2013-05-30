@@ -132,26 +132,22 @@ define [
           .appendTo(element)
           .aloha()
         )
-        semanticBlock.deactivateHandler(selector, (element) ->
-          bodyElement = element.children('.body')
-          body = bodyElement.children()
+        semanticBlock.deactivateHandler(selector, ($element) ->
+          $body = $element.children('.body')
+          $body = $body.children()
 
-          if body == bodyElement.attr('placeholder')
-            body = ''
-
-          element.children('.body').remove()
+          $element.children('.body').remove()
 
           if hasTitle
-            titleElement = element.children('.type-container').children('.title')
-            title = titleElement.text()
+            $typeContainer = $element.children('.type-container')
+            $title = $typeContainer.children('.title')
+            if not $title[0]
+              $title = jQuery("<#{titleTagName}></#{titleTagName}>")
+              $title.addClass 'title'
 
-            if title == titleElement.attr('placeholder')
-              title = ''
+              $title.prependTo(typeContainer)
 
-            element.children('.type-container').remove()
-            jQuery("<div>").addClass('title').text(title).prependTo(element)
-
-          element.append(body)
+          $element.append($body)
         )
         # Add a listener
         UI.adopt "insert-#{className}#{typeName}", Button,

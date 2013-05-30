@@ -53,6 +53,15 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       e.preventDefault()
       jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
       jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
+  ,
+    # Toggle a class on elements so if they are empty and have placeholder text
+    # the text shows up.
+    # See the CSS file more info.
+    name: 'blur'
+    selector: '[placeholder]'
+    callback: ->
+      $el = jQuery @
+      $el.toggleClass 'aloha-empty', $el.is(':empty')
   ]
   insertElement = (element) ->
 
@@ -99,19 +108,18 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           deactivate jQuery(this)
 
     init: ->
+      # On activation add a `aloha-empty` class on all elements that:
+      # - have a `placeholder` attribute
+      # - and do not have any children
+      #
+      # See CSS for placeholder logic. This class is updated on blur.
       Aloha.bind 'aloha-editable-activated', (e, params) =>
-        element = jQuery(params.editable.obj)
-        if element.attr('placeholder')
-          element.removeClass 'placeholder'
-          element.text '' if element.attr('placeholder') is element.text()
-      Aloha.bind 'aloha-editable-deactivated', (e, params) =>
-        element = jQuery(params.editable.obj)
-        if element.attr('placeholder') and element.text() == ''
-          element.text element.attr('placeholder')
-          element.addClass 'placeholder'
+        $root = jQuery(params.editable.obj)
+        $root.find('[placeholder]:empty').addClass('aloha-empty')
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
+
         # Add a `.aloha-oer-block` to all registered classes
         classes = []
         classes.push selector for selector of activateHandlers
