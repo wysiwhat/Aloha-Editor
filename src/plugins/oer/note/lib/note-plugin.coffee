@@ -22,9 +22,29 @@ define [
   notishClasses = {}
 
   Plugin.create 'note',
+    # Default Settings
+    # -------
+    # The plugin can listen to various classes that should "behave" like a note.
+    # For each notish element provide a:
+    # - `label`: **Required** Shows up in dropdown
+    # - `cls` :  **Required** The classname to enable this plugin on
+    # - `hasTitle`: **Required** `true` if the element allows optional titles
+    # - `type`: value in the `data-type` attribute.
+    # - `tagName`: Default: `div`. The HTML element name to use when creating a new note
+    # - `titleTagName`: Default: `div`. The HTML element name to use when creating a new title
+    #
+    # For example, a Warning could look like this:
+    #
+    #     { label:'Warning', cls:'note', hasTitle:false, type:'warning'}
+    #
+    # Then, when the user selects "Warning" from the dropdown the element's
+    # class and type will be changed and its `> .title` will be removed.
+    defaults: [
+      { label: 'Note', cls: 'note', hasTitle: true }
+    ]
     init: () ->
       # Load up specific classes to listen to or use the default
-      types = @settings.types or {note: true}
+      types = @settings
       jQuery.each types, (i, type) =>
         className = type.cls or throw 'BUG Invalid configuration of not plugin. cls required!'
         typeName = type.type
@@ -70,7 +90,7 @@ define [
           if hasTitle
             titleContainer = TITLE_CONTAINER.clone()
             # Add dropdown elements for each possible type
-            jQuery.each @settings.types, (i, foo) =>
+            jQuery.each @settings, (i, foo) =>
               $option = jQuery('<li><a href=""></a></li>')
               $option.appendTo(titleContainer.find('.dropdown-menu'))
               $option = $option.children('a')

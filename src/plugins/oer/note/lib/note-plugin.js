@@ -6,12 +6,17 @@
     TITLE_CONTAINER = jQuery('<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <span class="title" placeholder="Add a title (optional)"></span>\n    <ul class="dropdown-menu">\n    </ul>\n</div>');
     notishClasses = {};
     return Plugin.create('note', {
+      defaults: [
+        {
+          label: 'Note',
+          cls: 'note',
+          hasTitle: true
+        }
+      ],
       init: function() {
         var types,
           _this = this;
-        types = this.settings.types || {
-          note: true
-        };
+        types = this.settings;
         return jQuery.each(types, function(i, type) {
           var className, hasTitle, label, newTemplate, selector, tagName, titleTagName, typeName;
           className = type.cls || (function() {
@@ -53,7 +58,7 @@
             element.children().remove();
             if (hasTitle) {
               titleContainer = TITLE_CONTAINER.clone();
-              jQuery.each(_this.settings.types, function(i, foo) {
+              jQuery.each(_this.settings, function(i, foo) {
                 var $option;
                 $option = jQuery('<li><a href=""></a></li>');
                 $option.appendTo(titleContainer.find('.dropdown-menu'));
