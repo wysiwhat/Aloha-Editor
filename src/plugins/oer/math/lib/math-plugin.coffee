@@ -57,7 +57,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
           <label class="radio inline mime-type-mathml">
               <input type="radio" name="mime-type" value="math/mml"> MathML
           </label>
-          <label class="radio inline">
+          <label class="checkbox inline">
             <input id="cheatsheet-activator" type="checkbox" name="cheatsheet-activator"> Show cheat sheet
           </label>
           <button class="btn btn-primary done">Done</button>
@@ -489,12 +489,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
 
   help.on 'show', (e) ->
     opener.hide()
-    help.find('.cheatsheet').slideUp "fast", (e) ->
-      jQuery(@).show()
+    # It says slideDown, but it really causes it to slid up.
+    jQuery(@).find('.cheatsheet').slideDown("fast")
 
   help.on 'hide', (e) ->
-    jQuery(@).find('.cheatsheet').slideDown("fast").hide()
-    opener.show()
+    jQuery(@).find('.cheatsheet').slideUp "fast", () ->
+        opener.show()
 
   opener.on 'click', (e) ->
     help.trigger 'show'

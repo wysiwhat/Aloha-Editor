@@ -5,7 +5,7 @@
   define(['aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
     var EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, SELECTOR, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, findFormula, getEncoding, getMathFor, help, insertMath, makeCloseIcon, opener, squirrelMath, triggerMathJax;
 
-    EDITOR_HTML = '<div class="math-editor-dialog">\n    <div class="math-container">\n        <pre><span></span><br></pre>\n        <textarea type="text" class="formula" rows="1"\n                  placeholder="Insert your math notation here"></textarea>\n    </div>\n    <div class="footer">\n      <span>This is:</span>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath\n      </label>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/tex"> LaTeX\n      </label>\n      <label class="radio inline mime-type-mathml">\n          <input type="radio" name="mime-type" value="math/mml"> MathML\n      </label>\n      <label class="radio inline">\n        <input id="cheatsheet-activator" type="checkbox" name="cheatsheet-activator"> Show cheat sheet\n      </label>\n      <button class="btn btn-primary done">Done</button>\n    </div>\n</div>';
+    EDITOR_HTML = '<div class="math-editor-dialog">\n    <div class="math-container">\n        <pre><span></span><br></pre>\n        <textarea type="text" class="formula" rows="1"\n                  placeholder="Insert your math notation here"></textarea>\n    </div>\n    <div class="footer">\n      <span>This is:</span>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath\n      </label>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/tex"> LaTeX\n      </label>\n      <label class="radio inline mime-type-mathml">\n          <input type="radio" name="mime-type" value="math/mml"> MathML\n      </label>\n      <label class="checkbox inline">\n        <input id="cheatsheet-activator" type="checkbox" name="cheatsheet-activator"> Show cheat sheet\n      </label>\n      <button class="btn btn-primary done">Done</button>\n    </div>\n</div>';
     LANGUAGES = {
       'math/asciimath': {
         open: '`',
@@ -394,13 +394,12 @@
     opener = help.find('.cheatsheet-open');
     help.on('show', function(e) {
       opener.hide();
-      return help.find('.cheatsheet').slideUp("fast", function(e) {
-        return jQuery(this).show();
-      });
+      return jQuery(this).find('.cheatsheet').slideDown("fast");
     });
     help.on('hide', function(e) {
-      jQuery(this).find('.cheatsheet').slideDown("fast").hide();
-      return opener.show();
+      return jQuery(this).find('.cheatsheet').slideUp("fast", function() {
+        return opener.show();
+      });
     });
     opener.on('click', function(e) {
       help.trigger('show');
