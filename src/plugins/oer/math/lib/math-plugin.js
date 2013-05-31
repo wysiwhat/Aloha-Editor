@@ -281,8 +281,8 @@
       $span.off('hidden-popover').on('hidden-popover', function() {
         var tt;
 
+        jQuery('#math-cheatsheet').trigger('hide');
         jQuery('#math-cheatsheet .cheatsheet-open').hide();
-        jQuery('#math-cheatsheet .cheatsheet').hide();
         $span.css('background-color', '');
         tt = jQuery(this).data('tooltip');
         if (tt) {

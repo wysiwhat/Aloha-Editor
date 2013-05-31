@@ -332,8 +332,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
       , 10)
 
     $span.off('hidden-popover').on 'hidden-popover', () ->
+      jQuery('#math-cheatsheet').trigger 'hide'
       jQuery('#math-cheatsheet .cheatsheet-open').hide()
-      jQuery('#math-cheatsheet .cheatsheet').hide()
       $span.css 'background-color', ''
       tt = jQuery(@).data('tooltip')
       tt.enable() if tt
