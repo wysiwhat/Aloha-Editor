@@ -6,7 +6,7 @@
     WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png';
     DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.\n      </div>\n      <div>\n        <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
-      var $placeholder, $submit, $uploadImage, $uploadUrl, deferred, dialog, imageAltText, imageSource, loadLocalFile, root, setImageSource, settings,
+      var $placeholder, $submit, $uploadImage, $uploadUrl, deferred, dialog, editing, imageAltText, imageSource, loadLocalFile, root, setImageSource, settings,
         _this = this;
       settings = Aloha.require('assorted/assorted-plugin').settings;
       root = Aloha.activeEditable.obj;
@@ -20,6 +20,7 @@
       if (imageSource) {
         dialog.find('.action.insert').removeAttr('disabled');
       }
+      editing = Boolean(imageSource);
       dialog.find('[name=alt]').val(imageAltText);
       if (/^https?:\/\//.test(imageSource)) {
         $uploadUrl.val(imageSource);
@@ -102,7 +103,7 @@
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
-        if (!imageSource) {
+        if (!editing) {
           $el.parents('.semantic-container').remove();
         }
         deferred.reject({
@@ -208,7 +209,7 @@
       img = element.find('img');
       element.children().remove();
       element.append(img);
-      element.attr('data-alt', img.attr('alt') || img.attr('src'));
+      element.attr('data-alt', img.attr('alt') || '');
       return element.parents('.semantic-container').wrap('<p>');
     };
     return AlohaPlugin.create('oer-image', {
