@@ -73,7 +73,7 @@ define [
         )
         semanticBlock.deactivateHandler(className, (element) ->
           bodyElement = element.children('.body')
-          body = bodyElement.children()
+          body = bodyElement.html()
 
           if body == bodyElement.attr('placeholder')
             body = ''
@@ -87,10 +87,11 @@ define [
             if title == titleElement.attr('placeholder')
               title = ''
 
-            element.children('.type-container').remove()
-            jQuery("<div>").addClass('title').text(title).prependTo(element)
+            jQuery("<div>").addClass('title').text(title).prependTo(element) if title
 
-          element.append(body)
+          element.children('.type-container').remove()
+
+          jQuery('<p>').append(body).appendTo(element)
         )
         # Add a listener
         UI.adopt "insert-#{className}", Button,
