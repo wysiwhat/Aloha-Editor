@@ -490,9 +490,16 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
   help.on 'show', (e) ->
     opener.hide()
     # It says slideDown, but it really causes it to slid up.
-    jQuery(@).find('.cheatsheet').slideDown("fast")
+    jQuery(@).find('.cheatsheet').slideDown "fast", () ->
+      # Adjust the height of the document, to allow scrolling to the
+      # bottom
+      if Aloha.activeEditable
+          a = jQuery(@).height()
+          h = Aloha.activeEditable.obj.height()
+          h = Aloha.activeEditable.obj.height(a+h+50)
 
   help.on 'hide', (e) ->
+    Aloha.activeEditable.obj.height('auto') if Aloha.activeEditable
     jQuery(@).find('.cheatsheet').slideUp "fast", () ->
         opener.show()
 
