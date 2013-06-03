@@ -73,7 +73,7 @@ There are 3 variables that are stored on each element;
   define(['aloha', 'jquery'], function(Aloha, jQuery) {
     var Bootstrap_Popover__position, Bootstrap_Popover_hide, Bootstrap_Popover_show, Helper, Popover, bindHelper, findMarkup, monkeyPatch, selectionChangeHandler;
 
-    Bootstrap_Popover__position = function($tip) {
+    Bootstrap_Popover__position = function($tip, hint) {
       var actualHeight, actualWidth, inside, placement, pos, tp;
 
       placement = (typeof this.options.placement === "function" ? this.options.placement.call(this, $tip[0], this.$element[0]) : this.options.placement);
@@ -86,28 +86,56 @@ There are 3 variables that are stored on each element;
       actualHeight = $tip[0].offsetHeight;
       switch ((inside ? placement.split(" ")[1] : placement)) {
         case "bottom":
-          tp = {
-            top: pos.top + pos.height,
-            left: pos.left + pos.width / 2 - actualWidth / 2
-          };
+          if (hint) {
+            tp = {
+              top: hint.top + 10,
+              left: hint.left - actualWidth / 2
+            };
+          } else {
+            tp = {
+              top: pos.top + pos.height,
+              left: pos.left + pos.width / 2 - actualWidth / 2
+            };
+          }
           break;
         case "top":
-          tp = {
-            top: pos.top - actualHeight - 10,
-            left: pos.left + pos.width / 2 - actualWidth / 2
-          };
+          if (hint) {
+            tp = {
+              top: hint.top - actualHeight - 10,
+              left: hint.left - actualWidth / 2
+            };
+          } else {
+            tp = {
+              top: pos.top - actualHeight - 10,
+              left: pos.left + pos.width / 2 - actualWidth / 2
+            };
+          }
           break;
         case "left":
-          tp = {
-            top: pos.top + pos.height / 2 - actualHeight / 2,
-            left: pos.left - actualWidth
-          };
+          if (hint) {
+            tp = {
+              top: hint.top - actualHeight / 2,
+              left: hint.left - actualWidth
+            };
+          } else {
+            tp = {
+              top: pos.top + pos.height / 2 - actualHeight / 2,
+              left: pos.left - actualWidth
+            };
+          }
           break;
         case "right":
-          tp = {
-            top: pos.top + pos.height / 2 - actualHeight / 2,
-            left: pos.left + pos.width
-          };
+          if (hint) {
+            tp = {
+              top: hint.top - actualHeight / 2,
+              left: hint.left
+            };
+          } else {
+            tp = {
+              top: pos.top + pos.height / 2 - actualHeight / 2,
+              left: pos.left + pos.width
+            };
+          }
       }
       if (tp.top < 0 || tp.left < 0) {
         placement = 'bottom';
@@ -162,7 +190,6 @@ There are 3 variables that are stored on each element;
     });
     Popover = {
       MILLISECS: 2000,
-      MOVE_INTERVAL: 100,
       register: function(cfg) {
         return bindHelper(new Helper(cfg));
       }
@@ -213,18 +240,10 @@ There are 3 variables that are stored on each element;
             }
           });
         };
-        $el.on('show.bubble', this.selector, function(evt) {
-          var $node, movePopover;
+        $el.on('show.bubble', this.selector, function(evt, hint) {
+          var $node, that;
 
           $node = jQuery(evt.target);
-          movePopover = function() {
-            var that;
-
-            that = $node.data('popover');
-            if (that && that.$tip) {
-              return Bootstrap_Popover__position.bind(that)(that.$tip);
-            }
-          };
           clearTimeout($node.data('aloha-bubble-timer'));
           $node.removeData('aloha-bubble-timer');
           if (!$node.data('aloha-bubble-visible')) {
@@ -235,15 +254,16 @@ There are 3 variables that are stored on each element;
             }
             $node.data('aloha-bubble-visible', true);
           }
-          clearInterval($node.data('aloha-bubble-move-timer'));
-          return $node.data('aloha-bubble-move-timer', setInterval(movePopover, Popover.MOVE_INTERVAL));
+          that = $node.data('popover');
+          if (that && that.$tip) {
+            return Bootstrap_Popover__position.bind(that)(that.$tip, hint);
+          }
         });
         $el.on('hide.bubble', this.selector, function(evt) {
           var $node;
 
           $node = jQuery(evt.target);
           clearTimeout($node.data('aloha-bubble-timer'));
-          clearInterval($node.data('aloha-bubble-move-timer'));
           $node.removeData('aloha-bubble-timer');
           $node.data('aloha-bubble-selected', false);
           if ($node.data('aloha-bubble-visible')) {
@@ -354,7 +374,7 @@ There are 3 variables that are stored on each element;
           return insideScope = false;
         });
       });
-      Aloha.bind('aloha-selection-changed', function(event, rangeObject) {
+      Aloha.bind('aloha-selection-changed', function(event, rangeObject, originalEvent) {
         var $el, nodes;
 
         $el = jQuery(rangeObject.getCommonAncestorContainer());
@@ -372,7 +392,14 @@ There are 3 variables that are stored on each element;
               $el = $el.parents(helper.selector);
             }
             if (enteredLinkScope) {
-              $el.trigger('show');
+              if (originalEvent && originalEvent.pageX) {
+                $el.trigger('show', {
+                  top: originalEvent.pageY,
+                  left: originalEvent.pageX
+                });
+              } else {
+                $el.trigger('show');
+              }
               $el.data('aloha-bubble-selected', true);
               $el.off('.bubble');
               return event.stopPropagation();
