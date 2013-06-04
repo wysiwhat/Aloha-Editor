@@ -147,7 +147,7 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       # If no space at top, move to bottom. This attempts to keep the
       # popover inside the editable area by considering the top of
       # the editor and how far the document is scrolled.
-      if tp.top < (
+      if actualPlacement == 'top' and tp.top < (
         Aloha.activeEditable and Aloha.activeEditable.obj.position().top or 0
         ) + jQuery(window).scrollTop()
         actualPlacement = 'bottom'

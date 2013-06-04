@@ -138,7 +138,7 @@ There are 3 variables that are stored on each element;
             };
           }
       }
-      if (tp.top < (Aloha.activeEditable && Aloha.activeEditable.obj.position().top || 0) + jQuery(window).scrollTop()) {
+      if (actualPlacement === 'top' && tp.top < (Aloha.activeEditable && Aloha.activeEditable.obj.position().top || 0) + jQuery(window).scrollTop()) {
         actualPlacement = 'bottom';
         tp.top = pos.top + pos.height;
       }
