@@ -105,7 +105,8 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
       pos = @getPosition(inside)
       actualWidth = $tip[0].offsetWidth
       actualHeight = $tip[0].offsetHeight
-      switch (if inside then placement.split(" ")[1] else placement)
+      actualPlacement = (if inside then placement.split(" ")[1] else placement)
+      switch actualPlacement
         when "bottom"
           if hint
             tp =
@@ -143,14 +144,25 @@ define [ 'aloha', 'jquery' ], (Aloha, jQuery) ->
               top: pos.top + pos.height / 2 - actualHeight / 2
               left: pos.left + pos.width
 
-      if tp.top < 0 or tp.left < 0
-        placement = 'bottom'
+      # If no space at top, move to bottom. This attempts to keep the
+      # popover inside the editable area by considering the top of
+      # the editor and how far the document is scrolled.
+      if tp.top < (
+        Aloha.activeEditable and Aloha.activeEditable.obj.position().top or 0
+        ) + jQuery(window).scrollTop()
+        actualPlacement = 'bottom'
         tp.top = pos.top + pos.height
 
       if tp.left < 0
+        # If no space to left, move to right.
         tp.left = 10 # so it's not right at the edge of the page
+      else if tp.left + actualWidth > jQuery(window).width()
+        # If it falls off on the right hand side, move it in.
+        tp.left = jQuery(window).width() - actualWidth - 10
 
-      $tip.css(tp).addClass(placement)
+      # Remove any old positioning and reposition
+      $tip.css(tp).removeClass("top bottom left right").addClass(
+        actualPlacement)
 
   # Monkeypatch the bootstrap Popover so we can inject clickable buttons
   Bootstrap_Popover_show = () ->
