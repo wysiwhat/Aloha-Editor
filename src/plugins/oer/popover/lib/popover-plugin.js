@@ -154,6 +154,9 @@ There are 3 variables that are stored on each element;
       return proto.hide = Bootstrap_Popover_hide(proto.hide);
     };
     monkeyPatch();
+    jQuery('body').on('mousedown', '.popover', function(evt) {
+      return evt.stopPropagation();
+    });
     Popover = {
       MILLISECS: 2000,
       MOVE_INTERVAL: 100,
@@ -241,7 +244,7 @@ There are 3 variables that are stored on each element;
             return $node.removeData('aloha-bubble-visible');
           }
         });
-        $el.on('mouseenter.bubble', this.selector, function(evt) {
+        return $el.on('mouseenter.bubble', this.selector, function(evt) {
           var $node;
           $node = jQuery(evt.target);
           clearInterval($node.data('aloha-bubble-timer'));
@@ -273,14 +276,10 @@ There are 3 variables that are stored on each element;
             });
           }
         });
-        return jQuery('body').off('mousedown.bubble', '.popover').on('mousedown.bubble', '.popover', function(evt) {
-          return evt.stopPropagation();
-        });
       };
 
       Helper.prototype.stopAll = function(editable) {
         var $nodes;
-        jQuery('body').off('mousedown.bubble', '.popover');
         $nodes = jQuery(editable.obj).find(this.selector);
         this.stopOne($nodes);
         return jQuery(editable.obj).off('.bubble', this.selector);
@@ -333,14 +332,21 @@ There are 3 variables that are stored on each element;
       });
       Aloha.bind('aloha-editable-deactivated', function(event, data) {
         helper.stopAll(data.editable);
-        insideScope = false;
-        return enteredLinkScope = false;
+        return insideScope = false;
+      });
+      Aloha.bind('aloha-editable-created', function(evt, editable) {
+        return editable.obj.on('hidden-popover', helper.selector, function() {
+          return insideScope = false;
+        });
       });
       Aloha.bind('aloha-selection-changed', function(event, rangeObject) {
         var $el, nodes;
+        if (!(helper.populator && helper.selector)) {
+          return;
+        }
         $el = jQuery(rangeObject.getCommonAncestorContainer());
         if (!$el.is(helper.selector)) {
-          $el = $el.parents(helper.selector);
+          $el = $el.parents(helper.selector).eq(0);
         }
         if (Aloha.activeEditable) {
           nodes = jQuery(Aloha.activeEditable.obj).find(helper.selector);
@@ -350,7 +356,7 @@ There are 3 variables that are stored on each element;
           if (insideScope !== enteredLinkScope) {
             insideScope = enteredLinkScope;
             if (!$el.is(helper.selector)) {
-              $el = $el.parents(helper.selector);
+              $el = $el.parents(helper.selector).eq(0);
             }
             if (enteredLinkScope) {
               $el.trigger('show');
