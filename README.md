@@ -1,3 +1,12 @@
+# We have moved to OERPUB!
+
+OERPUB will continue working on the editor here:
+## [https://github.com/oerpub/Aloha-Editor/](https://github.com/oerpub/Aloha-Editor/)
+
+WYSIWHAT Aloha's fork will no longer be updated by OERPUB.
+
+---
+
 # Welcome to the WYSIWHAT fork of the Aloha Editor
 
 We are adapting the Aloha editor for creating books, textbooks and other structured content. We are adding mathematics editing and 
