@@ -178,7 +178,7 @@
         };
         return MathJax.Hub.Queue(["Typeset", MathJax.Hub, $mathElement.find('.mathjax-wrapper')[0], callback]);
       } else {
-        return console.log('MathJax was not loaded properly');
+        return console && console.log('MathJax was not loaded properly');
       }
     };
     cleanupFormula = function($editor, $span, destroy) {

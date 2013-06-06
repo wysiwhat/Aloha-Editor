@@ -235,7 +235,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         cb?()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, $mathElement.find('.mathjax-wrapper')[0], callback]
     else
-      console.log 'MathJax was not loaded properly'
+      console and console.log 'MathJax was not loaded properly'
 
   cleanupFormula = ($editor, $span, destroy=false) ->
     # If math is empty, remove the box
