@@ -2,7 +2,7 @@
 (function() {
 
   define(['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'semanticblock/semanticblock-plugin', 'css!assorted/css/image.css'], function(Aloha, jQuery, AlohaPlugin, Image, UI, semanticBlock) {
-    var DIALOG_HTML, WARNING_IMAGE_PATH, activate, deactivate, setEditText, setWidth, showModalDialog, uploadImage;
+    var DIALOG_HTML, WARNING_IMAGE_PATH, activate, deactivate, setEditText, setThankYou, setWidth, showModalDialog, uploadImage;
     WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png';
     DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.\n      </div>\n      <div>\n        <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
@@ -91,10 +91,18 @@
       });
       deferred = $.Deferred();
       dialog.on('submit', function(evt) {
+        var altAdded;
         evt.preventDefault();
+        altAdded = (!$el.attr('alt')) && dialog.find('[name=alt]').val();
         $el.attr('src', imageSource);
         $el.attr('alt', dialog.find('[name=alt]').val());
-        setEditText($el.parent());
+        console.log('submit');
+        if (altAdded) {
+          setThankYou($el.parent());
+        } else {
+          console.log('here');
+          setEditText($el.parent());
+        }
         deferred.resolve({
           target: $el[0],
           files: $uploadImage[0].files
@@ -182,10 +190,23 @@
         return wrapper.css('width', image.css('width'));
       }
     };
+    setThankYou = function(wrapper) {
+      var editDiv;
+      editDiv = wrapper.children('.image-edit');
+      editDiv.html('<i class="icon-edit"></i> Thank You!').removeClass('passive');
+      editDiv.css('background', 'lightgreen');
+      return editDiv.animate({
+        backgroundColor: 'white',
+        opacity: 0
+      }, 2000, 'swing', function() {
+        return setEditText(wrapper);
+      });
+    };
     setEditText = function(wrapper) {
       var alt, editDiv;
+      console.log('asdf');
       alt = wrapper.children('img').attr('alt');
-      editDiv = wrapper.children('.image-edit');
+      editDiv = wrapper.children('.image-edit').css('opacity', 1);
       if (alt) {
         return editDiv.html('<i class="icon-edit"></i>').addClass('passive');
       } else {
@@ -194,6 +215,7 @@
     };
     activate = function(element) {
       var edit, img, wrapper;
+      console.log('activate');
       wrapper = $('<div class="image-wrapper">').css('width', element.css('width'));
       edit = $('<div class="image-edit">');
       img = element.find('img');
@@ -220,9 +242,6 @@
           var img, promise;
           img = $(this).siblings('img');
           promise = showModalDialog(img);
-          promise.done(function(data) {
-            return setEditText(img.parent());
-          });
           return promise.show('Edit image');
         });
       }

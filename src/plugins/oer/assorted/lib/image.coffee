@@ -134,9 +134,15 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       dialog.on 'submit', (evt) =>
         evt.preventDefault() # Don't submit the form
 
+        altAdded = (not $el.attr 'alt') and dialog.find('[name=alt]').val()
+
         $el.attr 'src', imageSource
         $el.attr 'alt', dialog.find('[name=alt]').val()
-        setEditText $el.parent()
+
+        if altAdded
+          setThankYou $el.parent()
+        else
+          setEditText $el.parent()
 
         deferred.resolve(target: $el[0], files: $uploadImage[0].files)
         dialog.modal('hide')
@@ -207,11 +213,16 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     wrapper = image.parents('.image-wrapper')
     if wrapper.length
       wrapper.css('width', image.css('width'))
-    
+
+  setThankYou = (wrapper) ->
+    editDiv = wrapper.children('.image-edit')
+    editDiv.html('<i class="icon-edit"></i> Thank You!').removeClass('passive')
+    editDiv.css('background', 'lightgreen')
+    editDiv.animate({backgroundColor: 'white', opacity: 0}, 2000, 'swing', -> setEditText wrapper)
 
   setEditText = (wrapper) ->
     alt = wrapper.children('img').attr('alt')
-    editDiv = wrapper.children('.image-edit')
+    editDiv = wrapper.children('.image-edit').css('opacity', 1)
     if alt
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
@@ -247,7 +258,5 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       semanticBlock.registerEvent 'click', '.aloha-oer-block .image-edit', ->
         img = $(this).siblings('img')
         promise = showModalDialog(img)
-        promise.done (data)->
-          setEditText img.parent()
         promise.show('Edit image')
   })
