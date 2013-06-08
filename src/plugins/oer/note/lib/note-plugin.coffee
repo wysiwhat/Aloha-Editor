@@ -127,7 +127,7 @@ define [
           # If so, we need to wrap them in a `p` element
           hasTextChildren = $body.children().length != $body.contents().length
           $body = $body.contents()
-          $body = $body.wrap('<p></p>') if hasTextChildren
+          $body = $body.wrap('<p></p>').parent() if hasTextChildren
 
           $element.children('.body').remove()
 

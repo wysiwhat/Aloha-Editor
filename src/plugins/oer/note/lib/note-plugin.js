@@ -88,7 +88,7 @@
             hasTextChildren = $body.children().length !== $body.contents().length;
             $body = $body.contents();
             if (hasTextChildren) {
-              $body = $body.wrap('<p></p>');
+              $body = $body.wrap('<p></p>').parent();
             }
             $element.children('.body').remove();
             if (hasTitle) {
