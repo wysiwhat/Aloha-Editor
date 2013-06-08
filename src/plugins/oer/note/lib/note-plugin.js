@@ -87,7 +87,7 @@
             $body = $element.children('.body');
             hasTextChildren = $body.children().length !== $body.contents().length;
             $body = $body.contents();
-            if (hasChildren) {
+            if (hasTextChildren) {
               $body = $body.wrap('<p></p>');
             }
             $element.children('.body').remove();
