@@ -253,10 +253,9 @@
                         // Fetch the preview
                         $('#statusmessage').data('message')('Loading preview...');
                         Aloha.jQuery.get(body_url, function(data){
-                            var d = document.createElement('html');
-                            d.innerHTML = data;
+                            var $d = Aloha.jQuery('<div />').html(data);
                             var $editable = Aloha.jQuery('#canvas').html(
-                                $('body > *', d));
+                                $d.find('> *'));
 
                             // Remove the pyramid debug toolbar from the preview
                             // if it exists. This code should do nothing in production
@@ -366,17 +365,6 @@
                           <li><a href="#" class="action deletetable">Delete Table</a></li>
                         </ul>
                         <button class="btn action insertMath" rel="tooltip" title="Insert Math"><i class="icon-math-insert"></i></button>
-                      </div>
-                      <span class="separator"> </span>
-                      <div class="btn-group">
-                        <button class="btn btn-text dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Add a new...">
-                          Add a new...
-                          <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                          <li><a href="#" class="action insertNote">Note to Reader</a></li>
-                          <li><a href="#" class="action insertExercise">Exercise</a></li>
-                        </ul>
                       </div>
                     </div>
                 </div><!-- / ".toolbar" -->

@@ -83,9 +83,13 @@
             return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + className + " here.").append($body).appendTo($element).aloha();
           });
           semanticBlock.deactivateHandler(selector, function($element) {
-            var $body, $title;
+            var $body, $title, hasTextChildren;
             $body = $element.children('.body');
-            $body = $body.children();
+            hasTextChildren = $body.children().length !== $body.contents().length;
+            $body = $body.contents();
+            if (hasChildren) {
+              $body = $body.wrap('<p></p>');
+            }
             $element.children('.body').remove();
             if (hasTitle) {
               $title = $element.children('.title');

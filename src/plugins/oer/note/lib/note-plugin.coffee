@@ -123,7 +123,11 @@ define [
         )
         semanticBlock.deactivateHandler(selector, ($element) ->
           $body = $element.children('.body')
-          $body = $body.children()
+          # The body div could just contain text children.
+          # If so, we need to wrap them in a `p` element
+          hasTextChildren = $body.children().length != $body.contents().length
+          $body = $body.contents()
+          $body = $body.wrap('<p></p>') if hasChildren
 
           $element.children('.body').remove()
 
