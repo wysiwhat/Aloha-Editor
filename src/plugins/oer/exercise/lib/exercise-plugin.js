@@ -9,7 +9,7 @@
     SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n        <li><a href="">Answer</a></li>\n        <li><a href="">Solution</a></li>\n    </ul>\n</div>';
     return Plugin.create('exercise', {
       init: function() {
-        semanticBlock.activateHandler('exercise', function(element) {
+        semanticBlock.activateHandler('.exercise', function(element) {
           var problem, solutions, type, typeContainer;
           type = element.attr('data-type') || 'exercise';
           problem = element.children('.problem');
@@ -25,7 +25,7 @@
             return element.children('.solution-controls').children('.solution-toggle').hide();
           }
         });
-        semanticBlock.deactivateHandler('exercise', function(element) {
+        semanticBlock.deactivateHandler('.exercise', function(element) {
           var problem, solutions;
           problem = element.children('.problem');
           solutions = element.children('.solutions').children();
@@ -36,7 +36,7 @@
           jQuery("<div>").addClass('problem').html(jQuery('<p>').append(problem.html())).appendTo(element);
           return element.append(solutions);
         });
-        semanticBlock.activateHandler('solution', function(element) {
+        semanticBlock.activateHandler('.solution', function(element) {
           var body, type, typeContainer;
           type = element.attr('data-type') || 'solution';
           body = element.children();
@@ -46,7 +46,7 @@
           typeContainer.prependTo(element);
           return jQuery('<div>').addClass('body').append(body).appendTo(element).aloha();
         });
-        semanticBlock.deactivateHandler('solution', function(element) {
+        semanticBlock.deactivateHandler('.solution', function(element) {
           var content;
           content = element.children('.body').html();
           element.children().remove();
