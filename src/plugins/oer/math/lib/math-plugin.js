@@ -190,7 +190,7 @@
       var $editor, $formula, formula, keyDelay, keyTimeout, mimeType, radios,
         _this = this;
 
-      $editor = $_editor.clone();
+      $editor = $_editor.clone(true);
       $editor.find('.done').on('click', function() {
         if (!$span.next().is('.aloha-ephemera-wrapper')) {
           jQuery('<span class="aloha-ephemera-wrapper">&#160;</span>').insertAfter($span);
@@ -264,7 +264,7 @@
         clearTimeout(keyTimeout);
         return setTimeout(keyDelay.bind($formula), 500);
       });
-      $span.off('shown-popover').on('shown-popover', function() {
+      $span.off('shown-popover.math').on('shown-popover.math', function() {
         var $el, tt;
 
         $span.css('background-color', '#E5EEF5');
@@ -282,7 +282,7 @@
           }
         }, 10);
       });
-      $span.off('hidden-popover').on('hidden-popover', function() {
+      $span.off('hidden-popover.math').on('hidden-popover.math', function() {
         var tt;
 
         $span.css('background-color', '');
