@@ -64,14 +64,6 @@
           return jQuery(this).removeClass('focused');
         }
       }, {
-        name: 'click',
-        selector: '.aloha-oer-block .type-container li a',
-        callback: function(e) {
-          e.preventDefault();
-          jQuery(this).parents('.type-container').first().children('.type').text(jQuery(this).text());
-          return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
-        }
-      }, {
         name: 'blur',
         selector: '[placeholder]',
         callback: function() {

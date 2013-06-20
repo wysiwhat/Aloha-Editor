@@ -72,11 +72,8 @@ define [
           newTemplate.append("<#{titleTagName} class='title'></#{titleTagName}")
 
         semanticBlock.activateHandler(selector, ($element) =>
-
-          if not $element.attr('data-type')
-            $element.attr('data-type', className)
  
-          type = $element.attr('data-type')
+          type = $element.attr('data-type') || className
 
           $title = $element.children('.title')
           $title.attr('placeholder', 'Add a title (optional)')
@@ -86,17 +83,18 @@ define [
 
           typeContainer = TYPE_CONTAINER.clone()
           # Add dropdown elements for each possible type
-          jQuery.each @settings, (i, foo) =>
+          jQuery.each @settings, (i, dropType) =>
             $option = jQuery('<li><a href=""></a></li>')
             $option.appendTo(typeContainer.find('.dropdown-menu'))
             $option = $option.children('a')
-            $option.text(foo.label)
-            $option.on 'click', =>
+            $option.text(dropType.label)
+            $option.on 'click', (e) =>
+              e.preventDefault()
               # Remove the title if this type does not have one
-              if foo.hasTitle
+              if dropType.hasTitle
                 # If there is no `.title` element then add one in and enable it as an Aloha block
                 if not $element.children('.title')[0]
-                  $newTitle = jQuery("<#{foo.titleTagName or 'span'} class='title'></#{foo.titleTagName or 'span'}")
+                  $newTitle = jQuery("<#{dropType.titleTagName or 'span'} class='title'></#{dropType.titleTagName or 'span'}")
                   $element.append($newTitle)
                   $newTitle.aloha()
 
@@ -104,15 +102,15 @@ define [
                 $element.children('.title').remove()
 
               # Remove the `data-type` if this type does not have one
-              if foo.type
-                $element.attr('data-type', foo.type)
+              if dropType.type
+                $element.attr('data-type', dropType.type)
               else
                 $element.removeAttr('data-type')
 
               # Remove all notish class names and then add this one in
               for key of notishClasses
                 $element.removeClass key
-              $element.addClass(foo.cls)
+              $element.addClass(dropType.cls)
 
 
           typeContainer.find('.type').text(label)

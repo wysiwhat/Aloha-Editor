@@ -47,13 +47,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     callback: ->
       jQuery(this).removeClass('focused')
   ,
-    name: 'click'
-    selector: '.aloha-oer-block .type-container li a'
-    callback: (e) ->
-      e.preventDefault()
-      jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
-      jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
-  ,
     # Toggle a class on elements so if they are empty and have placeholder text
     # the text shows up.
     # See the CSS file more info.

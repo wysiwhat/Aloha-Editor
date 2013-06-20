@@ -43,7 +43,6 @@ define [
       init: () ->
         semanticBlock.activateHandler('.exercise', (element) ->
 
-
           type = element.attr('data-type') or 'exercise'
 
           problem = element.children('.problem')
@@ -140,5 +139,10 @@ define [
           controls = exercise.children('.solution-controls')
           controls.children('.add-solution').show()
           controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
+        )
+        semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li a', (e) ->
+          e.preventDefault()
+          jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
+          jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
         )
     })

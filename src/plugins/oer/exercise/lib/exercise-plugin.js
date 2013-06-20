@@ -77,7 +77,7 @@
             }
           });
         });
-        return semanticBlock.registerEvent('click', '.exercise .semantic-delete', function() {
+        semanticBlock.registerEvent('click', '.exercise .semantic-delete', function() {
           var controls, exercise;
           exercise = $(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
@@ -85,6 +85,11 @@
           if (exercise.children('.solutions').children().length === 1) {
             return controls.children('.solution-toggle').hide();
           }
+        });
+        return semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li a', function(e) {
+          e.preventDefault();
+          jQuery(this).parents('.type-container').first().children('.type').text(jQuery(this).text());
+          return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
         });
       }
     });
