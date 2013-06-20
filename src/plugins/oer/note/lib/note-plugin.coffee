@@ -136,12 +136,14 @@ define [
           $element.children('.body').remove()
 
           if hasTitle
-            $title = $element.children('.title')
-            if not $title[0]
-              $title = jQuery("<#{titleTagName}></#{titleTagName}>")
-              $title.addClass 'title'
+            $titleElement = $element.children('.title')
+            $title = jQuery("<#{titleTagName} class=\"title\"></#{titleTagName}>")
 
-              $title.prependTo($element)
+            if $titleElement.length
+              $title.append($titleElement.contents())
+              $titleElement.remove()
+
+            $title.prependTo($element)
 
           $element.append($body)
         )

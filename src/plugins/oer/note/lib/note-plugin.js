@@ -44,7 +44,6 @@
           }
           semanticBlock.activateHandler(selector, function($element) {
             var $body, $title, typeContainer;
-            type = $element.attr('data-type') || className;
             if (!$element.attr('data-type')) {
               $element.attr('data-type', className);
             }
@@ -87,7 +86,7 @@
             return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + className + " here.").append($body).appendTo($element).aloha();
           });
           semanticBlock.deactivateHandler(selector, function($element) {
-            var $body, $title, hasTextChildren;
+            var $body, $title, $titleElement, hasTextChildren;
             $body = $element.children('.body');
             hasTextChildren = $body.children().length !== $body.contents().length;
             $body = $body.contents();
@@ -96,12 +95,13 @@
             }
             $element.children('.body').remove();
             if (hasTitle) {
-              $title = $element.children('.title');
-              if (!$title[0]) {
-                $title = jQuery("<" + titleTagName + "></" + titleTagName + ">");
-                $title.addClass('title');
-                $title.prependTo($element);
+              $titleElement = $element.children('.title');
+              $title = jQuery("<" + titleTagName + " class=\"title\"></" + titleTagName + ">");
+              if ($titleElement.length) {
+                $title.append($titleElement.contents());
+                $titleElement.remove();
               }
+              $title.prependTo($element);
             }
             return $element.append($body);
           });
