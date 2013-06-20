@@ -9,7 +9,7 @@ define [
     'css!exercise/css/exercise-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
     TEMPLATE = '''
-        <div class="exercise" data-type="exercise">
+        <div class="exercise">
             <div class="problem"></div>
         </div>
 	'''
@@ -41,8 +41,7 @@ define [
 
     Plugin.create('exercise', {
       init: () ->
-        semanticBlock.activateHandler('exercise', (element) ->
-
+        semanticBlock.activateHandler('.exercise', (element) ->
 
           type = element.attr('data-type') or 'exercise'
 
@@ -73,7 +72,7 @@ define [
           if not solutions.length
             element.children('.solution-controls').children('.solution-toggle').hide()
         )
-        semanticBlock.deactivateHandler('exercise', (element) ->
+        semanticBlock.deactivateHandler('.exercise', (element) ->
           problem = element.children('.problem')
           solutions = element.children('.solutions').children()
           
@@ -88,7 +87,7 @@ define [
 
           element.append(solutions)
         )
-        semanticBlock.activateHandler('solution', (element) ->
+        semanticBlock.activateHandler('.solution', (element) ->
           type = element.attr('data-type') or 'solution'
 
           body = element.children()
@@ -104,7 +103,7 @@ define [
             .appendTo(element)
             .aloha()
         )
-        semanticBlock.deactivateHandler('solution', (element) ->
+        semanticBlock.deactivateHandler('.solution', (element) ->
           content = element.children('.body').html()
  
           element.children().remove()
