@@ -155,14 +155,9 @@
         var selector;
 
         for (selector in deactivateHandlers) {
-          if (typeof selector === 'string' && selector.length) {
-            if (selector[0] !== '.' && selector[0] !== '#') {
-              selector = '.' + selector;
-            }
-            content.find(".aloha-oer-block" + selector).each(function() {
-              return deactivate(jQuery(this));
-            });
-          }
+          content.find(".aloha-oer-block" + selector).each(function() {
+            return deactivate(jQuery(this));
+          });
         }
         return cleanIds(content);
       },
