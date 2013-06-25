@@ -30,6 +30,9 @@
     background: #FAFAFA;
 }
 
+.semantic-container.delete-hover {
+    background: #FAFAFA;
+}
 .semantic-container.delete-hover > .aloha-oer-block {
     opacity: 0.3; 
 }
