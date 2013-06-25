@@ -33,11 +33,6 @@
 .semantic-container.delete-hover > .aloha-oer-block {
     opacity: 0.3; 
 }
-.semantic-container.delete-hover > .semantic-delete {
-    opacity: 1;
-    color: white;
-    background: black; 
-}
 
 .semantic-container {
     cursor: auto !important; /* override default aloha cursor for blocks */
