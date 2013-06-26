@@ -9,7 +9,7 @@ define [
     'css!exercise/css/exercise-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
 
     TEMPLATE = '''
-        <div class="exercise" data-type="exercise">
+        <div class="exercise">
             <div class="problem"></div>
         </div>
 	'''
@@ -41,8 +41,7 @@ define [
 
     Plugin.create('exercise', {
       init: () ->
-        semanticBlock.activateHandler('exercise', (element) ->
-
+        semanticBlock.activateHandler('.exercise', (element) ->
 
           type = element.attr('data-type') or 'exercise'
 
@@ -73,7 +72,7 @@ define [
           if not solutions.length
             element.children('.solution-controls').children('.solution-toggle').hide()
         )
-        semanticBlock.deactivateHandler('exercise', (element) ->
+        semanticBlock.deactivateHandler('.exercise', (element) ->
           problem = element.children('.problem')
           solutions = element.children('.solutions').children()
           
@@ -82,11 +81,13 @@ define [
 
           element.children().remove()
 
-          jQuery("<div>").addClass('problem').html(problem.html()).appendTo(element)
+          jQuery("<div>").addClass('problem').html(
+            jQuery('<p>').append(problem.html())
+          ).appendTo(element)
 
           element.append(solutions)
         )
-        semanticBlock.activateHandler('solution', (element) ->
+        semanticBlock.activateHandler('.solution', (element) ->
           type = element.attr('data-type') or 'solution'
 
           body = element.children()
@@ -102,12 +103,12 @@ define [
             .appendTo(element)
             .aloha()
         )
-        semanticBlock.deactivateHandler('solution', (element) ->
-          content = element.children('.body')
+        semanticBlock.deactivateHandler('.solution', (element) ->
+          content = element.children('.body').html()
  
           element.children().remove()
 
-          element.append(content.html())
+          jQuery('<p>').append(content).appendTo(element)
         )
         
         UI.adopt 'insertExercise', Button,
@@ -138,5 +139,10 @@ define [
           controls = exercise.children('.solution-controls')
           controls.children('.add-solution').show()
           controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
+        )
+        semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li a', (e) ->
+          e.preventDefault()
+          jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
+          jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
         )
     })

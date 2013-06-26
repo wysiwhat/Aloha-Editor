@@ -47,12 +47,18 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     callback: ->
       jQuery(this).removeClass('focused')
   ,
-    name: 'click'
-    selector: '.aloha-oer-block .type-container li a'
-    callback: (e) ->
-      e.preventDefault()
-      jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
-      jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
+    # Toggle a class on elements so if they are empty and have placeholder text
+    # the text shows up.
+    # See the CSS file more info.
+    name: 'blur'
+    selector: '[placeholder]'
+    callback: ->
+      $el = jQuery @
+      # If the element does not contain any text (just empty paragraphs)
+      # Clear the contents so `:empty` is true
+      $el.empty() if not $el.text().trim()
+
+      $el.toggleClass 'aloha-empty', $el.is(':empty')
   ]
   insertElement = (element) ->
 
@@ -60,10 +66,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     unless element.parent('.semantic-container').length or element.is('.semantic-container')
       element.addClass 'aloha-oer-block'
       element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
-      type = undefined
-      for type of activateHandlers
-        if element.hasClass(type)
-          activateHandlers[type] element
+      for selector of activateHandlers
+        if element.is(selector)
+          activateHandlers[selector] element
           break
 
   deactivate = (element) ->
@@ -71,10 +76,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.removeClass 'aloha-oer-block ui-draggable'
       element.removeAttr 'style'
 
-      type = undefined
-      for type of deactivateHandlers
-        if element.hasClass(type)
-          deactivateHandlers[type] element
+      for selector of deactivateHandlers
+        if element.is(selector)
+          deactivateHandlers[selector] element
           break
       element.siblings('.semantic-controls').remove()
       element.unwrap()
@@ -90,33 +94,45 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.on event.name, event.selector, event.callback
       i++
 
+  cleanIds = (content) ->
+    elements = content.find('[id]')
+    ids = {}
+
+    for i in [0..elements.length]
+      element = jQuery(elements[i])
+      id = element.attr('id')
+      if ids[id]
+        element.attr('id', '')
+      else
+        ids[id] = element
+
   Aloha.ready ->
     bindEvents jQuery(document)
 
   Plugin.create 'semanticblock',
 
     makeClean: (content) ->
-      for type of deactivateHandlers
-        content.find('.aloha-oer-block.'+type).each ->
+      for selector of deactivateHandlers
+        content.find(".aloha-oer-block.#{selector}").each ->
           deactivate jQuery(this)
+      cleanIds(content)
 
     init: ->
+      # On activation add a `aloha-empty` class on all elements that:
+      # - have a `placeholder` attribute
+      # - and do not have any children
+      #
+      # See CSS for placeholder logic. This class is updated on blur.
       Aloha.bind 'aloha-editable-activated', (e, params) =>
-        element = jQuery(params.editable.obj)
-        if element.attr('placeholder')
-          element.removeClass 'placeholder'
-          element.text '' if element.attr('placeholder') is element.text()
-      Aloha.bind 'aloha-editable-deactivated', (e, params) =>
-        element = jQuery(params.editable.obj)
-        if element.attr('placeholder') and element.text() == ''
-          element.text element.attr('placeholder')
-          element.addClass 'placeholder'
+        $root = jQuery(params.editable.obj)
+        $root.find('[placeholder]:empty').addClass('aloha-empty')
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
+
         # Add a `.aloha-oer-block` to all registered classes
         classes = []
-        classes.push ".#{cls}" for cls of activateHandlers
+        classes.push selector for selector of activateHandlers
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
@@ -143,7 +159,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
           $root.sortable 'option', 'stop', (e, ui) ->
             $el = jQuery(ui.item)
-            activate $el
+            activate $el if $el.is(classes.join())
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
@@ -159,11 +175,11 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
       activate $element
 
-    activateHandler: (type, handler) ->
-      activateHandlers[type] = handler
+    activateHandler: (selector, handler) ->
+      activateHandlers[selector] = handler
 
-    deactivateHandler: (type, handler) ->
-      deactivateHandlers[type] = handler
+    deactivateHandler: (selector, handler) ->
+      deactivateHandlers[selector] = handler
 
     registerEvent: (name, selector, callback) ->
       pluginEvents.push
