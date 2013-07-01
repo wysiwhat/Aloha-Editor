@@ -149,7 +149,6 @@
       makeClean: function(content) {
         var selector;
         content.find('.semantic-container').each(function() {
-          console.log(jQuery(this).html(), jQuery(this).children().not('.semantic-controls').length);
           if (jQuery(this).children().not('.semantic-controls').length === 0) {
             return jQuery(this).remove();
           }
