@@ -78,6 +78,8 @@ define [
           
           if problem.text() == problem.attr('placeholder')
             problem.text('')
+          if problem.html() == '' or problem.html() == '<p></p>'
+            problem.html('&nbsp;')
 
           element.children().remove()
 
