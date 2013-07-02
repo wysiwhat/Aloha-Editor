@@ -157,10 +157,8 @@
       },
       init: function() {
         var _this = this;
-        Aloha.bind('aloha-editable-activated', function(e, params) {
-          var $root;
-          $root = jQuery(params.editable.obj);
-          return $root.find('[placeholder],[hover-placeholder]').blur();
+        Aloha.bind('aloha-editable-created', function(e, params) {
+          return jQuery('[placeholder],[hover-placeholder]').blur();
         });
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, selector;

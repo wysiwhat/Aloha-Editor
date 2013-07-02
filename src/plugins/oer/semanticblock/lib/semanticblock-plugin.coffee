@@ -124,9 +124,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       # - and do not have any children
       #
       # See CSS for placeholder logic. This class is updated on blur.
-      Aloha.bind 'aloha-editable-activated', (e, params) =>
-        $root = jQuery(params.editable.obj)
-        $root.find('[placeholder],[hover-placeholder]').blur()
+      Aloha.bind 'aloha-editable-created', (e, params) =>
+        jQuery('[placeholder],[hover-placeholder]').blur()
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
