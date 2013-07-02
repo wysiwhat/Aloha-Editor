@@ -60,6 +60,10 @@
     position: absolute;
     left: 50%;
     display: none !important; /* override the default aloha display logic for handles */
+    cursor: url('openhand.cur'), default;
+}
+.semantic-container.aloha-oer-dragging .aloha-block-handle {
+    cursor: url('closedhand.cur'), default;
 }
 .semantic-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
