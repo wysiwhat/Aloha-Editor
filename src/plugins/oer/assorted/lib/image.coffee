@@ -226,7 +226,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     if alt
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
-        editDiv.html('<i class="icon-warning"></i> Description missing').removeClass('passive')
+        editDiv.html('<i class="icon-warning"></i> <span class="warning-text">Description missing</span>').removeClass('passive')
  
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
