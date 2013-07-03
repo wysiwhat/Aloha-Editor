@@ -158,8 +158,8 @@
         return PubSub.sub('aloha.selection.context-change', function(data) {
           var active, button, currentHeading, el, h, headings, tagnames;
           el = data.range.commonAncestorContainer;
-          button = $ROOT.find('.btn.heading');
-          currentHeading = $ROOT.find('.btn.heading .currentHeading');
+          button = $ROOT.find('.headings button').first();
+          currentHeading = $ROOT.find('.headings .currentHeading');
           headings = $ROOT.find('.action.changeHeading');
           tagnames = [];
           headings.each(function() {
@@ -173,7 +173,7 @@
           } else {
             button.prop('disabled', false);
             active = $.grep(headings, function(elem, i) {
-              return $(elem).attr('data-tagname').toUpperCase() === el.tagName;
+              return $(elem).attr('data-tagname').toUpperCase() === h[0].tagName;
             });
             if (active.length) {
               return currentHeading.html($(active[0]).html());

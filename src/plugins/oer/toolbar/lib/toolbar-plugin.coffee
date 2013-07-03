@@ -121,8 +121,9 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
 
       PubSub.sub 'aloha.selection.context-change', (data) ->
         el = data.range.commonAncestorContainer
-        button = $ROOT.find('.btn.heading')
-        currentHeading = $ROOT.find('.btn.heading .currentHeading')
+        # Use the first button in the headings area
+        button = $ROOT.find('.headings button').first()
+        currentHeading = $ROOT.find('.headings .currentHeading')
         headings = $ROOT.find('.action.changeHeading')
         tagnames = []
         headings.each () ->
@@ -138,7 +139,7 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         else
           button.prop('disabled', false)
           active = $.grep headings, (elem, i) ->
-            $(elem).attr('data-tagname').toUpperCase()==el.tagName
+            $(elem).attr('data-tagname').toUpperCase()==h[0].tagName
           if active.length
             currentHeading.html($(active[0]).html())
           else
