@@ -207,7 +207,7 @@
       if (alt) {
         return editDiv.html('<i class="icon-edit"></i>').addClass('passive');
       } else {
-        return editDiv.html('<i class="icon-warning"></i> Description missing').removeClass('passive');
+        return editDiv.html('<i class="icon-warning"></i> <span class="warning-text">Description missing</span>').removeClass('passive');
       }
     };
     activate = function(element) {
