@@ -124,6 +124,7 @@
 }
 
 .aloha-oer-block .type {
+    font-weight: bold;
     margin: 5px 10px 0 5px;
     color: #369;
     text-decoration: none;
