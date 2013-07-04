@@ -29,9 +29,6 @@
           var problem, solutions;
           problem = element.children('.problem');
           solutions = element.children('.solutions').children();
-          if (problem.text() === problem.attr('placeholder')) {
-            problem.text('');
-          }
           if (problem.html() === '' || problem.html() === '<p></p>') {
             problem.html('&nbsp;');
           }
