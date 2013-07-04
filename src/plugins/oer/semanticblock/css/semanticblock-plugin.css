@@ -143,7 +143,10 @@
 }
 
 .aloha-oer-block .title {
-  font-size: 1em;
+    font-size: 1em;
+}
+.aloha-oer-block .title:not(.aloha-empty) {
+    font-weight: bold;
 }
 
 /* ========== note ========== */
