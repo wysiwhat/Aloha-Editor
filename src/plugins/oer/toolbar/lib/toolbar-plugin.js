@@ -145,8 +145,7 @@
           jQuery('.currentHeading')[0].innerHTML = $el[0].innerHTML;
           $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer());
           $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer());
-          $newEl.addClass($oldEl.attr('class'));
-          return $newEl.bind('click', headingFunc);
+          return $newEl.addClass($oldEl.attr('class'));
         };
         $ROOT.on('click', '.action.changeHeading', changeHeading);
         $ROOT.on('mousedown', ".action", function(evt) {
