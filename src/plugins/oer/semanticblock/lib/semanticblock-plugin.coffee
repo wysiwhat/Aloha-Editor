@@ -51,7 +51,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     # the text shows up.
     # See the CSS file more info.
     name: 'blur'
-    selector: '[placeholder]'
+    selector: '[placeholder],[hover-placeholder]'
     callback: ->
       $el = jQuery @
       # If the element does not contain any text (just empty paragraphs)
@@ -129,9 +129,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       # - and do not have any children
       #
       # See CSS for placeholder logic. This class is updated on blur.
-      Aloha.bind 'aloha-editable-activated', (e, params) =>
-        $root = jQuery(params.editable.obj)
-        $root.find('[placeholder]:empty').addClass('aloha-empty')
+      Aloha.bind 'aloha-editable-created', (e, params) =>
+        jQuery('[placeholder],[hover-placeholder]').blur()
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
