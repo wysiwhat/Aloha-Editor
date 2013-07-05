@@ -91,13 +91,6 @@
                     tal:content="string:var save_url = '${request.route_url('preview_save')}';">
                     var save_url = null;</script>
             <script type="text/javascript">
-                $(document).ready(function() {
-                    if (window.location.search === "?showblocks") {
-                        $('[oer-blocks]').show();
-                        $('#canvas').css('margin-left', '200px');
-                    }
-                });
-
                 Aloha.ready(function(){
                     Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
                             function(PubSub, GenericButton){
@@ -306,8 +299,8 @@
                       </div>
 
 
-                      <span class="separator" style="display: none;" oer-blocks></span>
-                      <div class="btn-group" style="display: none;" oer-blocks>
+                      <span class="separator"></span>
+                      <div class="btn-group">
                         <button class="btn btn-text dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Add a new...">
                           Add a new...
                           <span class="caret"></span>
@@ -319,7 +312,7 @@
                       </div>
                     </div>
 
-                    <div style="margin-top: 20px; width: 200px; display: none;" oer-blocks>
+                    <div style="margin-top: 20px; width: 200px;">
                         <h4>Drag to add a new ...</h4>
 
                         <div class="semantic-drag-source">
@@ -341,7 +334,7 @@
                         <metal:editor define-macro="editor">
                         <div id="statusmessage"></div>
                         <div id="editor">
-                            <div id="canvas"></div>
+                            <div id="canvas" style="margin-left: 200px;"></div>
                         </div>
                         </metal:editor>
                     </div>
