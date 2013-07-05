@@ -91,81 +91,7 @@
                     tal:content="string:var save_url = '${request.route_url('preview_save')}';">
                     var save_url = null;</script>
             <script type="text/javascript">
-
-                $(document).ready(function() {
-                    if (window.location.search === "?showblocks") {
-                        $('[oer-blocks]').show();
-                        $('#canvas').css('margin-left', '200px');
-                    }
-                });
-
-                // HTML elements which are the options in the heading drop down
-                var headingChoices = null;
-                // Element tags which are generated as headings 
-                var possibleHeadings = new Array();
-
-                // Search through parent links in the DOM until we find an element whose enclosing tag
-                // is one of the section heading tags
-                function getClosestHeadingParent(ele) {
-                    while(ele != null) {
-                        if(ele.tagName && possibleHeadings.indexOf(ele.tagName.toUpperCase()) != -1) {
-                            break;
-                        }
-
-                        if(ele.classList && ele.classList[0] === 'title-editor') {
-                            break;
-                        }
-                        ele = ele.parentNode;
-                    }
-                    return ele;
-                }
-
-                // Find the English heading name for a certain tag name (for instance, pre -> Code)
-                function getCorrectNewHeadingName(ele) {
-                    newName = 'Normal Text'; // Default heading display
-                    for(var i = 0; i < headingChoices.length; i++) {
-                        var checking  = Aloha.jQuery(headingChoices[i]).attr('data-tagname').toUpperCase()
-                        if(ele.tagName == checking) {
-                            newName = headingChoices[i].innerHTML;
-                            break;
-                        }
-                    }
-                    return newName;
-                }
-
-                function headingFuncHelper(ele) {
-                    var button = Aloha.jQuery('#headingbutton')[0];
-                    if(!ele) {
-                        button.disabled = true;
-                        Aloha.jQuery('.currentHeading')[0].innerHTML = 'Unknown'; 
-                    } else if(ele.classList[0] === 'title-editor') {
-                        button.disabled=true;
-                        Aloha.jQuery('.currentHeading')[0].innerHTML = 'Title'; 
-                    } else {
-                        button.disabled=false;
-                        var newName = getCorrectNewHeadingName(ele);
-                        Aloha.jQuery('.currentHeading')[0].innerHTML = newName; 
-                    }
-                }
-
-                // Binds Update function to all headings. Update function updates the current heading being displayed
-                function headingFunc(event, data) { 
-                    var ele = this;
-                    headingFuncHelper(ele);
-                }
-
-                function recursiveHeadingFunc(event, data) {
-                    var selection = Aloha.getSelection();
-                    var ele = getClosestHeadingParent(selection._nativeSelection.anchorNode);
-                    headingFuncHelper(ele);
-                }
-
                 Aloha.ready(function(){
-
-                    headingChoices = Aloha.jQuery('.changeHeading');
-                    for(var i = 0; i < headingChoices.length; i++) {
-                        possibleHeadings[possibleHeadings.length] = Aloha.jQuery(headingChoices[i]).attr('data-tagname').toUpperCase();
-                    }
                     Aloha.require(['PubSub', 'genericbutton/genericbutton-plugin'],
                             function(PubSub, GenericButton){
                         // Save button is disabled until something is changed
@@ -286,12 +212,6 @@
                                     GenericButton.getButtons()["save"].enable(true);
                                 }
                             }, 250);
-
-                            // Binds the function to all headers, paragraphs, and pre tags
-                            Aloha.jQuery(":header, p, pre").bind('click', headingFunc);
-                            Aloha.jQuery('#canvas').bind('keyup', recursiveHeadingFunc);
-                            Aloha.jQuery('#canvas').bind('click', recursiveHeadingFunc);
-                            Aloha.jQuery(".title-editor").bind('click', headingFunc);
                             Aloha.jQuery('#statusmessage').data('message')('Preview loaded');
                         });
                     });
@@ -379,8 +299,8 @@
                       </div>
 
 
-                      <span class="separator" style="display: none;" oer-blocks></span>
-                      <div class="btn-group" style="display: none;" oer-blocks>
+                      <span class="separator"></span>
+                      <div class="btn-group">
                         <button class="btn btn-text dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Add a new...">
                           Add a new...
                           <span class="caret"></span>
@@ -392,7 +312,7 @@
                       </div>
                     </div>
 
-                    <div style="margin-top: 20px; width: 200px; display: none;" oer-blocks>
+                    <div style="margin-top: 20px; width: 200px;">
                         <h4>Drag to add a new ...</h4>
 
                         <div class="semantic-drag-source">
@@ -414,7 +334,7 @@
                         <metal:editor define-macro="editor">
                         <div id="statusmessage"></div>
                         <div id="editor">
-                            <div id="canvas"></div>
+                            <div id="canvas" style="margin-left: 200px;"></div>
                         </div>
                         </metal:editor>
                     </div>

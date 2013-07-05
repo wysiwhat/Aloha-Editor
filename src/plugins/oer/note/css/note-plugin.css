@@ -1,5 +1,5 @@
 .semantic-drag-source .note:before {
-    content: "Note";
+    content: "Note to reader";
 }
 
 .note {
