@@ -62,7 +62,7 @@
     display: none !important; /* override the default aloha display logic for handles */
     cursor: -moz-grab !important;
     cursor: -webkit-grab !important;
-    cursor: url('openhand.cur'), default; 
+    cursor: url('openhand.cur'), default;
 }
 .semantic-container.aloha-oer-dragging .aloha-block-handle {
     cursor: -moz-grabbing !important;
