@@ -60,9 +60,13 @@
     position: absolute;
     left: 50%;
     display: none !important; /* override the default aloha display logic for handles */
-    cursor: url('openhand.cur'), default;
+    cursor: -moz-grab !important;
+    cursor: -webkit-grab !important;
+    cursor: url('openhand.cur'), default; 
 }
 .semantic-container.aloha-oer-dragging .aloha-block-handle {
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
     cursor: url('closedhand.cur'), default;
 }
 .semantic-container.drag-active .aloha-block-handle {
@@ -169,6 +173,8 @@
     width: 155px;
     border-radius: 5px;
     background: #EEE;
+    cursor: -moz-grab !important;
+    cursor: -webkit-grab !important;
     cursor: url('openhand.cur'), default;
 }
 
@@ -182,6 +188,8 @@
     height: 50px;
     max-width: 300px;
     max-height: 50px;
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
     cursor: url('closedhand.cur'), default;
 }
 
