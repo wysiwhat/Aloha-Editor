@@ -213,13 +213,14 @@
                 refreshPositions: true
               });
             });
-            return $root.sortable('option', 'stop', function(e, ui) {
+            $root.sortable('option', 'stop', function(e, ui) {
               var $el;
               $el = jQuery(ui.item);
               if ($el.is(classes.join())) {
                 return activate($el);
               }
             });
+            return $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder');
           }
         });
       },
