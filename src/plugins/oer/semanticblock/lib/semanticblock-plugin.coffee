@@ -161,12 +161,14 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           # setting up these drag sources may break if there is more than one top level editable on the page
           jQuery('.semantic-drag-source').children().each ->
             element = jQuery(this)
+            elementType = element.attr('class').split(' ')[0]
+            elementLabel = elementType.charAt(0).toUpperCase() + elementType.substring(1)
             element.draggable
               connectToSortable: $root
               revert: 'invalid'
               helper: ->
                 helper = jQuery(blockDragHelper).clone()
-                helper.find('.title').text 'im a helper'
+                helper.find('.title').text elementLabel
                 helper
 
               start: (e, ui) ->

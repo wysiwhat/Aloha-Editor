@@ -219,6 +219,7 @@
     margin-right: 10px;
 }
 .semantic-drag-helper .title {
+    font-weight: bold;
     color: #369;
 }
 
