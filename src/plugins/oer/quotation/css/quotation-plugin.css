@@ -1,9 +1,4 @@
-.semantic-drag-source .quotation:before {
+.semantic-drag-source .quote:before {
     font-style: normal;
     content: "Quotation";
-}
-
-.quotation {
-    font-style: italic;
-    min-height: 50px;
 }
