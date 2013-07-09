@@ -3,16 +3,16 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!quotation/css/quotation-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TEMPLATE;
-    TEMPLATE = "<div class=\"quotation\"></div>";
+    TEMPLATE = "<blockquote class=\"quote\"></blockquote>";
     return Plugin.create('quotation', {
       init: function() {
         var _this = this;
-        semanticBlock.activateHandler('.quotation', function($element) {
+        semanticBlock.activateHandler('.quote', function($element) {
           return $element.aloha();
         });
-        semanticBlock.deactivateHandler('.quotation', function($element) {
+        semanticBlock.deactivateHandler('.quote', function($element) {
           $element.mahalo();
-          return $element.attr('class', 'quotation');
+          return $element.attr('class', 'quote');
         });
         UI.adopt("insert-quotation", Button, {
           click: function(e) {
