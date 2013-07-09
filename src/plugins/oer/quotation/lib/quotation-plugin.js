@@ -15,12 +15,14 @@
           return $element.attr('class', 'quotation');
         });
         UI.adopt("insert-quotation", Button, {
-          click: function() {
+          click: function(e) {
+            e.preventDefault();
             return semanticBlock.insertAtCursor(jQuery(TEMPLATE));
           }
         });
-        return UI.adopt("insertQutoation", Button, {
-          click: function() {
+        return UI.adopt("insertQuotation", Button, {
+          click: function(e) {
+            e.preventDefault();
             return semanticBlock.insertAtCursor(jQuery(TEMPLATE));
           }
         });

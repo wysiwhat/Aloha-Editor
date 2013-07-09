@@ -20,8 +20,8 @@ define [
 
       # Add a listener
       UI.adopt "insert-quotation", Button,
-        click: -> semanticBlock.insertAtCursor(jQuery(TEMPLATE))
+        click: (e) -> e.preventDefault(); semanticBlock.insertAtCursor(jQuery(TEMPLATE))
 
-      # For legacy toolbars listen to 'insertNote'
-      UI.adopt "insertQutoation", Button,
-        click: -> semanticBlock.insertAtCursor(jQuery(TEMPLATE))
+      # For legacy toolbars
+      UI.adopt "insertQuotation", Button,
+        click: (e) -> e.preventDefault(); semanticBlock.insertAtCursor(jQuery(TEMPLATE))
