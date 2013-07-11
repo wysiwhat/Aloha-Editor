@@ -26,6 +26,9 @@
         $uploadUrl.val(imageSource);
         $uploadUrl.show();
       }
+      if (editing) {
+        dialog.find('.image-options').hide();
+      }
       (function(img, baseurl) {
         return img.onerror = function() {
           var errimg;

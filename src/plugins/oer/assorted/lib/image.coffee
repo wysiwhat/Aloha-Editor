@@ -72,6 +72,9 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       if /^https?:\/\//.test(imageSource)
         $uploadUrl.val(imageSource)
         $uploadUrl.show()
+        
+      if editing
+        dialog.find('.image-options').hide()
 
       # Set onerror of preview image
       ((img, baseurl) ->
