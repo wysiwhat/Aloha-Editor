@@ -231,7 +231,11 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
         editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
- 
+        editDiv.off('mouseenter').on 'mouseenter', (e) ->
+          editDiv.find('.warning-text').text('Image is missing a description for the visually impaired. Click to provide one.')
+        editDiv.off('mouseleave').on 'mouseleave', (e) ->
+          editDiv.find('.warning-text').text('Description missing')
+
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
     edit = $('<div class="image-edit">')

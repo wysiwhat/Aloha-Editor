@@ -211,7 +211,13 @@
       if (alt) {
         return editDiv.html('<i class="icon-edit"></i>').addClass('passive');
       } else {
-        return editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive');
+        editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive');
+        editDiv.off('mouseenter').on('mouseenter', function(e) {
+          return editDiv.find('.warning-text').text('Image is missing a description for the visually impaired. Click to provide one.');
+        });
+        return editDiv.off('mouseleave').on('mouseleave', function(e) {
+          return editDiv.find('.warning-text').text('Description missing');
+        });
       }
     };
     activate = function(element) {
