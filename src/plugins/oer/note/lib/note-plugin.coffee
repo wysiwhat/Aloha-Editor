@@ -98,8 +98,7 @@ define [
 
 
 
-              $option.on 'click', (e) =>
-                e.preventDefault()
+              $option.on 'click', () =>
                 # Remove the title if this type does not have one
                 if dropType.hasTitle
                   # If there is no `.title` element then add one in and enable it as an Aloha block

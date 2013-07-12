@@ -106,15 +106,14 @@
         Aloha.trigger('aloha-selection-changed', [range, evt]);
         return evt.stopPropagation();
       });
-      editable.obj.on('click.matheditor', '.math-element-destroy', function(e) {
+      editable.obj.on('click.matheditor', '.math-element-destroy', function() {
         var $el;
         jQuery(e.target).tooltip('destroy');
         $el = jQuery(e.target).closest('.math-element');
         $el.trigger('hide').tooltip('destroy').remove();
-        Aloha.activeEditable.smartContentChange({
+        return Aloha.activeEditable.smartContentChange({
           type: 'block-change'
         });
-        return e.preventDefault();
       });
       if (jQuery.ui && jQuery.ui.tooltip) {
         return editable.obj.tooltip({

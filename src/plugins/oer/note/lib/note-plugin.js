@@ -68,9 +68,8 @@
                     }
                   });
                 });
-                return $option.on('click', function(e) {
+                return $option.on('click', function() {
                   var $newTitle, key;
-                  e.preventDefault();
                   if (dropType.hasTitle) {
                     if (!$element.children('.title')[0]) {
                       $newTitle = jQuery("<" + (dropType.titleTagName || 'span') + " class='title'></" + (dropType.titleTagName || 'span'));

@@ -140,9 +140,9 @@ define [
           controls.children('.add-solution').show()
           controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
         )
-        semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li *', (e) ->
-          e.preventDefault()
-          jQuery(this).parents('.type-container').first().children('.type').text jQuery(this).text()
-          jQuery(this).parents('.aloha-oer-block').first().attr 'data-type', jQuery(this).text().toLowerCase()
+        semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li *', () ->
+          $el = jQuery(@)
+          $el.parents('.type-container').first().children('.type').text $el.text()
+          $el.parents('.aloha-oer-block').first().attr 'data-type', $el.text().toLowerCase()
         )
     })

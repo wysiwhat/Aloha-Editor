@@ -96,15 +96,13 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         reader.readAsDataURL(file)
 
       # Add click handlers
-      dialog.find('.upload-image-link').on 'click', (evt) ->
-        evt.preventDefault()
+      dialog.find('.upload-image-link').on 'click', () ->
         $placeholder.hide()
         $uploadUrl.hide()
         $uploadImage.click()
         $uploadImage.show()
 
-      dialog.find('.upload-url-link').on 'click', (evt) ->
-        evt.preventDefault()
+      dialog.find('.upload-url-link').on 'click', () ->
         $placeholder.hide()
         $uploadImage.hide()
         $uploadUrl.show()

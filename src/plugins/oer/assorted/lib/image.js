@@ -53,15 +53,13 @@
         };
         return reader.readAsDataURL(file);
       };
-      dialog.find('.upload-image-link').on('click', function(evt) {
-        evt.preventDefault();
+      dialog.find('.upload-image-link').on('click', function() {
         $placeholder.hide();
         $uploadUrl.hide();
         $uploadImage.click();
         return $uploadImage.show();
       });
-      dialog.find('.upload-url-link').on('click', function(evt) {
-        evt.preventDefault();
+      dialog.find('.upload-url-link').on('click', function() {
         $placeholder.hide();
         $uploadImage.hide();
         return $uploadUrl.show();

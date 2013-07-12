@@ -86,10 +86,11 @@
             return controls.children('.solution-toggle').hide();
           }
         });
-        return semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li *', function(e) {
-          e.preventDefault();
-          jQuery(this).parents('.type-container').first().children('.type').text(jQuery(this).text());
-          return jQuery(this).parents('.aloha-oer-block').first().attr('data-type', jQuery(this).text().toLowerCase());
+        return semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li *', function() {
+          var $el;
+          $el = jQuery(this);
+          $el.parents('.type-container').first().children('.type').text($el.text());
+          return $el.parents('.aloha-oer-block').first().attr('data-type', $el.text().toLowerCase());
         });
       }
     });
