@@ -447,9 +447,11 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
   ob =
     selector: '.math-element'
     populator: buildEditor
+    insertMath: insertMath
     placement: 'top'
     markerclass: 'math-popover'
     # Expose editor, so the cheatsheet plugin can modify it.
     editor: $_editor
 
   Popover.register ob
+  return ob
