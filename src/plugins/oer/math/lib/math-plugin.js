@@ -372,11 +372,13 @@
     ob = {
       selector: '.math-element',
       populator: buildEditor,
+      insertMath: insertMath,
       placement: 'top',
       markerclass: 'math-popover',
       editor: $_editor
     };
-    return Popover.register(ob);
+    Popover.register(ob);
+    return ob;
   });
 
 }).call(this);
