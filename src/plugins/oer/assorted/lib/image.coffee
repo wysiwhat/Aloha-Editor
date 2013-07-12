@@ -15,7 +15,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>
+            <span class="upload-image-link btn-link">Choose an image to upload</span> OR <span class="upload-url-link btn-link">get image from the Web</span>
             <div class="placeholder preview hide">
               <h4>Preview</h4>
               <img class="preview-image"/>
@@ -227,7 +227,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
         editDiv.html('<i class="icon-warning-sign"></i> Description missing').removeClass('passive')
- 
+
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
     edit = $('<div class="image-edit">')

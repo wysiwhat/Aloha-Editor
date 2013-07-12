@@ -372,7 +372,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
     # $el is <span class="math-element">
     $closer = $el.find '.math-element-destroy'
     if not $closer[0]?
-      $closer = jQuery('<a class="math-element-destroy aloha-ephemera" title="Delete\u00A0math">&nbsp;</a>')
+      $closer = jQuery('<span class="math-element-destroy aloha-ephemera" title="Delete\u00A0math">&nbsp;</span>')
       if jQuery.ui and jQuery.ui.tooltip
         $closer.tooltip()
       else

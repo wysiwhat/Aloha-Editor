@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <a class="type" data-toggle="dropdown"></a>
+          <span class="type btn-link" data-toggle="dropdown"></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
