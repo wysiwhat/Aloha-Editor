@@ -13,9 +13,19 @@ define [
   Plugin.create 'equation',
     init: () ->
       semanticBlock.activateHandler '.equation', ($element) ->
+        #$element.attr('placeholder', 'click here')
+        $element.text 'asdf'
         $element.aloha()
+        $element.click ->
+
+          setTimeout(
+            ->
+              Aloha.require ['math/math-plugin'], (MathPlugin) ->
+                MathPlugin.insertMath()
+            500
+          )
       semanticBlock.deactivateHandler '.equation', ($element) ->
-        $element.aloha()
+        $element.mahalo()
 
       # Add a listener
       UI.adopt "insert-equation", Button,

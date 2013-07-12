@@ -6,10 +6,18 @@
     return Plugin.create('equation', {
       init: function() {
         semanticBlock.activateHandler('.equation', function($element) {
-          return $element.aloha();
+          $element.text('asdf');
+          $element.aloha();
+          return $element.click(function() {
+            return setTimeout(function() {
+              return Aloha.require(['math/math-plugin'], function(MathPlugin) {
+                return MathPlugin.insertMath();
+              });
+            }, 500);
+          });
         });
         semanticBlock.deactivateHandler('.equation', function($element) {
-          return $element.aloha();
+          return $element.mahalo();
         });
         UI.adopt("insert-equation", Button, {
           click: function(e) {
