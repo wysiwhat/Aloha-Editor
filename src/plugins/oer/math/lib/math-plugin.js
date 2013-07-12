@@ -3,8 +3,9 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css'], function(Aloha, Plugin, jQuery, Popover, UI) {
-    var EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, SELECTOR, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, findFormula, getEncoding, getMathFor, insertMath, makeCloseIcon, placeCursorAfter, squirrelMath, triggerMathJax;
+    var $_editor, EDITOR_HTML, LANGUAGES, MATHML_ANNOTATION_MIME_ENCODINGS, MATHML_ANNOTATION_NONMIME_ENCODINGS, TOOLTIP_TEMPLATE, addAnnotation, buildEditor, cleanupFormula, findFormula, getEncoding, getMathFor, insertMath, makeCloseIcon, ob, placeCursorAfter, squirrelMath, triggerMathJax;
     EDITOR_HTML = '<div class="math-editor-dialog">\n    <div class="math-container">\n        <pre><span></span><br></pre>\n        <textarea type="text" class="formula" rows="1"\n                  placeholder="Insert your math notation here"></textarea>\n    </div>\n    <div class="footer">\n      <span>This is:</span>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath\n      </label>\n      <label class="radio inline">\n          <input type="radio" name="mime-type" value="math/tex"> LaTeX\n      </label>\n      <label class="radio inline mime-type-mathml">\n          <input type="radio" name="mime-type" value="math/mml"> MathML\n      </label>\n      <label class="plaintext-label radio inline">\n          <input type="radio" name="mime-type" value="text/plain"> Plain text\n      </label>\n      <button class="btn btn-primary done">Done</button>\n    </div>\n</div>';
+    $_editor = jQuery(EDITOR_HTML);
     LANGUAGES = {
       'math/asciimath': {
         open: '`',
@@ -157,11 +158,6 @@
         });
       }
     };
-    UI.adopt('insertMath', null, {
-      click: function() {
-        return insertMath();
-      }
-    });
     triggerMathJax = function($mathElement, cb) {
       var callback;
       if (typeof MathJax !== "undefined" && MathJax !== null) {
@@ -186,7 +182,7 @@
     buildEditor = function($span) {
       var $editor, $formula, formula, keyDelay, keyTimeout, mimeType, radios,
         _this = this;
-      $editor = jQuery(EDITOR_HTML);
+      $editor = $_editor.clone(true);
       if ($span.find('.mathjax-wrapper > *').length === 0) {
         $editor.find('.plaintext-label').remove();
       }
@@ -259,7 +255,7 @@
         clearTimeout(keyTimeout);
         return setTimeout(keyDelay.bind($formula), 500);
       });
-      $span.off('shown-popover').on('shown-popover', function() {
+      $span.off('shown-popover.math').on('shown-popover.math', function() {
         var $el, tt;
         $span.css('background-color', '#E5EEF5');
         $el = jQuery(this);
@@ -275,7 +271,7 @@
           }
         }, 10);
       });
-      $span.off('hidden-popover').on('hidden-popover', function() {
+      $span.off('hidden-popover.math').on('hidden-popover.math', function() {
         var tt;
         $span.css('background-color', '');
         tt = jQuery(this).data('tooltip');
@@ -368,13 +364,19 @@
         'formula': formula
       };
     };
-    SELECTOR = '.math-element';
-    return Popover.register({
-      selector: SELECTOR,
+    UI.adopt('insertMath', null, {
+      click: function() {
+        return insertMath();
+      }
+    });
+    ob = {
+      selector: '.math-element',
       populator: buildEditor,
       placement: 'top',
-      markerclass: 'math-popover'
-    });
+      markerclass: 'math-popover',
+      editor: $_editor
+    };
+    return Popover.register(ob);
   });
 
 }).call(this);

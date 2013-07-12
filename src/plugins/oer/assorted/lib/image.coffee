@@ -25,7 +25,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         </div>
         <div class="image-alt">
           <div class="forminfo">
-            <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
+            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
           </div>
           <div>
             <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>
@@ -145,6 +145,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
           setEditText $el.parent()
 
         deferred.resolve(target: $el[0], files: $uploadImage[0].files)
+        $el.parents('.media').removeClass('aloha-ephemera')
         dialog.modal('hide')
 
       dialog.on 'click', '.btn.action.cancel', (evt) =>
@@ -190,7 +191,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   UI.adopt 'insertImage-oer', null,
     click: () ->
-      template = $('<span class="media"><img /></span>')
+      template = $('<span class="media aloha-ephemera"><img /></span>')
       semanticBlock.insertAtCursor(template)
       newEl = template.find('img')
       promise = showModalDialog(newEl)
@@ -226,7 +227,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     if alt
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
-        editDiv.html('<i class="icon-warning-sign"></i> Description missing').removeClass('passive')
+        editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
 
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))

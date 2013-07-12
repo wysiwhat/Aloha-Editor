@@ -4,7 +4,7 @@
   define(['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'semanticblock/semanticblock-plugin', 'css!assorted/css/image.css'], function(Aloha, jQuery, AlohaPlugin, Image, UI, semanticBlock) {
     var DIALOG_HTML, WARNING_IMAGE_PATH, activate, deactivate, setEditText, setThankYou, setWidth, showModalDialog, uploadImage;
     WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png';
-    DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <span class="upload-image-link btn-link">Choose an image to upload</span> OR <span class="upload-url-link btn-link">get image from the Web</span>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        <i class="icon-warning-sign"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.\n      </div>\n      <div>\n        <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Insert image</h3>\n  </div>\n  <div class="modal-body">\n    <div class="image-options">\n        <span class="upload-image-link btn-link">Choose an image to upload</span> OR <span class="upload-url-link btn-link">get image from the Web</span>\n        <div class="placeholder preview hide">\n          <h4>Preview</h4>\n          <img class="preview-image"/>\n        </div>\n        <input type="file" class="upload-image-input" />\n        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>\n    </div>\n    <div class="image-alt">\n      <div class="forminfo">\n        <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.\n      </div>\n      <div>\n        <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button type="submit" disabled="true" class="btn btn-primary action insert">Save</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</form>';
     showModalDialog = function($el) {
       var $placeholder, $submit, $uploadImage, $uploadUrl, deferred, dialog, editing, imageAltText, imageSource, loadLocalFile, root, setImageSource, settings,
         _this = this;
@@ -105,6 +105,7 @@
           target: $el[0],
           files: $uploadImage[0].files
         });
+        $el.parents('.media').removeClass('aloha-ephemera');
         return dialog.modal('hide');
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
@@ -162,7 +163,7 @@
     UI.adopt('insertImage-oer', null, {
       click: function() {
         var newEl, promise, template;
-        template = $('<span class="media"><img /></span>');
+        template = $('<span class="media aloha-ephemera"><img /></span>');
         semanticBlock.insertAtCursor(template);
         newEl = template.find('img');
         promise = showModalDialog(newEl);
@@ -207,7 +208,7 @@
       if (alt) {
         return editDiv.html('<i class="icon-edit"></i>').addClass('passive');
       } else {
-        return editDiv.html('<i class="icon-warning-sign"></i> Description missing').removeClass('passive');
+        return editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive');
       }
     };
     activate = function(element) {

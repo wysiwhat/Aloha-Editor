@@ -1,22 +1,5 @@
-
-.semantic-drag-source .note > * {
-    display: none;
-}
-.semantic-drag-source .note:hover {
-    background: #DDD;
-}
-.semantic-drag-source .note {
-    margin: 5px;
-    padding: 5px 0 5px 10px;
-    border: 1px solid black;
-    min-height: 0;
-    height: 20px;
-    width: 155px;
-    border-radius: 5px;
-    background: #EEE;
-}
 .semantic-drag-source .note:before {
-    content: "Note";
+    content: "Note to reader";
 }
 
 .note {
@@ -25,12 +8,4 @@
 
 .note .body {
   margin: 10px;
-}
-
-.note .title.placeholder {
-    display: none;
-}
-
-.semantic-container.focused > .note > .type-container .title.placeholder {
-    display: inline;
 }

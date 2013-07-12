@@ -12,10 +12,15 @@
     This way, the browser does most of the heavy lifting AND the actual text
     is never part of the DOM for serializing.
  */
-.aloha-oer-block:hover *[placeholder].aloha-empty:not(:focus):before,
-.aloha-block-active    *[placeholder].aloha-empty:not(:focus):before {
-    color: #AAA;
+.aloha-oer-block       *[placeholder].aloha-empty:not(:focus):before {
     content: attr(placeholder);
+    color: #AAA;
+    font-style: italic;
+}
+.aloha-oer-block:hover *[hover-placeholder].aloha-empty:not(:focus):before {
+    content: attr(hover-placeholder);
+    color: #AAA;
+    font-style: italic;
 }
 
 /* Make titles inline so they show up next to the type dropdown if there is one */
@@ -27,7 +32,14 @@
 }
 
 .semantic-container.drag-active {
-    background: #FAFAFA;
+    background: #F0F0F0;
+}
+
+.semantic-container.delete-hover {
+    background: #F0F0F0;
+}
+.semantic-container.delete-hover > .aloha-oer-block {
+    opacity: 0.3; 
 }
 
 .semantic-container {
@@ -55,6 +67,10 @@
     position: absolute;
     left: 50%;
     display: none !important; /* override the default aloha display logic for handles */
+    cursor: url('openhand.cur'), default;
+}
+.semantic-container.aloha-oer-dragging .aloha-block-handle {
+    cursor: url('closedhand.cur'), default;
 }
 .semantic-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
@@ -98,7 +114,7 @@
 .aloha-oer-block {
   padding: 20px 10px 5px 20px;
   min-height: 50px;
-  margin: 10px 50px 10px 50px;
+  margin: 0 30px 0 30px;
   border: 1px solid #333;
   border-top-color: #ccc;
   border-left-color: #ccc;
@@ -119,20 +135,49 @@
 }
 
 .aloha-oer-block .type {
+    font-weight: bold;
     margin: 5px 10px 0 5px;
     color: #369;
     text-decoration: none;
 }
 
+.aloha-oer-block .type-container ul.dropdown-menu {
+    margin: -1.5em 0 0 0 !important;
+}
+
 .aloha-oer-block .type-container li {
     list-style-type: none !important;
 }
+.aloha-oer-block .type-container li.checked a:before {
+    content: "\2713";
+    margin: 0 3px 0 -14px;
+}
 
 .aloha-oer-block .title {
-  font-size: 1em;
+    font-size: 1em;
+}
+.aloha-oer-block .title:not(.aloha-empty) {
+    font-weight: bold;
 }
 
 /* ========== note ========== */
+.semantic-drag-source > * > * {
+    display: none;
+}
+.semantic-drag-source > *:hover {
+    background: #DDD;
+}
+.semantic-drag-source > * {
+    margin: 5px;
+    padding: 5px 0 5px 10px;
+    border: 1px solid black;
+    min-height: 0 !important;
+    height: 20px;
+    width: 155px;
+    border-radius: 5px;
+    background: #EEE;
+    cursor: url('openhand.cur'), default;
+}
 
 .semantic-drag-helper {
     border-radius: 5px;
@@ -144,6 +189,7 @@
     height: 50px;
     max-width: 300px;
     max-height: 50px;
+    cursor: url('closedhand.cur'), default;
 }
 
 .semantic-drag-helper .title,
@@ -161,4 +207,5 @@
 .semantic-drag-helper .title {
     color: #369;
 }
+
 

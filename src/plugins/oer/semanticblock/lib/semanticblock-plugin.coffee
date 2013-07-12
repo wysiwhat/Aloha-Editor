@@ -3,7 +3,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   # hack to accomodate multiple executions
   return pluginManager.plugins.semanticblock  if pluginManager.plugins.semanticblock
   blockTemplate = jQuery('<div class="semantic-container"></div>')
-  blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete"><i class="icon-remove"></i></button></div>')
+  blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete" title="Remove this element."><i class="icon-remove"></i></button></div>')
   blockDragHelper = jQuery('<div class="semantic-drag-helper"><div class="title"></div><div class="body">Drag me to the desired location in the document</div></div>')
   activateHandlers = {}
   deactivateHandlers = {}
@@ -16,18 +16,29 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'mouseleave'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container').removeClass 'drag-active'  unless jQuery(this).parents('.semantic-container').data('dragging')
+      jQuery(this).parents('.semantic-container')
+        .removeClass 'drag-active'  unless jQuery(this).parents('.semantic-container').is('.aloha-oer-dragging')
+  ,
+    name: 'mouseenter'
+    selector: '.semantic-delete'
+    callback: ->
+      jQuery(this).parents('.semantic-container').addClass 'delete-hover'
+  ,
+    name: 'mouseleave'
+    selector: '.semantic-delete'
+    callback: ->
+      jQuery(this).parents('.semantic-container').removeClass 'delete-hover'
   ,
     name: 'mousedown'
     selector: '.aloha-block-draghandle'
     callback: (e) ->
       e.preventDefault()
-      jQuery(this).parents('.semantic-container').data 'dragging', true
+      jQuery(this).parents('.semantic-container').addClass 'aloha-oer-dragging', true
   ,
     name: 'mouseup'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container').data 'dragging', false
+      jQuery(this).parents('.semantic-container').removeClass 'aloha-oer-dragging'
   ,
     name: 'click'
     selector: '.semantic-container .semantic-delete'
@@ -41,6 +52,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     callback: ->
       jQuery(this).parents('.semantic-container').removeClass('focused')
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
+      jQuery(this).find('.aloha-block-handle').attr('title', 'Drag this element to another location.')
   ,
     name: 'mouseout'
     selector: '.semantic-container'
@@ -51,7 +63,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     # the text shows up.
     # See the CSS file more info.
     name: 'blur'
-    selector: '[placeholder]'
+    selector: '[placeholder],[hover-placeholder]'
     callback: ->
       $el = jQuery @
       # If the element does not contain any text (just empty paragraphs)
@@ -66,6 +78,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     unless element.parent('.semantic-container').length or element.is('.semantic-container')
       element.addClass 'aloha-oer-block'
       element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
+      
       for selector of activateHandlers
         if element.is(selector)
           activateHandlers[selector] element
@@ -112,6 +125,11 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   Plugin.create 'semanticblock',
 
     makeClean: (content) ->
+
+      content.find('.semantic-container').each ->
+        if jQuery(this).children().not('.semantic-controls').length == 0
+          jQuery(this).remove()
+
       for selector of deactivateHandlers
         content.find(".aloha-oer-block#{selector}").each ->
           deactivate jQuery(this)
@@ -124,9 +142,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       # - and do not have any children
       #
       # See CSS for placeholder logic. This class is updated on blur.
-      Aloha.bind 'aloha-editable-activated', (e, params) =>
-        $root = jQuery(params.editable.obj)
-        $root.find('[placeholder]:empty').addClass('aloha-empty')
+      Aloha.bind 'aloha-editable-created', (e, params) =>
+        jQuery('[placeholder],[hover-placeholder]').blur()
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
