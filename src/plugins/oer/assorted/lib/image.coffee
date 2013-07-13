@@ -15,14 +15,23 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>
+            <div class="image-selection">
+              <div class="dia-alternative">
+                <a class="upload-image-link">Choose an image to upload</a>
+              </div>
+              <div class="dia-alternative">
+                OR
+              </div>
+              <div class="dia-alternative">
+                <a class="upload-url-link">get image from the Web</a>
+              </div>
+            </div>
             <div class="placeholder preview hide">
-              <h4>Preview</h4>
               <img class="preview-image"/>
             </div>
-            <input type="file" class="upload-image-input" />
-            <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
         </div>
+        <input type="file" class="upload-image-input" />
+        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
         <div class="image-alt">
           <div class="forminfo">
             <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
@@ -44,6 +53,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       dialog = jQuery(DIALOG_HTML)
 
       # Find the dynamic modal elements and bind events to the buttons
+      $imageselect = dialog.find('.image-selection')
       $placeholder = dialog.find('.placeholder.preview')
       $uploadImage = dialog.find('.upload-image-input').hide()
       $uploadUrl =   dialog.find('.upload-url-input').hide()
@@ -110,7 +120,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         evt.preventDefault()
         $placeholder.hide()
         $uploadImage.hide()
-        $uploadUrl.show()
+        $uploadUrl.show().focus()
 
       $uploadImage.on 'change', () ->
         files = $uploadImage[0].files
@@ -120,6 +130,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
             $previewImg = $placeholder.find('img')
             loadLocalFile files[0], $previewImg
             $placeholder.show()
+            $imageselect.hide()
           else
             loadLocalFile files[0]
 
@@ -130,6 +141,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         if settings.image.preview
           $previewImg.attr 'src', url
           $placeholder.show()
+          $imageselect.hide()
 
       # On save update the actual img tag. Use the submit event because this
       # allows the use of html5 validation.
