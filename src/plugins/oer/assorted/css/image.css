@@ -7,9 +7,12 @@
     padding: 5em;
     position: relative;
     text-align: center;
-    height: 100px;
+    height: 176px;
     overflow: hidden;
     padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 form.plugin.image textarea {
