@@ -52,16 +52,16 @@
             if (_this.settings.length > 1) {
               jQuery.each(_this.settings, function(i, dropType) {
                 var $option;
-                $option = jQuery('<li><a href="#"></a></li>');
+                $option = jQuery('<li><span class="btn-link"></span></li>');
                 $option.appendTo(typeContainer.find('.dropdown-menu'));
-                $option = $option.children('a');
+                $option = $option.children('span');
                 $option.text(dropType.label);
                 typeContainer.find('.type').on('click', function() {
                   return jQuery.each(_this.settings, function(i, dropType) {
                     if ($element.attr('data-type') === dropType.type) {
                       return typeContainer.find('.dropdown-menu li').each(function(i, li) {
                         jQuery(li).removeClass('checked');
-                        if (jQuery(li).children('a').text() === dropType.label) {
+                        if (jQuery(li).children('span').text() === dropType.label) {
                           return jQuery(li).addClass('checked');
                         }
                       });

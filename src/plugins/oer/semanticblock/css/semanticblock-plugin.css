@@ -12,15 +12,21 @@
     This way, the browser does most of the heavy lifting AND the actual text
     is never part of the DOM for serializing.
  */
-.aloha-oer-block       *[placeholder].aloha-empty:not(:focus):before {
+.semantic-container       *[placeholder].aloha-empty:not(:focus):before {
     content: attr(placeholder);
     color: #AAA;
     font-style: italic;
 }
-.aloha-oer-block:hover *[hover-placeholder].aloha-empty:not(:focus):before {
+.semantic-container:hover *[hover-placeholder].aloha-empty:not(:focus):before {
     content: attr(hover-placeholder);
     color: #AAA;
     font-style: italic;
+}
+
+.aloha-oer-block-placeholder {
+    background: #C5DAE9;
+    border: 1px dashed #1b86d2;
+    min-height: 100px;
 }
 
 /* Make titles inline so they show up next to the type dropdown if there is one */
@@ -67,9 +73,13 @@
     position: absolute;
     left: 50%;
     display: none !important; /* override the default aloha display logic for handles */
+    cursor: -moz-grab !important;
+    cursor: -webkit-grab !important;
     cursor: url('openhand.cur'), default;
 }
 .semantic-container.aloha-oer-dragging .aloha-block-handle {
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
     cursor: url('closedhand.cur'), default;
 }
 .semantic-container.drag-active .aloha-block-handle {
@@ -156,7 +166,8 @@
 .aloha-oer-block .title {
     font-size: 1em;
 }
-.aloha-oer-block .title:not(.aloha-empty) {
+.aloha-oer-block .title:not(.aloha-empty),
+.aloha-oer-block .title:focus {
     font-weight: bold;
 }
 
@@ -176,6 +187,8 @@
     width: 155px;
     border-radius: 5px;
     background: #EEE;
+    cursor: -moz-grab !important;
+    cursor: -webkit-grab !important;
     cursor: url('openhand.cur'), default;
 }
 
@@ -189,6 +202,8 @@
     height: 50px;
     max-width: 300px;
     max-height: 50px;
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
     cursor: url('closedhand.cur'), default;
 }
 
@@ -205,6 +220,8 @@
     margin-right: 10px;
 }
 .semantic-drag-helper .title {
+    text-transform: capitalize;
+    font-weight: bold;
     color: #369;
 }
 

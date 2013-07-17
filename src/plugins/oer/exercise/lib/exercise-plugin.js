@@ -10,13 +10,19 @@
     return Plugin.create('exercise', {
       init: function() {
         semanticBlock.activateHandler('.exercise', function(element) {
-          var problem, solutions, type, typeContainer;
+          var problem, solutions, type, typeContainer,
+            _this = this;
           type = element.attr('data-type') || 'exercise';
           problem = element.children('.problem');
           solutions = element.children('.solution');
           element.children().remove();
           typeContainer = jQuery(TYPE_CONTAINER);
           typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+          typeContainer.find('.dropdown-menu li').each(function(i, li) {
+            if (jQuery(li).children('a').text().toLowerCase() === type) {
+              return jQuery(li).addClass('checked');
+            }
+          });
           typeContainer.prependTo(element);
           problem.attr('placeholder', "Type the text of your problem here.").appendTo(element).aloha();
           jQuery('<div>').addClass('solutions').appendTo(element);
@@ -37,12 +43,18 @@
           return element.append(solutions);
         });
         semanticBlock.activateHandler('.solution', function(element) {
-          var body, type, typeContainer;
+          var body, type, typeContainer,
+            _this = this;
           type = element.attr('data-type') || 'solution';
           body = element.children();
           element.children().remove();
           typeContainer = jQuery(SOLUTION_TYPE_CONTAINER);
           typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+          typeContainer.find('.dropdown-menu li').each(function(i, li) {
+            if (jQuery(li).children('a').text().toLowerCase() === type) {
+              return jQuery(li).addClass('checked');
+            }
+          });
           typeContainer.prependTo(element);
           return jQuery('<div>').addClass('body').append(body).appendTo(element).aloha();
         });
@@ -86,11 +98,19 @@
             return controls.children('.solution-toggle').hide();
           }
         });
-        return semanticBlock.registerEvent('click', '.aloha-oer-block.exercise,.aloha-oer-block.solution .type-container li *', function() {
-          var $el;
+        return semanticBlock.registerEvent('click', '.aloha-oer-block.solution > .type-container > ul > li > *,\
+                                              .aloha-oer-block.exercise > .type-container > ul > li > *', function(e) {
+          var $el,
+            _this = this;
           $el = jQuery(this);
           $el.parents('.type-container').first().children('.type').text($el.text());
-          return $el.parents('.aloha-oer-block').first().attr('data-type', $el.text().toLowerCase());
+          $el.parents('.aloha-oer-block').first().attr('data-type', $el.text().toLowerCase());
+          return $el.parents('.type-container').find('.dropdown-menu li').each(function(i, li) {
+            jQuery(li).removeClass('checked');
+            if (jQuery(li).children('a').text() === $el.text()) {
+              return jQuery(li).addClass('checked');
+            }
+          });
         });
       }
     });

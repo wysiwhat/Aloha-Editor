@@ -83,16 +83,16 @@ define [
           # Add dropdown elements for each possible type
           if @settings.length > 1
             jQuery.each @settings, (i, dropType) =>
-              $option = jQuery('<li><a href="#"></a></li>')
+              $option = jQuery('<li><span class="btn-link"></span></li>')
               $option.appendTo(typeContainer.find('.dropdown-menu'))
-              $option = $option.children('a')
+              $option = $option.children('span')
               $option.text(dropType.label)
               typeContainer.find('.type').on 'click', =>
                 jQuery.each @settings, (i, dropType) =>
                   if $element.attr('data-type') == dropType.type
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
                       jQuery(li).removeClass('checked')
-                      if jQuery(li).children('a').text() == dropType.label
+                      if jQuery(li).children('span').text() == dropType.label
                         jQuery(li).addClass('checked')
 
 
