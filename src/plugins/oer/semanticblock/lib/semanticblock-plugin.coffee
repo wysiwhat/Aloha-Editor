@@ -9,8 +9,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         <h3></h3>
       </div>
       <div class="modal-body">
-        <p>Give this element a new "type". Nothing obvious will change in your document. This is for advanced book styling and requires support from the publishing system.</p> 
-        <input type="text" placeholder="custom-element-type" name="custom_class">
+        <p>Give this element a custom "class". Nothing obvious will change in your document. This is for advanced book styling and requires support from the publishing system.</p> 
+        <input type="text" placeholder="custom element class" name="custom_class">
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary action submit">Save</button>
