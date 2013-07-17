@@ -196,7 +196,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
         # Add a `.aloha-oer-block` to all registered classes
         classes = []
-        classes.push type.selector for type of registeredTypes
+        classes.push type.selector for type in registeredTypes
+        console.log(classes)
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]

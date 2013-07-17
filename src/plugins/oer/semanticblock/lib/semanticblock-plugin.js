@@ -224,12 +224,14 @@
           return jQuery('[placeholder],[hover-placeholder]').blur();
         });
         return Aloha.bind('aloha-editable-created', function(e, params) {
-          var $root, classes, type;
+          var $root, classes, type, _i, _len;
           $root = params.obj;
           classes = [];
-          for (type in registeredTypes) {
+          for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
+            type = registeredTypes[_i];
             classes.push(type.selector);
           }
+          console.log(classes);
           $root.find(classes.join()).each(function(i, el) {
             var $el;
             $el = jQuery(el);
