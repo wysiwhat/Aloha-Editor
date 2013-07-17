@@ -13,11 +13,14 @@
           hasTitle: true
         }
       ],
+      getLabel: function($element) {
+        return 'Note';
+      },
       activate: function($element) {
         var _this = this;
         return jQuery.each(types, function(i, type) {
           var $body, $title, typeContainer;
-          if ($element.is(type.selector) && type.hasTitle) {
+          if ($element.is(type.selector)) {
             $title = $element.children('.title');
             $title.attr('hover-placeholder', 'Add a title (optional)');
             $title.aloha();
@@ -148,7 +151,6 @@
             });
           }
         });
-        console.log(this.selector);
         return semanticBlock.register(this);
       }
     });

@@ -7,61 +7,68 @@
     TYPE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n        <li><a href="">Exercise</a></li>\n        <li><a href="">Homework</a></li>\n        <li><a href="">Problem</a></li>\n        <li><a href="">Question</a></li>\n        <li><a href="">Task</a></li>\n    </ul>\n</div>';
     SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown">\n    <a class="type" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n        <li><a href="">Answer</a></li>\n        <li><a href="">Solution</a></li>\n    </ul>\n</div>';
     activateExercise = function($element) {
-      var problem, solutions, type, typeContainer,
+      var $problem, $solutions, $typeContainer, type,
         _this = this;
-      type = element.attr('data-type') || 'exercise';
-      problem = element.children('.problem');
-      solutions = element.children('.solution');
-      element.children().remove();
-      typeContainer = jQuery(TYPE_CONTAINER);
-      typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
-      typeContainer.find('.dropdown-menu li').each(function(i, li) {
+      type = $element.attr('data-type') || 'exercise';
+      $problem = $element.children('.problem');
+      $solutions = $element.children('.solution');
+      $element.children().remove();
+      $typeContainer = jQuery(TYPE_CONTAINER);
+      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+      $typeContainer.find('.dropdown-menu li').each(function(i, li) {
         if (jQuery(li).children('a').text().toLowerCase() === type) {
           return jQuery(li).addClass('checked');
         }
       });
-      typeContainer.prependTo(element);
-      problem.attr('placeholder', "Type the text of your problem here.").appendTo(element).aloha();
-      jQuery('<div>').addClass('solutions').appendTo(element);
-      jQuery('<div>').addClass('solution-controls').append('<a class="add-solution">Click here to add an answer/solution</a>').append('<a class="solution-toggle"></a>').appendTo(element);
-      if (!solutions.length) {
-        return element.children('.solution-controls').children('.solution-toggle').hide();
+      $typeContainer.prependTo($element);
+      $problem.attr('placeholder', "Type the text of your problem here.").appendTo($element).aloha();
+      jQuery('<div>').addClass('solutions').appendTo($element);
+      jQuery('<div>').addClass('solution-controls').append('<a class="add-solution">Click here to add an answer/solution</a>').append('<a class="solution-toggle"></a>').appendTo($element);
+      if (!$solutions.length) {
+        return $element.children('.solution-controls').children('.solution-toggle').hide();
       }
     };
     deactivateExercise = function($element) {
-      var problem, solutions;
-      problem = element.children('.problem');
-      solutions = element.children('.solutions').children();
-      if (problem.html() === '' || problem.html() === '<p></p>') {
-        problem.html('&nbsp;');
+      var $problem, $solutions;
+      $problem = $element.children('.problem');
+      $solutions = $element.children('.solutions').children();
+      if ($problem.html() === '' || $problem.html() === '<p></p>') {
+        $problem.html('&nbsp;');
       }
-      element.children().remove();
-      jQuery("<div>").addClass('problem').html(jQuery('<p>').append(problem.html())).appendTo(element);
-      return element.append(solutions);
+      $element.children().remove();
+      jQuery("<div>").addClass('problem').html(jQuery('<p>').append($problem.html())).appendTo($element);
+      return $element.append($solutions);
     };
     activateSolution = function($element) {
-      var body, type, typeContainer,
+      var $body, $typeContainer, type,
         _this = this;
-      type = element.attr('data-type') || 'solution';
-      body = element.children();
-      element.children().remove();
-      typeContainer = jQuery(SOLUTION_TYPE_CONTAINER);
-      typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
-      typeContainer.find('.dropdown-menu li').each(function(i, li) {
+      type = $element.attr('data-type') || 'solution';
+      $body = $element.children();
+      $element.children().remove();
+      $typeContainer = jQuery(SOLUTION_TYPE_CONTAINER);
+      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
+      $typeContainer.find('.dropdown-menu li').each(function(i, li) {
         if (jQuery(li).children('a').text().toLowerCase() === type) {
           return jQuery(li).addClass('checked');
         }
       });
-      typeContainer.prependTo(element);
-      return jQuery('<div>').addClass('body').append(body).appendTo(element).aloha();
+      $typeContainer.prependTo($element);
+      return jQuery('<div>').addClass('body').append($body).appendTo($element).aloha();
     };
     deactivateSolution = function($element) {
       var content;
-      content = element.children('.body').html();
-      element.children().remove();
-      return jQuery('<p>').append(content).appendTo(element);
+      content = $element.children('.body').html();
+      $element.children().remove();
+      return jQuery('<p>').append(content).appendTo($element);
     };
     return Plugin.create('exercise', {
+      getLabel: function($element) {
+        if ($element.is('.exercise')) {
+          return 'Exercise';
+        } else if ($element.is('.solution')) {
+          return 'Solution';
+        }
+      },
       activate: function($element) {
         if ($element.is('.exercise')) {
           return activateExercise($element);

@@ -67,7 +67,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       dialog = jQuery(DIALOG_HTML)
       dialog.modal 'show'
       $element = jQuery(this).parents('.semantic-controls').siblings('.aloha-oer-block')
-      elementName = $element.attr('class').split(' ')[0]
+      elementName = getLabel($element)
       dialog.find('h3').text('Edit options for this ' + elementName)
       dialog.find('[name=custom_class]').val $element.attr('data-class')
       dialog.data 'element', $element
@@ -114,11 +114,10 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   ]
   insertElement = (element) ->
   
-  label = (element) ->
+  getLabel = ($element) ->
     for type in registeredTypes
-      if element.is(type.selector)
-        return type.label
-        break
+      if $element.is(type.selector)
+        return type.getLabel $element
 
   activate = (element) ->
     unless element.parent('.semantic-container').length or element.is('.semantic-container')
@@ -197,7 +196,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         # Add a `.aloha-oer-block` to all registered classes
         classes = []
         classes.push type.selector for type in registeredTypes
-        console.log(classes)
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]

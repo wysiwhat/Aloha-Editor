@@ -42,9 +42,10 @@ define [
     defaults: [
       { label: 'Note', cls: 'note', hasTitle: true }
     ]
+    getLabel: ($element) -> 'Note'
     activate: ($element) ->
       jQuery.each types, (i, type) =>
-        if $element.is(type.selector) && type.hasTitle
+        if $element.is(type.selector)
           $title = $element.children('.title')
           $title.attr('hover-placeholder', 'Add a title (optional)')
           $title.aloha()
@@ -177,5 +178,4 @@ define [
           UI.adopt "insertNote", Button,
             click: -> semanticBlock.insertAtCursor(newTemplate.clone())
 
-      console.log(this.selector)
       semanticBlock.register(this)
