@@ -238,6 +238,9 @@
       }
     };
     return AlohaPlugin.create('oer-image', {
+      getLabel: function() {
+        return 'Image';
+      },
       activate: activate,
       deactivate: deactivate,
       selector: '.media',

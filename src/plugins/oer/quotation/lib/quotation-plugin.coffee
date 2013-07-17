@@ -12,6 +12,7 @@ define [
 
   Plugin.create 'quotation',
     selector: '.quote'
+    getLabel: -> 'Quotation'
     activate: ($element) ->
       $element.attr('placeholder', 'Type the text of you quotation here.')
       $element.aloha()

@@ -40,83 +40,89 @@ define [
     '''
 
     activateExercise = ($element) ->
-      type = element.attr('data-type') or 'exercise'
+      type = $element.attr('data-type') or 'exercise'
 
-      problem = element.children('.problem')
-      solutions = element.children('.solution')
+      $problem = $element.children('.problem')
+      $solutions = $element.children('.solution')
 
-      element.children().remove()
+      $element.children().remove()
 
-      typeContainer = jQuery(TYPE_CONTAINER)
-      typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
+      $typeContainer = jQuery(TYPE_CONTAINER)
+      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
 
-      typeContainer.find('.dropdown-menu li').each (i, li) =>
+      $typeContainer.find('.dropdown-menu li').each (i, li) =>
         if jQuery(li).children('a').text().toLowerCase() == type
           jQuery(li).addClass('checked')
 
-      typeContainer.prependTo(element)
+      $typeContainer.prependTo($element)
 
-      problem
+      $problem
         .attr('placeholder', "Type the text of your problem here.")
-        .appendTo(element)
+        .appendTo($element)
         .aloha()
 
       jQuery('<div>')
         .addClass('solutions')
-        .appendTo(element)
+        .appendTo($element)
 
       jQuery('<div>')
         .addClass('solution-controls')
         .append('<a class="add-solution">Click here to add an answer/solution</a>')
         .append('<a class="solution-toggle"></a>')
-        .appendTo(element)
+        .appendTo($element)
 
-      if not solutions.length
-        element.children('.solution-controls').children('.solution-toggle').hide()
+      if not $solutions.length
+        $element.children('.solution-controls').children('.solution-toggle').hide()
 
     deactivateExercise = ($element) ->
-      problem = element.children('.problem')
-      solutions = element.children('.solutions').children()
+      $problem = $element.children('.problem')
+      $solutions = $element.children('.solutions').children()
       
-      if problem.html() == '' or problem.html() == '<p></p>'
-        problem.html('&nbsp;')
+      if $problem.html() == '' or $problem.html() == '<p></p>'
+        $problem.html('&nbsp;')
 
-      element.children().remove()
+      $element.children().remove()
 
       jQuery("<div>").addClass('problem').html(
-        jQuery('<p>').append(problem.html())
-      ).appendTo(element)
+        jQuery('<p>').append($problem.html())
+      ).appendTo($element)
 
-      element.append(solutions)
+      $element.append($solutions)
 
     activateSolution = ($element) ->
-      type = element.attr('data-type') or 'solution'
+      type = $element.attr('data-type') or 'solution'
 
-      body = element.children()
-      element.children().remove()
+      $body = $element.children()
+      $element.children().remove()
 
-      typeContainer = jQuery(SOLUTION_TYPE_CONTAINER)
-      typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
+      $typeContainer = jQuery(SOLUTION_TYPE_CONTAINER)
+      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
 
-      typeContainer.find('.dropdown-menu li').each (i, li) =>
+      $typeContainer.find('.dropdown-menu li').each (i, li) =>
         if jQuery(li).children('a').text().toLowerCase() == type
           jQuery(li).addClass('checked')
 
-      typeContainer.prependTo(element)
+      $typeContainer.prependTo($element)
 
       jQuery('<div>')
         .addClass('body')
-        .append(body)
-        .appendTo(element)
+        .append($body)
+        .appendTo($element)
         .aloha()
 
     deactivateSolution = ($element) ->
-      content = element.children('.body').html()
-      element.children().remove()
-      jQuery('<p>').append(content).appendTo(element)
+      content = $element.children('.body').html()
+      $element.children().remove()
+      jQuery('<p>').append(content).appendTo($element)
     
 
     Plugin.create('exercise', {
+      getLabel: ($element) ->
+        if $element.is('.exercise')
+          return 'Exercise'
+        else if $element.is('.solution')
+          return 'Solution'
+
       activate: ($element) ->
         if $element.is('.exercise')
           activateExercise($element)

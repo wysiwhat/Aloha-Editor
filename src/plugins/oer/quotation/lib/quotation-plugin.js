@@ -5,6 +5,9 @@
     TEMPLATE = '<blockquote class="quote"></blockquote>';
     return Plugin.create('quotation', {
       selector: '.quote',
+      getLabel: function() {
+        return 'Quotation';
+      },
       activate: function($element) {
         $element.attr('placeholder', 'Type the text of you quotation here.');
         return $element.aloha();

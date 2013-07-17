@@ -267,6 +267,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
   # Return config
   AlohaPlugin.create('oer-image', {
+    getLabel: -> 'Image'
     activate: activate
     deactivate: deactivate
     selector: '.media'
