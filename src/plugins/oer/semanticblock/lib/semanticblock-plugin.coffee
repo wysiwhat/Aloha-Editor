@@ -4,9 +4,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   return pluginManager.plugins.semanticblock  if pluginManager.plugins.semanticblock
 
   DIALOG_HTML = '''
-    <div class="semantic-settings modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
+    <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
-        <h3>Advanced Options</h3>
+        <h3></h3>
       </div>
       <div class="modal-body">
         <p>Give this element a new "type". Nothing obvious will change in your document. This is for advanced book styling and requires support from the publishing system.</p> 
@@ -21,8 +21,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
   blockTemplate = jQuery('<div class="semantic-container"></div>')
   blockControls = jQuery('<div class="semantic-controls"><button class="semantic-delete" title="Remove this element."><i class="icon-remove"></i></button><button class="semantic-settings" title="advanced options."><i class="icon-cog"></i></button></div>')
   blockDragHelper = jQuery('<div class="semantic-drag-helper"><div class="title"></div><div class="body">Drag me to the desired location in the document</div></div>')
-  activateHandlers = {}
-  deactivateHandlers = {}
+  registeredTypes = []
   pluginEvents = [
     name: 'mouseenter'
     selector: '.aloha-block-draghandle'
@@ -68,6 +67,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       dialog = jQuery(DIALOG_HTML)
       dialog.modal 'show'
       $element = jQuery(this).parents('.semantic-controls').siblings('.aloha-oer-block')
+      elementName = $element.attr('class').split(' ')[0]
+      dialog.find('h3').text('Edit options for this ' + elementName)
       dialog.find('[name=custom_class]').val $element.attr('data-class')
       dialog.data 'element', $element
   ,
@@ -112,15 +113,21 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       $el.toggleClass 'aloha-empty', $el.is(':empty')
   ]
   insertElement = (element) ->
+  
+  label = (element) ->
+    for type in registeredTypes
+      if element.is(type.selector)
+        return type.label
+        break
 
   activate = (element) ->
     unless element.parent('.semantic-container').length or element.is('.semantic-container')
       element.addClass 'aloha-oer-block'
       element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
       
-      for selector of activateHandlers
-        if element.is(selector)
-          activateHandlers[selector] element
+      for type in registeredTypes
+        if element.is(type.selector)
+          type.activate element
           break
 
   deactivate = (element) ->
@@ -128,9 +135,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       element.removeClass 'aloha-oer-block ui-draggable'
       element.removeAttr 'style'
 
-      for selector of deactivateHandlers
-        if element.is(selector)
-          deactivateHandlers[selector] element
+      for type in registeredTypes
+        if element.is(type.selector)
+          type.deactivate element
           break
       element.siblings('.semantic-controls').remove()
       element.unwrap()
@@ -169,8 +176,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         if jQuery(this).children().not('.semantic-controls').length == 0
           jQuery(this).remove()
 
-      for selector of deactivateHandlers
-        content.find(".aloha-oer-block#{selector}").each ->
+      for type in registeredTypes
+        content.find(".aloha-oer-block#{type.selector}").each ->
           deactivate jQuery(this)
 
       cleanIds(content)
@@ -189,7 +196,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
         # Add a `.aloha-oer-block` to all registered classes
         classes = []
-        classes.push selector for selector of activateHandlers
+        classes.push type.selector for type of registeredTypes
         $root.find(classes.join()).each (i, el) ->
           $el = jQuery(el)
           $el.addClass 'aloha-oer-block' if not $el.parents('.semantic-drag-source')[0]
@@ -232,11 +239,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
       activate $element
 
-    activateHandler: (selector, handler) ->
-      activateHandlers[selector] = handler
-
-    deactivateHandler: (selector, handler) ->
-      deactivateHandlers[selector] = handler
+    register: (plugin) ->
+      registeredTypes.push(plugin)
 
     registerEvent: (name, selector, callback) ->
       pluginEvents.push
