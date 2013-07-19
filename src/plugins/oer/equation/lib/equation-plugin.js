@@ -11,7 +11,7 @@
           if ($contents.text().trim().length === 0) {
             $contents = '';
           }
-          $body = jQuery("<p></p>").attr('placeholder', 'click here');
+          $body = jQuery("<p></p>").attr('placeholder', 'Enter your math notation here');
           $element.empty().append($body.append($contents));
           return $element.click(function() {
             if ($body.html().trim().length === 0) {

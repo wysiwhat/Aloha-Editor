@@ -1,3 +1,7 @@
 .semantic-drag-source .equation:before {
     content: "Numbered Equation";
 }
+
+.aloha-oer-block.equation {
+    text-align: center;
+}

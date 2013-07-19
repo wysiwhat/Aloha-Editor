@@ -19,7 +19,7 @@ define [
         $contents = '' if $contents.text().trim().length == 0
         
         # for some reason math only loads properly if inside a `p`
-        $body = jQuery("<p></p>").attr('placeholder', 'click here')
+        $body = jQuery("<p></p>").attr('placeholder', 'Enter your math notation here')
 
         #move everything inside the paragraph
         $element.empty().append($body.append($contents))
