@@ -70,6 +70,10 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'click'
     selector: '.semantic-container .semantic-settings'
     callback: (e) ->
+
+      if jQuery('.semantic-settings.modal:visible').length
+        return
+
       dialog = jQuery(DIALOG_HTML)
       dialog.modal 'show'
       $element = jQuery(this).parents('.semantic-controls').siblings('.aloha-oer-block')

@@ -63,6 +63,9 @@
         selector: '.semantic-container .semantic-settings',
         callback: function(e) {
           var $element, dialog, elementName;
+          if (jQuery('.semantic-settings.modal:visible').length) {
+            return;
+          }
           dialog = jQuery(DIALOG_HTML);
           dialog.modal('show');
           $element = jQuery(this).parents('.semantic-controls').siblings('.aloha-oer-block');
