@@ -2,6 +2,13 @@
     content: "Numbered Equation";
 }
 
+body { counter-reset: equation; }
+
+.aloha-oer-block.equation:after {
+    counter-increment: equation;
+    content: '(' counter(equation) ')';
+    float: right;
+}
 .aloha-oer-block.equation {
     text-align: center;
     border: 0;
@@ -9,5 +16,6 @@
     padding: 10px 10px 0px 20px;
 }
 .aloha-oer-block.equation p {
+    display: inline;
     cursor: pointer;
 }
