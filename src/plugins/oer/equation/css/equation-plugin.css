@@ -5,3 +5,6 @@
 .aloha-oer-block.equation {
     text-align: center;
 }
+.aloha-oer-block.equation p {
+    cursor: pointer;
+}
