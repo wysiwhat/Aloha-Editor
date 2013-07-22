@@ -19,12 +19,13 @@ define [
         $contents = '' if $contents.text().trim().length == 0
         
         # for some reason math only loads properly if inside a `p`
-        $body = jQuery("<p></p>").attr('placeholder', 'Enter your math notation here')
+        $body = jQuery('<p></p>').attr('placeholder', 'Enter your math notation here')
 
         #move everything inside the paragraph
         $element.empty().append($body.append($contents))
 
         $element.click ->
+          $body.removeClass('aloha-empty')
           # if there is no math in the element, then we need to add some on click
           if $body.html().trim().length == 0
             Aloha.require ['math/math-plugin'], (MathPlugin) ->

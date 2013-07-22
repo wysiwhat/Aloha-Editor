@@ -11,9 +11,10 @@
           if ($contents.text().trim().length === 0) {
             $contents = '';
           }
-          $body = jQuery("<p></p>").attr('placeholder', 'Enter your math notation here');
+          $body = jQuery('<p></p>').attr('placeholder', 'Enter your math notation here');
           $element.empty().append($body.append($contents));
           return $element.click(function() {
+            $body.removeClass('aloha-empty');
             if ($body.html().trim().length === 0) {
               return Aloha.require(['math/math-plugin'], function(MathPlugin) {
                 return MathPlugin.insertMathInto($body);
