@@ -178,7 +178,6 @@
         });
         return PubSub.sub('aloha.selection.context-change', function(data) {
           var allowedFormats, blacklist, currentHeading, el, label, parents, tag, whitelist;
-          console.log('context change');
           el = data.range.commonAncestorContainer;
           parents = $(el).parents().andSelf();
           currentHeading = parents.filter(Object.keys(formats).join(',')).first();
@@ -197,8 +196,6 @@
               allowedFormats[tag] = label;
             }
           }
-          console.log(blacklist, whitelist);
-          console.log(allowedFormats);
           if (currentHeading.length) {
             currentHeading = currentHeading.get(0).tagName.toLowerCase();
           } else {

@@ -137,7 +137,6 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         squirreledEditable = data.editable
 
       PubSub.sub 'aloha.selection.context-change', (data) ->
-        console.log('context change')
         el = data.range.commonAncestorContainer
 
         # Figure out if we are in any particular heading
@@ -156,9 +155,6 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         for tag, label of formats
           if (!blacklist.length || blacklist.indexOf(tag) == -1) && (!whitelist.length || whitelist.indexOf(tag) != -1)
             allowedFormats[tag] = label
-
-        console.log(blacklist, whitelist)
-        console.log(allowedFormats)
 
         if currentHeading.length
           currentHeading = currentHeading.get(0).tagName.toLowerCase()
