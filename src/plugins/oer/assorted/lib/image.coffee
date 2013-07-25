@@ -178,7 +178,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       # Uploading if a local file was chosen
       if data.files.length
         newEl.addClass('aloha-image-uploading')
-        @uploadImage data.files[0], (url) ->
+        @uploadImage data.files[0], newEl, (url) ->
           if url
             jQuery(data.target).attr('src', url)
           newEl.removeClass('aloha-image-uploading')
@@ -261,7 +261,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         promise = showModalDialog(img)
         promise.show('Edit image')
 
-    uploadImage: (file, callback) ->
+    uploadImage: (file, el, callback) ->
       plugin = @
       settings = Aloha.require('assorted/assorted-plugin').settings
       xhr = new XMLHttpRequest()

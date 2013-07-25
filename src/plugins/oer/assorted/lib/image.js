@@ -144,7 +144,7 @@
       promise.done(function(data) {
         if (data.files.length) {
           newEl.addClass('aloha-image-uploading');
-          return _this.uploadImage(data.files[0], function(url) {
+          return _this.uploadImage(data.files[0], newEl, function(url) {
             if (url) {
               jQuery(data.target).attr('src', url);
             }
@@ -236,7 +236,7 @@
           return promise.show('Edit image');
         });
       },
-      uploadImage: function(file, callback) {
+      uploadImage: function(file, el, callback) {
         var f, plugin, settings, xhr;
         plugin = this;
         settings = Aloha.require('assorted/assorted-plugin').settings;
