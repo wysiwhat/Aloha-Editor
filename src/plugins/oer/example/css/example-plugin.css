@@ -1,0 +1,11 @@
+.semantic-drag-source .example:before {
+    content: "Example";
+}
+
+.example {
+    min-height: 50px;
+}
+
+.example .body {
+  margin: 10px;
+}
