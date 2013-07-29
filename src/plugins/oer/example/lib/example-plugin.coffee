@@ -137,7 +137,6 @@ define [
           $title.prependTo($element)
 
       $element.append($body)
-      console.log(isEmpty, $element.html())
 
     selector: ''
     init: () ->

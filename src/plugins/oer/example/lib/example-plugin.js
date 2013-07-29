@@ -133,8 +133,7 @@
             return $title.prependTo($element);
           }
         });
-        $element.append($body);
-        return console.log(isEmpty, $element.html());
+        return $element.append($body);
       },
       selector: '',
       init: function() {
