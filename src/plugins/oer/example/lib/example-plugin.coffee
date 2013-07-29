@@ -114,8 +114,14 @@ define [
       # The body div could just contain text children.
       # If so, we need to wrap them in a `p` element
       hasTextChildren = $body.children().length != $body.contents().length
-      $body = $body.contents()
-      $body = $body.wrap('<p></p>').parent() if hasTextChildren
+      # we also need to poke a `p` in there if its empty 
+      isEmpty = $body.text().trim() == ''
+
+      if isEmpty
+        $body = jQuery('<p class="para"></p>')
+      else
+        $body = $body.contents()
+        $body = $body.wrap('<p></p>').parent() if hasTextChildren
 
       $element.children('.body').remove()
 
@@ -131,6 +137,7 @@ define [
           $title.prependTo($element)
 
       $element.append($body)
+      console.log(isEmpty, $element.html())
 
     selector: ''
     init: () ->

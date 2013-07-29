@@ -107,13 +107,18 @@
         });
       },
       deactivate: function($element) {
-        var $body, hasTextChildren,
+        var $body, hasTextChildren, isEmpty,
           _this = this;
         $body = $element.children('.body');
         hasTextChildren = $body.children().length !== $body.contents().length;
-        $body = $body.contents();
-        if (hasTextChildren) {
-          $body = $body.wrap('<p></p>').parent();
+        isEmpty = $body.text().trim() === '';
+        if (isEmpty) {
+          $body = jQuery('<p class="para"></p>');
+        } else {
+          $body = $body.contents();
+          if (hasTextChildren) {
+            $body = $body.wrap('<p></p>').parent();
+          }
         }
         $element.children('.body').remove();
         jQuery.each(types, function(i, type) {
@@ -128,7 +133,8 @@
             return $title.prependTo($element);
           }
         });
-        return $element.append($body);
+        $element.append($body);
+        return console.log(isEmpty, $element.html());
       },
       selector: '',
       init: function() {
