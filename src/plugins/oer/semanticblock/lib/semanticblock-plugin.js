@@ -54,7 +54,7 @@
       }, {
         name: 'click',
         selector: '.semantic-container .semantic-delete',
-        callback: function(e) {
+        callback: function() {
           return jQuery(this).parents('.semantic-container').first().slideUp('slow', function() {
             return jQuery(this).remove();
           });
