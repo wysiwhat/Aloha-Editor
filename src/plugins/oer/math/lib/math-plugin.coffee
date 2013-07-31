@@ -37,7 +37,7 @@
 #    </span>
 
 
-define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css' ], (Aloha, Plugin, jQuery, Popover, UI) ->
+define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'css!../../../oer/math/css/math.css' ], (Aloha, Plugin, jQuery, Popover, UI) ->
 
   EDITOR_HTML = '''
     <div class="math-editor-dialog">
@@ -186,7 +186,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
       $el = jQuery(e.target).closest('.math-element')
       # Though the tooltip was bound to the editor and delegates
       # to these items, you still have to clean it up youself
-      $el.trigger('hide').tooltip('destroy').remove()
+      $el.siblings('.math-element-spaceafter').remove()
+      $el.trigger('hide-popover').tooltip('destroy').remove()
       Aloha.activeEditable.smartContentChange {type: 'block-change'}
     )
 
@@ -208,13 +209,18 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         trigger: 'hover',
         template: TOOLTIP_TEMPLATE)
 
+  insertMathInto = ($container) ->
+    $math = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera"></span></span>')
+    $container.html($math)
+    $math.trigger 'show'
+    
   insertMath = () ->
     $el = jQuery('<span class="math-element aloha-ephemera-wrapper"><span class="mathjax-wrapper aloha-ephemera">&#160;</span></span>') # nbsp
     range = Aloha.Selection.getRangeObject()
     if range.isCollapsed()
       GENTICS.Utils.Dom.insertIntoDOM $el, range, Aloha.activeEditable.obj
       # Callback opens up the math editor by "clicking" on it
-      $el.trigger 'show'
+      $el.trigger 'show-popover'
       makeCloseIcon($el)
     else
       # Assume the user highlighted ASCIIMath (by putting the text in backticks)
@@ -247,6 +253,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
     # If math is empty, remove the box
     if destroy or jQuery.trim($editor.find('.formula').val()).length == 0
       $span.find('.math-element-destroy').tooltip('destroy')
+      $span.siblings('.math-element-spaceafter').remove()
       $span.remove()
 
   # $span contains the span with LaTeX/ASCIIMath
@@ -259,10 +266,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
 
     # Bind some actions for the buttons
     $editor.find('.done').on 'click', =>
-      $span.trigger 'hide'
+      $span.trigger 'hide-popover'
       placeCursorAfter($span)
     $editor.find('.remove').on 'click', =>
-      $span.trigger 'hide'
+      $span.trigger 'hide-popover'
       cleanupFormula($editor, $span, true)
 
     $formula = $editor.find('.formula')
@@ -342,7 +349,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         clearTimeout(keyTimeout)
         setTimeout(keyDelay.bind($formula), 500)
 
-    $span.off('shown-popover.math').on 'shown-popover.math', () ->
+    $span.off('shown.math').on 'shown.math', () ->
       $span.css 'background-color', '#E5EEF5'
       $el = jQuery(@)
       tt = $el.data('tooltip')
@@ -352,7 +359,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
         $popover.$tip.find('.formula').trigger('focus') if $popover
       , 10)
 
-    $span.off('hidden-popover.math').on 'hidden-popover.math', () ->
+    $span.off('hidden.math').on 'hidden.math', () ->
       $span.css 'background-color', ''
       tt = jQuery(@).data('tooltip')
       tt.enable() if tt
@@ -446,9 +453,12 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'popover/popover-plugin', 'ui/ui', '
   ob =
     selector: '.math-element'
     populator: buildEditor
+    insertMathInto: insertMathInto
+    insertMath: insertMath
     placement: 'top'
     markerclass: 'math-popover'
     # Expose editor, so the cheatsheet plugin can modify it.
     editor: $_editor
 
   Popover.register ob
+  return ob

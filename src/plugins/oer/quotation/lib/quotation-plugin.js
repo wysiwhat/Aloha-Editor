@@ -4,16 +4,23 @@
     var TEMPLATE;
     TEMPLATE = '<blockquote class="quote"></blockquote>';
     return Plugin.create('quotation', {
+      selector: '.quote',
+      getLabel: function() {
+        return 'Quotation';
+      },
+      activate: function($element) {
+        $element.attr('data-format-whitelist', '["p"]');
+        Ephemera.markAttr($element, 'data-format-whitelist');
+        $element.attr('placeholder', 'Type the text of you quotation here.');
+        $element.aloha();
+        return $element.addClass('aloha-block-dropzone');
+      },
+      deactivate: function($element) {
+        $element.mahalo();
+        return $element.attr('class', 'quote');
+      },
       init: function() {
-        var _this = this;
-        semanticBlock.activateHandler('.quote', function($element) {
-          $element.attr('placeholder', 'Type the text of you quotation here.');
-          return $element.aloha();
-        });
-        semanticBlock.deactivateHandler('.quote', function($element) {
-          $element.mahalo();
-          return $element.attr('class', 'quote');
-        });
+        semanticBlock.register(this);
         UI.adopt("insert-quotation", Button, {
           click: function(e) {
             e.preventDefault();

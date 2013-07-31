@@ -5,7 +5,7 @@
 define [
   'aloha',
   'jquery',
-  'popover/popover-plugin',
+  'overlay/overlay-plugin',
   'ui/ui',
   'aloha/console',
   'aloha/ephemera',
@@ -351,6 +351,12 @@ define [
           newLink = Aloha.activeEditable.obj.find '.aloha-new-link'
           newLink.removeClass 'aloha-new-link'
 
+
+  # Prevent default on links as the bubble out of the editor. This signals
+  # any other machinery (or the browser) that we handled the event already.
+  Aloha.bind 'aloha-editable-created', (event, editable) ->
+    editable.obj.on 'click', 'a', (e)->
+      e.preventDefault()
 
   # Return config
   selector: selector
