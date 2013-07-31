@@ -170,7 +170,8 @@
         }
       }
       $title = $element.children('.title').first().mahalo().removeClass('aloha-editable aloha-block-blocklevel-sortable ui-sortable').removeAttr('hover-placeholder');
-      return $element.find('.body').children().unwrap();
+      $element.find('.body').children().unwrap();
+      return $element.attr('data-unknown', 'true');
     };
     bindEvents = function(element) {
       var event, i, _results;
