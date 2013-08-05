@@ -46,13 +46,18 @@ define [
           return type.label
       
     activate: ($element) ->
+      $title = $element.children('.title')
+      $title.attr('hover-placeholder', 'Add a title (optional)')
+      $title.aloha()
+
+      label = 'Exercise'
+      
+      $body = $element.contents().not($title)
+
       jQuery.each types, (i, type) =>
         if $element.is(type.selector)
-          $title = $element.children('.title')
-          $title.attr('hover-placeholder', 'Add a title (optional)')
-          $title.aloha()
-       
-          $body = $element.contents().not($title)
+
+          label = type.label
        
           typeContainer = TYPE_CONTAINER.clone()
           # Add dropdown elements for each possible type
@@ -102,12 +107,12 @@ define [
           typeContainer.find('.type').text(type.label)
           typeContainer.prependTo($element)
       
-          # Create the body and add some placeholder text
-          $('<div>').addClass('body')
-          .attr('placeholder', "Type the text of your #{type.label.toLowerCase()} here.")
-          .append($body)
-          .appendTo($element)
-          .aloha()
+      # Create the body and add some placeholder text
+      $('<div>').addClass('body')
+      .attr('placeholder', "Type the text of your #{label.toLowerCase()} here.")
+      .append($body)
+      .appendTo($element)
+      .aloha()
      
     deactivate: ($element) ->
       $body = $element.children('.body')
