@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <a class="type" href="#" data-toggle="dropdown"></a>
+          <span class="type btn-link" data-toggle="dropdown"></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
@@ -48,11 +48,13 @@ define [
           return type.label
       
     activate: ($element) ->
+      $element.attr('data-format-whitelist', '["p"]')
+      Ephemera.markAttr($element, 'data-format-whitelist')
+
       jQuery.each types, (i, type) =>
         if $element.is(type.selector)
           $title = $element.children('.title')
           $title.attr('hover-placeholder', 'Add a title (optional)')
-          console.log($title)
           $title.aloha()
        
           $body = $element.contents().not($title)
@@ -61,20 +63,19 @@ define [
           # Add dropdown elements for each possible type
           if types.length > 1
             jQuery.each types, (i, dropType) =>
-              $option = jQuery('<li><a href="#"></a></li>')
+              $option = jQuery('<li><span class="btn-link"></span></li>')
               $option.appendTo(typeContainer.find('.dropdown-menu'))
-              $option = $option.children('a')
+              $option = $option.children('span')
               $option.text(dropType.label.toUpperCase())
               typeContainer.find('.type').on 'click', =>
                 jQuery.each types, (i, dropType) =>
                   if $element.attr('data-type') == dropType.type
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
                       jQuery(li).removeClass('checked')
-                      if jQuery(li).children('a').text() == dropType.label
+                      if jQuery(li).children('span').text() == dropType.label
                         jQuery(li).addClass('checked')
-                  
-              $option.on 'click', (e) =>
-                e.preventDefault()
+
+              $option.on 'click', () =>
                 # Remove the title if this type does not have one
                 if dropType.hasTitle
                   # If there is no `.title` element then add one in and enable it as an Aloha block
@@ -82,18 +83,18 @@ define [
                     $newTitle = jQuery("<#{dropType.titleTagName or 'span'} class='title'></#{dropType.titleTagName or 'span'}")
                     $element.append($newTitle)
                     $newTitle.aloha()
-          
+
                 else
                   $element.children('.title').remove()
-          
+
                 # Remove the `data-type` if this type does not have one
                 if dropType.type
                   $element.attr('data-type', dropType.type)
                 else
                   $element.removeAttr('data-type')
-              
+
                 typeContainer.find('.type').text(dropType.label)
-          
+
                 # Remove all notish class names and then add this one in
                 for key of notishClasses
                   $element.removeClass key
@@ -104,13 +105,15 @@ define [
        
           typeContainer.find('.type').text(type.label)
           typeContainer.prependTo($element)
-      
+ 
           # Create the body and add some placeholder text
-          $('<div>').addClass('body')
-          .attr('placeholder', "Type the text of your #{type.label.toLowerCase()} here.")
-          .append($body)
-          .appendTo($element)
-          .aloha()
+          $body = $('<div>')
+            .addClass('body')
+            .addClass('aloha-block-dropzone')
+            .attr('placeholder', "Type the text of your #{type.label.toLowerCase()} here.")
+            .appendTo($element)
+            .aloha()
+            .append($body)
      
     deactivate: ($element) ->
       $body = $element.children('.body')

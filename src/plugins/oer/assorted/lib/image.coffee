@@ -15,14 +15,23 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       </div>
       <div class="modal-body">
         <div class="image-options">
-            <a class="upload-image-link">Choose an image to upload</a> OR <a class="upload-url-link">get image from the Web</a>
+            <div class="image-selection">
+              <div class="dia-alternative">
+                <span class="upload-image-link btn-link">Choose an image to upload</span>
+              </div>
+              <div class="dia-alternative">
+                OR
+              </div>
+              <div class="dia-alternative">
+                <span class="upload-url-link btn-link">get image from the Web</span>
+              </div>
+            </div>
             <div class="placeholder preview hide">
-              <h4>Preview</h4>
               <img class="preview-image"/>
             </div>
-            <input type="file" class="upload-image-input" />
-            <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
         </div>
+        <input type="file" class="upload-image-input" />
+        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
         <div class="image-alt">
           <div class="forminfo">
             <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
@@ -44,6 +53,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       dialog = jQuery(DIALOG_HTML)
 
       # Find the dynamic modal elements and bind events to the buttons
+      $imageselect = dialog.find('.image-selection')
       $placeholder = dialog.find('.placeholder.preview')
       $uploadImage = dialog.find('.upload-image-input').hide()
       $uploadUrl =   dialog.find('.upload-url-input').hide()
@@ -69,9 +79,8 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
 
       dialog.find('[name=alt]').val(imageAltText)
 
-      if /^https?:\/\//.test(imageSource)
-        $uploadUrl.val(imageSource)
-        $uploadUrl.show()
+      if editing
+        dialog.find('.image-options').hide()
 
       # Set onerror of preview image
       ((img, baseurl) ->
@@ -96,18 +105,16 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         reader.readAsDataURL(file)
 
       # Add click handlers
-      dialog.find('.upload-image-link').on 'click', (evt) ->
-        evt.preventDefault()
+      dialog.find('.upload-image-link').on 'click', () ->
         $placeholder.hide()
         $uploadUrl.hide()
         $uploadImage.click()
         $uploadImage.show()
 
-      dialog.find('.upload-url-link').on 'click', (evt) ->
-        evt.preventDefault()
+      dialog.find('.upload-url-link').on 'click', () ->
         $placeholder.hide()
         $uploadImage.hide()
-        $uploadUrl.show()
+        $uploadUrl.show().focus()
 
       $uploadImage.on 'change', () ->
         files = $uploadImage[0].files
@@ -117,6 +124,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
             $previewImg = $placeholder.find('img')
             loadLocalFile files[0], $previewImg
             $placeholder.show()
+            $imageselect.hide()
           else
             loadLocalFile files[0]
 
@@ -127,6 +135,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         if settings.image.preview
           $previewImg.attr 'src', url
           $placeholder.show()
+          $imageselect.hide()
 
       # On save update the actual img tag. Use the submit event because this
       # allows the use of html5 validation.
@@ -168,44 +177,23 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
               dialog.find('.modal-header h3').text(title)
             dialog.modal 'show'
 
-  uploadImage = (file, callback) ->
-    plugin = @
-    settings = Aloha.require('assorted/assorted-plugin').settings
-    xhr = new XMLHttpRequest()
-    if xhr.upload
-      if not settings.image.uploadurl
-        throw new Error("uploadurl not defined")
+  insertImage = () ->
+    template = $('<span class="media aloha-ephemera"><img /></span>')
+    semanticBlock.insertAtCursor(template)
+    newEl = template.find('img')
+    promise = showModalDialog(newEl)
 
-      xhr.onload = () ->
-        if settings.image.parseresponse
-          url = parseresponse(xhr)
-        else
-          url = JSON.parse(xhr.response).url
-        callback(url)
-
-      xhr.open("POST", settings.image.uploadurl, true)
-      xhr.setRequestHeader("Cache-Control", "no-cache")
-      f = new FormData()
-      f.append(settings.image.uploadfield or 'upload', file, file.name)
-      xhr.send(f)
-
-  UI.adopt 'insertImage-oer', null,
-    click: () ->
-      template = $('<span class="media aloha-ephemera"><img /></span>')
-      semanticBlock.insertAtCursor(template)
-      newEl = template.find('img')
-      promise = showModalDialog(newEl)
-
-      promise.done (data)->
-        # Uploading if a local file was chosen
-        if data.files.length
-          newEl.addClass('aloha-image-uploading')
-          uploadImage data.files[0], (url) ->
+    promise.done (data)=>
+      # Uploading if a local file was chosen
+      if data.files.length
+        newEl.addClass('aloha-image-uploading')
+        @uploadImage data.files[0], newEl, (url) ->
+          if url
             jQuery(data.target).attr('src', url)
-            newEl.removeClass('aloha-image-uploading')
+          newEl.removeClass('aloha-image-uploading')
 
-      # Finally show the dialog
-      promise.show()
+    # Finally show the dialog
+    promise.show()
 
   $('body').bind 'aloha-image-resize', ->
     setWidth Image.imageObj
@@ -228,7 +216,11 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
         editDiv.html('<i class="icon-edit"></i>').addClass('passive')
     else
         editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
- 
+        editDiv.off('mouseenter').on 'mouseenter', (e) ->
+          editDiv.find('.warning-text').text('Image is missing a description for the visually impaired. Click to provide one.')
+        editDiv.off('mouseleave').on 'mouseleave', (e) ->
+          editDiv.find('.warning-text').text('Description missing')
+
   activate = (element) ->
     wrapper = $('<div class="image-wrapper">').css('width', element.css('width'))
     edit = $('<div class="image-edit">')
@@ -272,9 +264,34 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     deactivate: deactivate
     selector: '.media'
     init: () ->
+      plugin = @
+      UI.adopt 'insertImage-oer', null,
+        click: (e) -> insertImage.bind(plugin)(e)
+
       semanticBlock.register(this)
       semanticBlock.registerEvent 'click', '.aloha-oer-block .image-edit', ->
         img = $(this).siblings('img')
         promise = showModalDialog(img)
         promise.show('Edit image')
+
+    uploadImage: (file, el, callback) ->
+      plugin = @
+      settings = Aloha.require('assorted/assorted-plugin').settings
+      xhr = new XMLHttpRequest()
+      if xhr.upload
+        if not settings.image.uploadurl
+          throw new Error("uploadurl not defined")
+
+        xhr.onload = () ->
+          if settings.image.parseresponse
+            url = parseresponse(xhr)
+          else
+            url = JSON.parse(xhr.response).url
+          callback(url)
+
+        xhr.open("POST", settings.image.uploadurl, true)
+        xhr.setRequestHeader("Cache-Control", "no-cache")
+        f = new FormData()
+        f.append(settings.image.uploadfield or 'upload', file, file.name)
+        xhr.send(f)
   })

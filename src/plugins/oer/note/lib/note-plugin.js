@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TYPE_CONTAINER, notishClasses, types;
-    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <a class="type" href="#" data-toggle="dropdown"></a>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
+    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
     notishClasses = {};
     types = [];
     return Plugin.create('note', {
@@ -25,37 +25,37 @@
       },
       activate: function($element) {
         var _this = this;
+        $element.attr('data-format-whitelist', '["p"]');
+        Ephemera.markAttr($element, 'data-format-whitelist');
         return jQuery.each(types, function(i, type) {
           var $body, $title, typeContainer;
           if ($element.is(type.selector)) {
             $title = $element.children('.title');
             $title.attr('hover-placeholder', 'Add a title (optional)');
-            console.log($title);
             $title.aloha();
             $body = $element.contents().not($title);
             typeContainer = TYPE_CONTAINER.clone();
             if (types.length > 1) {
               jQuery.each(types, function(i, dropType) {
                 var $option;
-                $option = jQuery('<li><a href="#"></a></li>');
+                $option = jQuery('<li><span class="btn-link"></span></li>');
                 $option.appendTo(typeContainer.find('.dropdown-menu'));
-                $option = $option.children('a');
+                $option = $option.children('span');
                 $option.text(dropType.label.toUpperCase());
                 typeContainer.find('.type').on('click', function() {
                   return jQuery.each(types, function(i, dropType) {
                     if ($element.attr('data-type') === dropType.type) {
                       return typeContainer.find('.dropdown-menu li').each(function(i, li) {
                         jQuery(li).removeClass('checked');
-                        if (jQuery(li).children('a').text() === dropType.label) {
+                        if (jQuery(li).children('span').text() === dropType.label) {
                           return jQuery(li).addClass('checked');
                         }
                       });
                     }
                   });
                 });
-                return $option.on('click', function(e) {
+                return $option.on('click', function() {
                   var $newTitle, key;
-                  e.preventDefault();
                   if (dropType.hasTitle) {
                     if (!$element.children('.title')[0]) {
                       $newTitle = jQuery("<" + (dropType.titleTagName || 'span') + " class='title'></" + (dropType.titleTagName || 'span'));
@@ -83,7 +83,7 @@
             }
             typeContainer.find('.type').text(type.label);
             typeContainer.prependTo($element);
-            return $('<div>').addClass('body').attr('placeholder', "Type the text of your " + (type.label.toLowerCase()) + " here.").append($body).appendTo($element).aloha();
+            return $body = $('<div>').addClass('body').addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your " + (type.label.toLowerCase()) + " here.").appendTo($element).aloha().append($body);
           }
         });
       },
