@@ -138,7 +138,7 @@ define [
 
       $element.append($body)
 
-    selector: ''
+    selector: '.example'
     init: () ->
       # Load up specific classes to listen to or use the default
       types = @settings
@@ -155,13 +155,6 @@ define [
           type.selector = ".#{className}[data-type='#{typeName}']"
         else
           type.selector = ".#{className}:not([data-type])"
-
-        # store a global selector for this plugin, so the semantic block plugin knows when
-        # to defer to us
-        if this.selector.length
-          this.selector += ","+type.selector
-        else
-          this.selector = type.selector
 
         exampleishClasses[className] = true
 

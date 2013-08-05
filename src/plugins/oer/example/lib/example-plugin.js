@@ -135,7 +135,7 @@
         });
         return $element.append($body);
       },
-      selector: '',
+      selector: '.example',
       init: function() {
         var _this = this;
         types = this.settings;
@@ -155,11 +155,6 @@
             type.selector = "." + className + "[data-type='" + typeName + "']";
           } else {
             type.selector = "." + className + ":not([data-type])";
-          }
-          if (_this.selector.length) {
-            _this.selector += "," + type.selector;
-          } else {
-            _this.selector = type.selector;
           }
           exampleishClasses[className] = true;
           newTemplate = jQuery("<" + tagName + "></" + tagName);
