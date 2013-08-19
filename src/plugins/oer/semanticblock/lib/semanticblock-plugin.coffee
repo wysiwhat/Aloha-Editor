@@ -162,7 +162,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       # just make it editable
 
       # this might could be more efficient
-      $element.find('*').andSelf().filter('[placeholder],[hover-placeholder]').each ->
+      $element.children('[placeholder],[hover-placeholder]').andSelf().filter('[placeholder],[hover-placeholder]').each ->
         jQuery(@).empty() if not jQuery(@).text().trim()
 
       # if there is a title, give it a placeholder and make it editable
