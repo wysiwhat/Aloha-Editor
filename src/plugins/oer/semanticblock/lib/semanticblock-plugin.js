@@ -297,7 +297,7 @@
                 return activate($root);
               }
             });
-            return $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera', 100);
+            return $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera', 500);
           });
         });
       },
