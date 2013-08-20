@@ -202,9 +202,7 @@
         return setWidth($(this));
       });
     };
-    deactivate = function(element) {
-      element.find('img').unwrap();
-    };
+    deactivate = function(element) {};
     return AlohaPlugin.create('oer-image', {
       getLabel: function() {
         return 'Image';

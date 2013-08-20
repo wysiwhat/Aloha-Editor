@@ -232,8 +232,6 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
       setWidth $(this)
 
   deactivate = (element) ->
-    
-    element.find('img').unwrap()
     return
 
   # Return config
