@@ -267,7 +267,7 @@
               return activate(jQuery(this));
             }
           });
-          if (!$root.parents('.aloha-editable').length) {
+          if ($root.parent().is('#layout-body')) {
             jQuery('.semantic-drag-source').children().each(function() {
               var element, elementLabel;
               element = jQuery(this);
@@ -289,16 +289,16 @@
                 refreshPositions: true
               });
             });
-          }
-          return setTimeout(function() {
-            $root.sortable('option', 'stop', function(e, ui) {
-              $root = jQuery(ui.item);
-              if ($root.is(selector)) {
-                return activate($root);
-              }
+            return setTimeout(function() {
+              $root.sortable('option', 'stop', function(e, ui) {
+                $root = jQuery(ui.item);
+                if ($root.is(selector)) {
+                  return activate($root);
+                }
+              });
+              return $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera', 500);
             });
-            return $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera', 500);
-          });
+          }
         });
       },
       insertAtCursor: function(template) {
