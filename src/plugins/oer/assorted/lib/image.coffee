@@ -178,7 +178,7 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
             dialog.modal 'show'
 
   insertImage = () ->
-    template = $('<span class="media aloha-ephemera"><img /></span>')
+    template = $('<figure class="figure aloha-ephemera"><div class="title" /><img /><figcaption /></figure>')
     semanticBlock.insertAtCursor(template)
     newEl = template.find('img')
     promise = showModalDialog(newEl)
@@ -226,6 +226,9 @@ define ['aloha', 'jquery', 'aloha/plugin', 'image/image-plugin', 'ui/ui', 'seman
     edit = $('<div class="image-edit aloha-ephemera">')
 
     element.find('img').wrap(wrapper)
+
+    element.prepend('<div class="title"></div>') if not element.find('.title').length
+    element.append('<figcaption></figcaption>') if not element.find('figcaption').length
 
     setEditText element.children('.image-wrapper').prepend(edit)
     element.find('img').load ->
