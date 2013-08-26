@@ -63,6 +63,7 @@
             <script type="text/javascript" src="../src/lib/aloha.js"
                     tal:attributes="src string:${request.application_url}/aloha/src/lib/aloha.js"
                 data-aloha-plugins="common/ui,
+                                    oer/copy,
                                     oer/toolbar,
                                     oer/overlay,
                                     oer/format,
@@ -84,6 +85,7 @@
                                     oer/exercise,
                                     oer/quotation,
                                     oer/equation,
+                                    oer/example,
                                     oer/note"> <!-- xhtml workaround --></script>
 
             <script type="text/javascript"
@@ -296,10 +298,14 @@
                         </button>
                         <ul class="dropdown-menu">
                           <li><a href="#" class="action insertNote">Note to Reader</a></li>
+                          <li><a href="#" class="action insertExample">Example</a></li>
                           <li><a href="#" class="action insertExercise">Exercise</a></li>
                           <li><a href="#" class="action insertQuotation">Quotation</a></li>
                           <li><a href="#" class="action insertEquation">Equation</a></li>
                         </ul>
+                      </div>
+                      <div class="btn-group">
+                        <button class="btn hide action paste" rel="tooltip" title="paste"><i class="icon-image-insert"></i></button>
                       </div>
                     </div>
 
@@ -308,6 +314,10 @@
 
                         <div class="semantic-drag-source">
                             <div class="note">
+                                <div class="title"></div>
+                            </div>
+                            
+                            <div class="example">
                                 <div class="title"></div>
                             </div>
 
