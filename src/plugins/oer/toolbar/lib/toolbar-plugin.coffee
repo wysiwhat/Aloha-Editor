@@ -1,5 +1,5 @@
-define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
-    jQuery, Aloha, Plugin, Ui, PubSub) ->
+define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
+    jQuery, Aloha, Plugin, PubSub, Button) ->
 
   squirreledEditable = null
   $ROOT = jQuery('body') # Could also be configured to some other div
@@ -36,26 +36,6 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
 
   # Store `{ actionName: action() }` object so we can bind all the clicks when we init the plugin
   adoptedActions = {}
-
-  # Hijack the toolbar buttons so we can customize where they are placed.
-  Ui.adopt = (slot, type, settings) ->
-    # publish an adoption event, if item finds a home, return the
-    # constructed component
-    evt = $.Event('aloha.toolbar.adopt')
-    $.extend(evt,
-        params:
-            slot: slot,
-            type: type,
-            settings: settings
-        component: null)
-    PubSub.pub(evt.type, evt)
-    if evt.isDefaultPrevented()
-      evt.component.adoptParent(toolbar)
-      return evt.component
-
-    adoptedActions[slot] = settings
-    return makeItemRelay slot
-
 
   # Delegate toolbar actions once all the plugins have initialized and called `UI.adopt`
   Aloha.bind 'aloha-ready', (event, editable) ->
@@ -123,8 +103,29 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer())
         $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
         $newEl.addClass($oldEl.attr('class'))
+        
         # $newEl.attr('id', $oldEl.attr('id))
         # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
+
+      #### start temporary copy paste code
+      focusHeading = null
+      Aloha.bind 'aloha-selection-changed', (e, params) =>
+        if params.startOffset == params.endOffset and jQuery(params.startContainer).parents('h1,h2,h3').length
+          focusHeading = jQuery(params.startContainer).parents('h1,h2,h3').first()
+          jQuery('.action.copy').fadeIn('fast')
+        else
+          jQuery('.action.copy').fadeOut('fast')
+        
+      toolbar.adopt "copy", Button,
+        click: (e) ->
+          e.preventDefault()
+          $element = focusHeading
+          selector = "h1,h2,h3".substr(0, "h1,h2,h3".indexOf($element[0].nodeName.toLowerCase())+2)
+          $elements = $element.nextUntil(selector).addBack()
+          html = ''
+          html += jQuery(element).outerHtml() for element in $elements
+          Copy.buffer html
+      #### end temporary copy paste code
 
       $ROOT.on 'click', '.action.changeHeading', changeHeading
 
@@ -182,6 +183,24 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'ui/ui', 'PubSub' ], (
         evt = $.Event('aloha.toolbar.childforeground')
         evt.component = childComponent
         PubSub.pub(evt.type, evt)
+
+    adopt: (slot, type, settings) ->
+      # publish an adoption event, if item finds a home, return the
+      # constructed component
+      evt = $.Event('aloha.toolbar.adopt')
+      $.extend(evt,
+          params:
+              slot: slot,
+              type: type,
+              settings: settings
+          component: null)
+      PubSub.pub(evt.type, evt)
+      if evt.isDefaultPrevented()
+        evt.component.adoptParent(toolbar)
+        return evt.component
+
+      adoptedActions[slot] = settings
+      return makeItemRelay slot
 
     ###
      toString method
