@@ -15,7 +15,6 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button'], (Aloha, Plugin
 
       localStorage.alohaOerCopyBuffer = buffer if localStorage
 
-      console.log(buffer)
       jQuery('.action.paste').fadeIn('fast')
 
     init: ->
