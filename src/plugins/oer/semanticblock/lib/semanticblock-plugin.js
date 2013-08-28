@@ -264,13 +264,25 @@
             classes.push(type.selector);
           }
           selector = _this.settings.defaultSelector + ',' + classes.join();
-          $root.find(selector).each(function() {
-            if (!jQuery(this).parents('.semantic-drag-source').length) {
-              return activate(jQuery(this));
+          setTimeout(function() {
+            if ($root.is('.ui-sortable')) {
+              $root.sortable('option', 'stop', function(e, ui) {
+                $root = jQuery(ui.item);
+                if ($root.is(selector)) {
+                  return activate($root);
+                }
+              });
+              $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera');
             }
+            return 500;
           });
-          if ($root.parent().is('#layout-body')) {
-            jQuery('.semantic-drag-source').children().each(function() {
+          if ($root.is('.aloha-root-editable')) {
+            $root.find(selector).each(function() {
+              if (!jQuery(this).parents('.semantic-drag-source').length) {
+                return activate(jQuery(this));
+              }
+            });
+            return jQuery('.semantic-drag-source').children().each(function() {
               var element, elementLabel;
               element = jQuery(this);
               elementLabel = (element.data('type') || element.attr('class')).split(' ')[0];
@@ -292,18 +304,6 @@
               });
             });
           }
-          return setTimeout(function() {
-            if ($root.is('.ui-sortable')) {
-              $root.sortable('option', 'stop', function(e, ui) {
-                $root = jQuery(ui.item);
-                if ($root.is(selector)) {
-                  return activate($root);
-                }
-              });
-              $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera');
-            }
-            return 500;
-          });
         });
       },
       insertAtCursor: function(template) {

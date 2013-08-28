@@ -267,11 +267,22 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         classes.push type.selector for type in registeredTypes
 
         selector = @settings.defaultSelector + ',' + classes.join()
-        $root.find(selector).each ->
-          activate jQuery(@) if not jQuery(@).parents('.semantic-drag-source').length
 
-        # this needs to be configurable, it is currently broken outside of github-book
-        if $root.parent().is('#layout-body')
+        # theres no really good way to do this. editables get made into sortables
+        # on `aloha-editable-created` and there is no event following that, so we 
+        # just have to wait
+        setTimeout ->
+          if $root.is('.ui-sortable')
+            $root.sortable 'option', 'stop', (e, ui) ->
+              $root = jQuery(ui.item)
+              activate $root if $root.is(selector)
+            $root.sortable 'option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera',
+          500
+
+        if $root.is('.aloha-root-editable')
+
+          $root.find(selector).each ->
+            activate jQuery(@) if not jQuery(@).parents('.semantic-drag-source').length
 
           # setting up these drag sources may break if there is more than one top level editable on the page
           jQuery('.semantic-drag-source').children().each ->
@@ -292,16 +303,6 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
          
               refreshPositions: true
 
-        # theres no really good way to do this. editables get made into sortables
-        # on `aloha-editable-created` and there is no event following that, so we 
-        # just have to wait
-        setTimeout ->
-          if $root.is('.ui-sortable')
-            $root.sortable 'option', 'stop', (e, ui) ->
-              $root = jQuery(ui.item)
-              activate $root if $root.is(selector)
-            $root.sortable 'option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera',
-          500
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
