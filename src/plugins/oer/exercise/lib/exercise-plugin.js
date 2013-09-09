@@ -34,7 +34,7 @@
       var $body, $typeContainer, type,
         _this = this;
       type = $element.attr('data-type') || 'solution';
-      jQuery($element.get(0).childNodes).filter(function(i, child) {
+      $element.contents().filter(function(i, child) {
         return child.nodeType === 3 && child.data.trim().length;
       }).wrap('<p></p>');
       $body = '';
@@ -56,7 +56,7 @@
       $element.children(':not(.body)').remove();
       $element.children('.body').contents().unwrap();
       $element.children('.body').remove();
-      return jQuery($element.get(0).childNodes).filter(function(i, child) {
+      return $element.contents().filter(function(i, child) {
         return child.nodeType === 3 && child.data.trim().length;
       }).wrap('<p></p>');
     };

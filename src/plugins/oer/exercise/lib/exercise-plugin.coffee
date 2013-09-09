@@ -84,7 +84,7 @@ define [
     activateSolution = ($element) ->
       type = $element.attr('data-type') or 'solution'
 
-      jQuery($element.get(0).childNodes)
+      $element.contents()
         .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
         .wrap('<p></p>')
 
@@ -114,7 +114,7 @@ define [
       $element.children('.body').contents().unwrap()
       $element.children('.body').remove()
 
-      jQuery($element.get(0).childNodes)
+      $element.contents()
         .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
         .wrap('<p></p>')
 
