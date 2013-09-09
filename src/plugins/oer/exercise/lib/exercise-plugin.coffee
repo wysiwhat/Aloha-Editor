@@ -88,9 +88,9 @@ define [
       type = $element.attr('data-type') or 'solution'
 
       for child in $element.get(0).childNodes
-        hasTextChildren = true if child.nodeName is '#text'
-        
-      $element.wrapInner('<p>') if hasTextChildren
+        if child.nodeName is '#text' && child.data.trim().length
+          jQuery(child).wrap('<p></p>')
+
       $body = ''
       $body = $element.children() if $element.text().trim().length
       
@@ -116,6 +116,10 @@ define [
       $element.children(':not(.body)').remove()
       $element.children('.body').contents().unwrap()
       $element.children('.body').remove()
+
+      for child in $element.get(0).childNodes
+        if child.nodeName is '#text' && child.data.trim().length
+          jQuery(child).wrap('<p></p>')
 
     Plugin.create('exercise', {
       getLabel: ($element) ->
