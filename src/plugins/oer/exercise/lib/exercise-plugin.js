@@ -31,16 +31,12 @@
     };
     deactivateExercise = function($element) {};
     activateSolution = function($element) {
-      var $body, $typeContainer, child, type, _i, _len, _ref,
+      var $body, $typeContainer, type,
         _this = this;
       type = $element.attr('data-type') || 'solution';
-      _ref = $element.get(0).childNodes;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        if (child.nodeName === '#text' && child.data.trim().length) {
-          jQuery(child).wrap('<p></p>');
-        }
-      }
+      jQuery($element.get(0).childNodes).filter(function(i, child) {
+        return child.nodeType === 3 && child.data.trim().length;
+      }).wrap('<p></p>');
       $body = '';
       if ($element.text().trim().length) {
         $body = $element.children();
@@ -57,21 +53,12 @@
       return jQuery('<div>').addClass('body').addClass('aloha-block-dropzone').appendTo($element).aloha().append($body);
     };
     deactivateSolution = function($element) {
-      var child, _i, _len, _ref, _results;
       $element.children(':not(.body)').remove();
       $element.children('.body').contents().unwrap();
       $element.children('.body').remove();
-      _ref = $element.get(0).childNodes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        if (child.nodeName === '#text' && child.data.trim().length) {
-          _results.push(jQuery(child).wrap('<p></p>'));
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
+      return jQuery($element.get(0).childNodes).filter(function(i, child) {
+        return child.nodeType === 3 && child.data.trim().length;
+      }).wrap('<p></p>');
     };
     return Plugin.create('exercise', {
       getLabel: function($element) {

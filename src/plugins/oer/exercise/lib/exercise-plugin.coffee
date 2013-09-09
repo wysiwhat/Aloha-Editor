@@ -84,9 +84,9 @@ define [
     activateSolution = ($element) ->
       type = $element.attr('data-type') or 'solution'
 
-      for child in $element.get(0).childNodes
-        if child.nodeName is '#text' && child.data.trim().length
-          jQuery(child).wrap('<p></p>')
+      jQuery($element.get(0).childNodes)
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
 
       $body = ''
       $body = $element.children() if $element.text().trim().length
@@ -114,9 +114,9 @@ define [
       $element.children('.body').contents().unwrap()
       $element.children('.body').remove()
 
-      for child in $element.get(0).childNodes
-        if child.nodeName is '#text' && child.data.trim().length
-          jQuery(child).wrap('<p></p>')
+      jQuery($element.get(0).childNodes)
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
 
     Plugin.create('exercise', {
       getLabel: ($element) ->
