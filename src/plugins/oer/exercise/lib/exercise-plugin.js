@@ -8,7 +8,7 @@
     TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-type="">Exercise</span></li>\n        <li><span class="btn-link" data-type="homework">Homework</span></li>\n        <li><span class="btn-link" data-type="problem">Problem</span></li>\n        <li><span class="btn-link" data-type="question">Question</span></li>\n        <li><span class="btn-link" data-type="task">Task</span></li>\n        <li><span class="btn-link" data-type="Worked Example">Worked Example</span></li>\n    </ul>\n</div>';
     SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link">Answer</span></li>\n        <li><span class="btn-link">Solution</span></li>\n    </ul>\n</div>';
     activateExercise = function($element) {
-      var $problem, $solutions, $typeContainer, type,
+      var $content, $problem, $solutions, $typeContainer, type,
         _this = this;
       type = $element.attr('data-type') || 'exercise';
       $problem = $element.children('.problem');
@@ -22,7 +22,8 @@
         }
       });
       $typeContainer.prependTo($element);
-      $problem.addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your problem here.").aloha();
+      $content = $problem.contents();
+      $problem.empty().addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your problem here.").aloha().append($content);
       jQuery('<div>').addClass('solutions').addClass('aloha-ephemera-wrapper').appendTo($element).append($solutions);
       jQuery('<div>').addClass('solution-controls').addClass('aloha-ephemera').append('<span class="add-solution btn-link">Click here to add an answer/solution</span>').append('<span class="solution-toggle">hide solution</span>').appendTo($element);
       if (!$solutions.length) {

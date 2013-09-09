@@ -57,10 +57,13 @@ define [
 
       $typeContainer.prependTo($element)
 
+      $content = $problem.contents()
       $problem
+        .empty()
         .addClass('aloha-block-dropzone')
         .attr('placeholder', "Type the text of your problem here.")
         .aloha()
+        .append($content)
 
       jQuery('<div>')
         .addClass('solutions')
