@@ -130,7 +130,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       else
         # Show the classes involved, filter out the aloha ones
         classes = (c for c in wrapped.attr('class').split(/\s+/) when not /^aloha/.test(c))
-        elementName = "element (class='#{classes.join(' ')}')"
+        elementName = classes.length and "element (class='#{classes.join(' ')}')" or 'element'
       jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{elementName} to another location.")
   ,
     name: 'mouseout'

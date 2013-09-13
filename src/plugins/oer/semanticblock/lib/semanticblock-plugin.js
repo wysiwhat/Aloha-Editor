@@ -134,7 +134,7 @@
               }
               return _results;
             })();
-            elementName = "element (class='" + (classes.join(' ')) + "')";
+            elementName = classes.length && ("element (class='" + (classes.join(' ')) + "')") || 'element';
           }
           return jQuery(this).find('.aloha-block-handle').attr('title', "Drag this " + elementName + " to another location.");
         }
