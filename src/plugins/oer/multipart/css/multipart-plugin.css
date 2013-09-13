@@ -49,9 +49,3 @@
     font-weight: bold;
     color: #369;
 }
-
-.multipart > .semantic-container > .exercise > .solutions > .semantic-container,
-.problemset > .semantic-container > .exercise > .solutions > .semantic-container {
-    border: 0px;
-}
-

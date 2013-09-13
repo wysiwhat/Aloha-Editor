@@ -26,21 +26,10 @@
 }
 
 .exercise > .solutions > .semantic-container {
-    border: 0;
     margin: 0;
     padding: 0;
 }
 
-.exercise > .solutions > .semantic-container > .semantic-controls {
-    display: none !important;
-}
-
-.semantic-container:hover {
-    border: 1px solid #ccc;
-}
-.semantic-container:hover > .semantic-controls {
-    display: block !important; 
-}
 .semantic-container .exercise .solution-placeholder {
     color: #AAA;
     padding: 5px;
