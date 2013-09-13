@@ -47,10 +47,10 @@
     -ms-transition: opacity .15s ease-in-out;
     -o-transition: opacity .15s ease-in-out;
     transition: opacity .15s ease-in-out;
+    margin-left: 45px;
     height: 20px;
 }
 .semantic-container:hover > .exercise > .solution-controls {
-    margin-left: 45px;
     opacity: 1;
     -webkit-transition: opacity .15s ease-in-out;
     -moz-transition: opacity .15s ease-in-out;
