@@ -34,8 +34,8 @@ define [
         <div class="type-container dropdown aloha-ephemera">
             <span class="type btn-link" data-toggle="dropdown"></span>
             <ul class="dropdown-menu">
-                <li><span class="btn-link">Answer</span></li>
-                <li><span class="btn-link">Solution</span></li>
+                <li><span class="btn-link" data-type="answer">Answer</span></li>
+                <li><span class="btn-link" data-type="solution">Solution</span></li>
             </ul>
         </div>
     '''
@@ -43,10 +43,10 @@ define [
     activateExercise = ($element) ->
       type = $element.attr('data-type') or 'exercise'
 
-      $problem = $element.children('.problem').contents()
+      $problem = $element.children('.problem')
       $solutions = $element.children('.solution')
 
-      $element.children().remove()
+      $element.children().not($problem).remove()
 
       $typeContainer = jQuery(TYPE_CONTAINER)
       $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
@@ -57,13 +57,13 @@ define [
 
       $typeContainer.prependTo($element)
 
-      jQuery('<div>')
-        .addClass('problem')
+      $content = $problem.contents()
+      $problem
+        .empty()
         .addClass('aloha-block-dropzone')
         .attr('placeholder', "Type the text of your problem here.")
-        .appendTo($element)
         .aloha()
-        .append($problem)
+        .append($content)
 
       jQuery('<div>')
         .addClass('solutions')
@@ -87,10 +87,10 @@ define [
     activateSolution = ($element) ->
       type = $element.attr('data-type') or 'solution'
 
-      for child in $element.get(0).childNodes
-        hasTextChildren = true if child.nodeName is '#text'
-        
-      $element.wrapInner('<p>') if hasTextChildren
+      $element.contents()
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
+
       $body = ''
       $body = $element.children() if $element.text().trim().length
       
@@ -117,6 +117,10 @@ define [
       $element.children('.body').contents().unwrap()
       $element.children('.body').remove()
 
+      $element.contents()
+        .filter((i, child) -> child.nodeType is 3 && child.data.trim().length)
+        .wrap('<p></p>')
+
     Plugin.create('exercise', {
       getLabel: ($element) ->
         if $element.is('.exercise')
@@ -137,11 +141,16 @@ define [
           deactivateSolution($element)
     
       appendTo: (target) ->
-        semanticBlock.appendElement($(TEMPLATE), target)
+        semanticBlock.appendElement(jQuery(TEMPLATE), target)
         
 
       selector: '.exercise,.solution' #this plugin handles both exercises and solutions
       ignore: '.problem'
+
+      options: ($el) ->
+        if $el.is('.solution')
+          return buttons: ['settings']
+        return buttons: ['settings', 'copy']
 
       init: () ->
 
@@ -151,15 +160,15 @@ define [
           click: -> semanticBlock.insertAtCursor(TEMPLATE)
 
         semanticBlock.registerEvent('click', '.exercise .solution-controls .add-solution', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
 
           controls.children('.solution-toggle').text('hide solution').show()
 
-          semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'))
+          semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.children('.solutions'))
         )
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
           solutions = exercise.children('.solutions')
 
@@ -171,7 +180,7 @@ define [
 
         )
         semanticBlock.registerEvent('click', '.exercise .semantic-delete', () ->
-          exercise = $(this).parents('.exercise').first()
+          exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
           controls.children('.add-solution').show()
           controls.children('.solution-toggle').hide() if exercise.children('.solutions').children().length == 1
@@ -184,6 +193,6 @@ define [
 
           $el.parents('.type-container').find('.dropdown-menu li').each (i, li) =>
             jQuery(li).removeClass('checked')
-          $el.parents('li').first().addclass('checked')
+          $el.parents('li').first().addClass('checked')
         )
     })

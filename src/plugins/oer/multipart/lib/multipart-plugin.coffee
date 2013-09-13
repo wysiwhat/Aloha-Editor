@@ -37,15 +37,14 @@ define [
 
 
       $header = $element.children('.header')
-      $contents = $header.contents()
-      $header.empty().remove()
-      $body = $('<div>')
-        .addClass('header')
+
+      $content = $header.contents()
+      $header
+        .empty()
         .addClass('aloha-block-dropzone')
         .attr('placeholder', "Type the text of your header here.")
-        .prependTo($element)
         .aloha()
-        .append($contents)
+        .append($content)
       
       $typeContainer.prependTo($element)
 
@@ -77,10 +76,10 @@ define [
         semanticBlock.registerEvent('click', '.multipart .exercise-controls .add-exercise,
                                               .problemset .exercise-controls .add-exercise', ->
 
-          parent = $(@).parents(multipart.selector).first()
+          parent = jQuery(@).parents(multipart.selector).first()
           console.log(multipart.selector, parent)
           Exercise.appendTo(parent)
-          $(this).parents('.exercise-controls').appendTo(parent)
+          jQuery(this).parents('.exercise-controls').appendTo(parent)
         )
         semanticBlock.registerEvent('click', '.multipart > .type-container > ul > li > *,
                                               .problemset > .type-container > ul > li > *', (e) ->

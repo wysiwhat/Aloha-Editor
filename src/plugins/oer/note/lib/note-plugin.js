@@ -87,7 +87,7 @@
             return typeContainer.prependTo($element);
           }
         });
-        return $body = $('<div>').addClass('body').addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your " + (label.toLowerCase()) + " here.").appendTo($element).aloha().append($body);
+        return $body = jQuery('<div>').addClass('body').addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your " + (label.toLowerCase()) + " here.").appendTo($element).aloha().append($body);
       },
       deactivate: function($element) {
         var $body, $title, $titleElement, element, hasTitle, titleTag, _i, _len, _ref,
@@ -98,7 +98,7 @@
           element = _ref[_i];
           if (element.nodeName === '#text') {
             if (element.data.trim().length) {
-              $(element).wrap('<p></p>');
+              jQuery(element).wrap('<p></p>');
             } else {
               element.remove();
             }

@@ -5,14 +5,14 @@
     TEMPLATE = '<div class="exercise">\n    <div class="problem"></div>\n</div>';
     SOLUTION_TEMPLATE = '<div class="solution">\n</div>';
     TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-type="">Exercise</span></li>\n        <li><span class="btn-link" data-type="homework">Homework</span></li>\n        <li><span class="btn-link" data-type="problem">Problem</span></li>\n        <li><span class="btn-link" data-type="question">Question</span></li>\n        <li><span class="btn-link" data-type="task">Task</span></li>\n        <li><span class="btn-link" data-type="Worked Example">Worked Example</span></li>\n    </ul>\n</div>';
-    SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link">Answer</span></li>\n        <li><span class="btn-link">Solution</span></li>\n    </ul>\n</div>';
+    SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-type="answer">Answer</span></li>\n        <li><span class="btn-link" data-type="solution">Solution</span></li>\n    </ul>\n</div>';
     activateExercise = function($element) {
-      var $problem, $solutions, $typeContainer, type,
+      var $content, $problem, $solutions, $typeContainer, type,
         _this = this;
       type = $element.attr('data-type') || 'exercise';
-      $problem = $element.children('.problem').contents();
+      $problem = $element.children('.problem');
       $solutions = $element.children('.solution');
-      $element.children().remove();
+      $element.children().not($problem).remove();
       $typeContainer = jQuery(TYPE_CONTAINER);
       $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
       $typeContainer.find('.dropdown-menu li').each(function(i, li) {
@@ -21,7 +21,8 @@
         }
       });
       $typeContainer.prependTo($element);
-      jQuery('<div>').addClass('problem').addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your problem here.").appendTo($element).aloha().append($problem);
+      $content = $problem.contents();
+      $problem.empty().addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your problem here.").aloha().append($content);
       jQuery('<div>').addClass('solutions').addClass('aloha-ephemera-wrapper').appendTo($element).append($solutions);
       jQuery('<div>').addClass('solution-controls').addClass('aloha-ephemera').append('<span class="add-solution btn-link">Click here to add an answer/solution</span>').append('<span class="solution-toggle">hide solution</span>').appendTo($element);
       if (!$solutions.length) {
@@ -30,19 +31,12 @@
     };
     deactivateExercise = function($element) {};
     activateSolution = function($element) {
-      var $body, $typeContainer, child, hasTextChildren, type, _i, _len, _ref,
+      var $body, $typeContainer, type,
         _this = this;
       type = $element.attr('data-type') || 'solution';
-      _ref = $element.get(0).childNodes;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        if (child.nodeName === '#text') {
-          hasTextChildren = true;
-        }
-      }
-      if (hasTextChildren) {
-        $element.wrapInner('<p>');
-      }
+      $element.contents().filter(function(i, child) {
+        return child.nodeType === 3 && child.data.trim().length;
+      }).wrap('<p></p>');
       $body = '';
       if ($element.text().trim().length) {
         $body = $element.children();
@@ -61,7 +55,10 @@
     deactivateSolution = function($element) {
       $element.children(':not(.body)').remove();
       $element.children('.body').contents().unwrap();
-      return $element.children('.body').remove();
+      $element.children('.body').remove();
+      return $element.contents().filter(function(i, child) {
+        return child.nodeType === 3 && child.data.trim().length;
+      }).wrap('<p></p>');
     };
     return Plugin.create('exercise', {
       getLabel: function($element) {
@@ -86,10 +83,20 @@
         }
       },
       appendTo: function(target) {
-        return semanticBlock.appendElement($(TEMPLATE), target);
+        return semanticBlock.appendElement(jQuery(TEMPLATE), target);
       },
       selector: '.exercise,.solution',
       ignore: '.problem',
+      options: function($el) {
+        if ($el.is('.solution')) {
+          return {
+            buttons: ['settings']
+          };
+        }
+        return {
+          buttons: ['settings', 'copy']
+        };
+      },
       init: function() {
         semanticBlock.register(this);
         UI.adopt('insertExercise', Button, {
@@ -99,14 +106,14 @@
         });
         semanticBlock.registerEvent('click', '.exercise .solution-controls .add-solution', function() {
           var controls, exercise;
-          exercise = $(this).parents('.exercise').first();
+          exercise = jQuery(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
           controls.children('.solution-toggle').text('hide solution').show();
-          return semanticBlock.appendElement($(SOLUTION_TEMPLATE), exercise.children('.solutions'));
+          return semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.children('.solutions'));
         });
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', function() {
           var controls, exercise, solutions;
-          exercise = $(this).parents('.exercise').first();
+          exercise = jQuery(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
           solutions = exercise.children('.solutions');
           return solutions.slideToggle(function() {
@@ -119,7 +126,7 @@
         });
         semanticBlock.registerEvent('click', '.exercise .semantic-delete', function() {
           var controls, exercise;
-          exercise = $(this).parents('.exercise').first();
+          exercise = jQuery(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
           controls.children('.add-solution').show();
           if (exercise.children('.solutions').children().length === 1) {
@@ -136,7 +143,7 @@
           $el.parents('.type-container').find('.dropdown-menu li').each(function(i, li) {
             return jQuery(li).removeClass('checked');
           });
-          return $el.parents('li').first().addclass('checked');
+          return $el.parents('li').first().addClass('checked');
         });
       }
     });
