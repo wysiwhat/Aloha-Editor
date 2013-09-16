@@ -125,7 +125,12 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
       wrapped = jQuery(this).children('.aloha-oer-block').first()
       label = wrapped.length and getLabel(wrapped)
-      elementName = label and label.toLowerCase() or 'element'
+      if label
+        elementName = label.toLowerCase()
+      else
+        # Show the classes involved, filter out the aloha ones
+        classes = (c for c in wrapped.attr('class').split(/\s+/) when not /^aloha/.test(c))
+        elementName = classes.length and "element (class='#{classes.join(' ')}')" or 'element'
       jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{elementName} to another location.")
   ,
     name: 'mouseout'
@@ -159,13 +164,33 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery('<p class="aloha-oer-ephemera-if-empty"></p>').insertBefore($element)
       jQuery('<p class="aloha-oer-ephemera-if-empty"></p>').insertAfter($element)
 
-      $element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
- 
+      # What kind of block is being activated
+      type = null
       for type in registeredTypes
         if $element.is(type.selector)
-          type.activate $element
-          return
+          break
 
+      if type == null
+        $element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
+      else
+        controls = blockControls.clone()
+        # Ask `type` plugin about the controls it wants
+        if type.options
+          if typeof type.options == 'function'
+            options = type.options($element)
+          else
+            options = type.options
+
+          if options.buttons
+            # We deliberately don't allow people to drop the delete button. At
+            # least until we know whether that is even needed!
+            controls.find('button.semantic-settings').remove() if 'settings' not in options.buttons
+            controls.find('button.copy').remove() if 'copy' not in options.buttons
+
+        $element.wrap(blockTemplate).parent().append(controls).alohaBlock()
+        type.activate $element
+        return
+ 
       # if we make it this far none of the activators have run
       # just make it editable
 
@@ -274,13 +299,14 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         # theres no really good way to do this. editables get made into sortables
         # on `aloha-editable-created` and there is no event following that, so we 
         # just have to wait
-        setTimeout ->
-          if $root.is('.ui-sortable')
+        sortableInterval = setInterval ->
+          if $root.data 'sortable'
+            clearInterval(sortableInterval)
             $root.sortable 'option', 'stop', (e, ui) ->
               $root = jQuery(ui.item)
               activate $root if $root.is(selector)
             $root.sortable 'option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera',
-          500
+          100
 
         if $root.is('.aloha-root-editable')
 
