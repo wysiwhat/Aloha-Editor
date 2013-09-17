@@ -22,7 +22,7 @@ define [
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
 
   DIALOG_HTML_CONTAINER = '''
-      <form class="plugin image modal hide fade" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
+      <form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
 
   DIALOG_HTML = '''
       <div class="modal-header">
@@ -46,16 +46,26 @@ define [
               <img class="preview-image"/>
             </div>
         </div>
-        <input type="file" class="upload-image-input" />
-        <input type="url" class="upload-url-input" placeholder="Enter URL of image ..."/>
-        <div class="figure-options">
-          <div>
-            <strong>Image title:</strong><input class="image-title" type="text" placeholder="Shows up above image"></input>
+        <fieldset>
+          <div class="control-group">
+            <div class="controls">
+              <input type="file" class="upload-image-input">
+              <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
+            </div>
           </div>
-          <div>
-            <strong>Image caption:</strong><input class="image-caption" type="text" placeholder="Shows up below image"></input>
+          <div class="control-group">
+            <label class="control-label">Image title:</label>
+            <div class="controls">
+              <input class="image-title" type="text" placeholder="Shows up above image">
+            </div>
           </div>
-        </div>
+          <div class="control-group">
+            <label class="control-label">Image caption:</label>
+            <div class="controls">
+              <input class="image-caption" type="text" placeholder="Shows up below image">
+            </div>
+          </div>
+        </fieldset>
         <div class="image-alt">
           <div class="forminfo">
             <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
@@ -82,36 +92,38 @@ define [
         <div class="source-selection">
           <ul style="list-style-type: none; padding: 0; margin: 0;">
             <li id="listitem-i-own-this">
-              <input type="radio" name="image-source-selection" value="i-own-this">
-                <span>I own it (no citation needed)</span><br/>
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) 
+              </label>
             </li>
             <li id="listitem-i-got-permission">
-              <input type="radio" name="image-source-selection" value="i-got-permission">
-                <span>I am allowed to reuse it:</span><br/>
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: 
+              </label>
               <div class="source-selection-allowed">
-                <ul style="list-style-type: none; padding: 0; margin: 0;">
-                  <li>
-                    <div>Who is the original author of this image?</div>
-                    <div>
-                      <input type="text" id="reuse-author"">
+                <fieldset>
+                  <div class="control-group">
+                    <label class="control-label">Who is the original author of this image?</label>
+                    <div class="controls">
+                      <input type="text" disabled="disabled" id="reuse-author"">
                     </div>
-                  </li>
-                  <li>
-                    <div>What organization owns this image?</div>
-                    <div>
-                      <input type="text" id="reuse-org"">
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">What organization owns this image?</label>
+                    <div class="controls">
+                      <input type="text" disabled="disabled" id="reuse-org"">
                     </div>
-                  </li>
-                  <li>
-                    <div>What is the original URL of this image?</div>
-                    <div>
-                      <input type="text" id="reuse-url" placeholder="http://">
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">What is the original URL of this image?</label>
+                    <div class="controls">
+                      <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">
                     </div>
-                  </li>
-                  <li>
-                    <div>Permission to reuse</div>
-                    <div>
-                      <select id="reuse-license">
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Permission to reuse</label>
+                    <div class="controls">
+                      <select id="reuse-license" disabled="disabled">
                         <option value="">Choose a license</option>
                         <option value="http://creativecommons.org/licenses/by/3.0/">
                           Creative Commons Attribution - CC-BY</option>
@@ -130,13 +142,14 @@ define [
                         <option>other</option>
                       </select>
                     </div>
-                  </li>
-                </ul>
+                  </div>
+                </fieldset>
               </div>
             </li>
             <li id="listitem-i-dont-know">
-              <input type="radio" name="image-source-selection" value="i-dont-know">
-                <span>I don't know (skip citation for now)</span><br/>
+              <label class="radio">
+                <input type="radio" name="image-source-selection" value="i-dont-know">I don't know (skip citation for now)
+              </label>
             </li>
           </ul>
         </div>
@@ -319,9 +332,16 @@ define [
             $option.prop 'selected', true
         if creator or publisher or rightsUrl
           $dialog.find('input[value="i-got-permission"]').prop 'checked', true
+
+        $dialog.find('input[type=radio]').click()
       else
 
-      $dialog.find('input[name="image-source-selection"]').click (evt) =>
+      $dialog.find('input[name="image-source-selection"]').click (evt) ->
+        if jQuery(@).val() == 'i-got-permission'
+          jQuery('.source-selection-allowed').find('input,select').removeAttr('disabled')
+        else
+          jQuery('.source-selection-allowed').find('input,select').attr('disabled', 'disabled')
+
         evt.stopPropagation()
         return
 

@@ -4,29 +4,31 @@
     background-repeat: no-repeat;
     border: 2px dashed #999999;
     margin: 0.5em 0;
-    padding: 5em;
+    padding: 5px;
     position: relative;
     text-align: center;
     height: 176px;
     overflow: hidden;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 .image-options .placeholder.preview img {
     max-height: 156px;
 }
 
+
+
 form.plugin.image textarea {
     width: 99%;
     padding: 0.25em;
 }
 
-form.plugin.image .upload-url-input,
 form.plugin.image .upload-image-input {
-    width: 98%;
+    line-height: 17px;
+    height: 17px;
+}
+
+form.plugin.image .control-group {
+    margin-bottom: 10px;
 }
 
 form#linkModal:focus {
