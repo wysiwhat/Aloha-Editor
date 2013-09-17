@@ -436,9 +436,15 @@
           };
           xhr.open("POST", settings.image.uploadurl, true);
           xhr.setRequestHeader("Cache-Control", "no-cache");
-          f = new FormData();
-          f.append(settings.image.uploadfield || 'upload', file, file.name);
-          return xhr.send(f);
+          if (settings.image.uploadSinglepart) {
+            xhr.setRequestHeader("Content-Type", "");
+            xhr.setRequestHeader("X-File-Name", file.name);
+            return xhr.send(file);
+          } else {
+            f = new FormData();
+            f.append(settings.image.uploadfield || 'upload', file, file.name);
+            return xhr.send(f);
+          }
         }
       }
     });
