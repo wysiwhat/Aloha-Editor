@@ -7,7 +7,7 @@
     padding: 5px;
     position: relative;
     text-align: center;
-    height: 176px;
+    height: 175px;
     overflow: hidden;
 }
 
@@ -15,7 +15,12 @@
     max-height: 156px;
 }
 
-
+.source-selection-allowed {
+    margin: 5px 0 5px 20px;
+}
+.source-selection-allowed input[type="text"] {
+    width: 500px;
+}
 
 form.plugin.image textarea {
     width: 99%;
@@ -25,10 +30,6 @@ form.plugin.image textarea {
 form.plugin.image .upload-image-input {
     line-height: 17px;
     height: 17px;
-}
-
-form.plugin.image .control-group {
-    margin-bottom: 10px;
 }
 
 form#linkModal:focus {

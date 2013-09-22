@@ -47,31 +47,21 @@ define [
             </div>
         </div>
         <fieldset>
-          <div class="control-group">
-            <div class="controls">
-              <input type="file" class="upload-image-input">
-              <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label">Image title:</label>
-            <div class="controls">
-              <input class="image-title" type="text" placeholder="Shows up above image">
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label">Image caption:</label>
-            <div class="controls">
-              <input class="image-caption" type="text" placeholder="Shows up below image">
-            </div>
-          </div>
+          <input type="file" class="upload-image-input">
+          <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
+
+          <label>Image title:</label>
+          <textarea class="image-title" placeholder="Shows up above image" rows="1"></textarea>
+
+          <label>Image caption:</label>
+          <textarea class="image-caption" placeholder="Shows up below image" rows="1"></textarea>
         </fieldset>
         <div class="image-alt">
           <div class="forminfo">
             <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
           </div>
           <div>
-            <textarea name="alt" type="text" placeholder="Enter description ..."></textarea>
+            <textarea name="alt" placeholder="Enter description ..." rows="1"></textarea>
           </div>
         </div>
       </div>
@@ -102,47 +92,34 @@ define [
               </label>
               <div class="source-selection-allowed">
                 <fieldset>
-                  <div class="control-group">
-                    <label class="control-label">Who is the original author of this image?</label>
-                    <div class="controls">
-                      <input type="text" disabled="disabled" id="reuse-author"">
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">What organization owns this image?</label>
-                    <div class="controls">
-                      <input type="text" disabled="disabled" id="reuse-org"">
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">What is the original URL of this image?</label>
-                    <div class="controls">
-                      <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label">Permission to reuse</label>
-                    <div class="controls">
-                      <select id="reuse-license" disabled="disabled">
-                        <option value="">Choose a license</option>
-                        <option value="http://creativecommons.org/licenses/by/3.0/">
-                          Creative Commons Attribution - CC-BY</option>
-                        <option value="http://creativecommons.org/licenses/by-nd/3.0/">
-                          Creative Commons Attribution-NoDerivs - CC BY-ND</option>
-                        <option value="http://creativecommons.org/licenses/by-sa/3.0/">
-                          Creative Commons Attribution-ShareAlike - CC BY-SA</option>
-                        <option value="http://creativecommons.org/licenses/by-nc/3.0/">
-                          Creative Commons Attribution-NonCommercial - CC BY-NC</option>
-                        <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">
-                          Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>
-                        <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">
-                          Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>
-                        <option value="http://creativecommons.org/publicdomain/">
-                          Public domain</option>
-                        <option>other</option>
-                      </select>
-                    </div>
-                  </div>
+                  <label>Who is the original author of this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-author">
+
+                  <label>What organization owns this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-org">
+
+                  <label>What is the original URL of this image?</label>
+                  <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">
+
+                  <label>Permission to reuse</label>
+                  <select id="reuse-license" disabled="disabled">
+                    <option value="">Choose a license</option>
+                    <option value="http://creativecommons.org/licenses/by/3.0/">
+                      Creative Commons Attribution - CC-BY</option>
+                    <option value="http://creativecommons.org/licenses/by-nd/3.0/">
+                      Creative Commons Attribution-NoDerivs - CC BY-ND</option>
+                    <option value="http://creativecommons.org/licenses/by-sa/3.0/">
+                      Creative Commons Attribution-ShareAlike - CC BY-SA</option>
+                    <option value="http://creativecommons.org/licenses/by-nc/3.0/">
+                      Creative Commons Attribution-NonCommercial - CC BY-NC</option>
+                    <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">
+                      Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>
+                    <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">
+                      Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>
+                    <option value="http://creativecommons.org/publicdomain/">
+                      Public domain</option>
+                    <option>other</option>
+                  </select>
                 </fieldset>
               </div>
             </li>
