@@ -167,8 +167,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
 
       # What kind of block is being activated
       type = null
-      for type in registeredTypes
-        if $element.is(type.selector)
+      for plugin in registeredTypes
+        if $element.is(plugin.selector)
+          type = plugin
           break
 
       if type == null
