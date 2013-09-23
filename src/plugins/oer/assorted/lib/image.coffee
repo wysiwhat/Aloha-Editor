@@ -34,12 +34,14 @@ define [
             <div class="image-selection">
               <div class="dia-alternative">
                 <span class="upload-image-link btn-link">Choose an image to upload</span>
+                <input type="file" class="upload-image-input">
               </div>
               <div class="dia-alternative">
                 OR
               </div>
               <div class="dia-alternative">
                 <span class="upload-url-link btn-link">get image from the Web</span>
+                <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
               </div>
             </div>
             <div class="placeholder preview hide">
@@ -47,18 +49,15 @@ define [
             </div>
         </div>
         <fieldset>
-          <input type="file" class="upload-image-input">
-          <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
-
-          <label>Image title:</label>
+          <label><strong>Image title:</strong></label>
           <textarea class="image-title" placeholder="Shows up above image" rows="1"></textarea>
 
-          <label>Image caption:</label>
+          <label><strong>Image caption:</strong></label>
           <textarea class="image-caption" placeholder="Shows up below image" rows="1"></textarea>
         </fieldset>
         <div class="image-alt">
           <div class="forminfo">
-            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.
+            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
           </div>
           <div>
             <textarea name="alt" placeholder="Enter description ..." rows="1"></textarea>
@@ -205,7 +204,6 @@ define [
         $placeholder.hide()
         $uploadUrl.hide()
         $uploadImage.click()
-        $uploadImage.show()
 
       dialog.find('.upload-url-link').on 'click', () ->
         $placeholder.hide()
