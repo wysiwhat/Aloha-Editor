@@ -30,6 +30,8 @@
       }
       editing = Boolean(imageSource);
       dialog.find('[name=alt]').val(imageAltText);
+      dialog.find('.image-title').val($title.text());
+      dialog.find('.image-caption').val($caption.text());
       if (editing) {
         dialog.find('.image-options').hide();
         dialog.find('.figure-options').hide();
