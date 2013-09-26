@@ -242,12 +242,12 @@ define [
         $el.attr 'src', imageSource
         $el.attr 'alt', dialog.find('[name=alt]').val()
 
-        if dialog.find('input.image-title').val()
-          $title.html dialog.find('input.image-title').val()
+        if dialog.find('.image-title').val()
+          $title.html dialog.find('.image-title').val()
         # else probably should remove the $title element
 
-        if dialog.find('input.image-caption').val()
-          $caption.html dialog.find('input.image-caption').val()
+        if dialog.find('.image-caption').val()
+          $caption.html dialog.find('.image-caption').val()
         # else probably should remove the $caption element
 
         if altAdded
