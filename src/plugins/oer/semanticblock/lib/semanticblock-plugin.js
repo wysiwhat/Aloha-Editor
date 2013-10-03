@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'copy/copy-plugin', 'css!semanticblock/css/semanticblock-plugin.css'], function(Aloha, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button, Copy) {
-    var DIALOG_HTML, activate, bindEvents, blockControls, blockDragHelper, blockTemplate, cleanIds, cleanWhitespace, copyBuffer, deactivate, getLabel, insertElement, pluginEvents, registeredTypes;
+    var DIALOG_HTML, activate, bindEvents, blockControls, blockDragHelper, blockIdentifier, blockTemplate, cleanIds, cleanWhitespace, copyBuffer, deactivate, getLabel, insertElement, pluginEvents, registeredTypes;
     if (pluginManager.plugins.semanticblock) {
       return pluginManager.plugins.semanticblock;
     }
@@ -114,31 +114,14 @@
         name: 'mouseover',
         selector: '.semantic-container',
         callback: function() {
-          var c, classes, elementName, label, wrapped;
+          var label, wrapped;
           jQuery(this).parents('.semantic-container').removeClass('focused');
           if (!jQuery(this).find('.focused').length) {
             jQuery(this).addClass('focused');
           }
           wrapped = jQuery(this).children('.aloha-oer-block').first();
-          label = wrapped.length && getLabel(wrapped);
-          if (label) {
-            elementName = label.toLowerCase();
-          } else {
-            classes = (function() {
-              var _i, _len, _ref, _results;
-              _ref = wrapped.attr('class').split(/\s+/);
-              _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                c = _ref[_i];
-                if (!/^aloha/.test(c)) {
-                  _results.push(c);
-                }
-              }
-              return _results;
-            })();
-            elementName = classes.length && ("element (class='" + (classes.join(' ')) + "')") || 'element';
-          }
-          return jQuery(this).find('.aloha-block-handle').attr('title', "Drag this " + elementName + " to another location.");
+          label = wrapped.length && blockIdentifier(wrapped);
+          return jQuery(this).find('.aloha-block-handle').attr('title', "Drag this " + label + " to another location.");
         }
       }, {
         name: 'mouseout',
@@ -168,8 +151,29 @@
         }
       }
     };
+    blockIdentifier = function($element) {
+      var c, classes, elementName, label;
+      label = getLabel($element);
+      if (label) {
+        return elementName = label.toLowerCase();
+      } else {
+        classes = (function() {
+          var _i, _len, _ref, _results;
+          _ref = $element.attr('class').split(/\s+/);
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            c = _ref[_i];
+            if (!/^aloha/.test(c)) {
+              _results.push(c);
+            }
+          }
+          return _results;
+        })();
+        return elementName = classes.length && ("element (class='" + (classes.join(' ')) + "')") || 'element';
+      }
+    };
     activate = function($element) {
-      var $body, $title, controls, options, plugin, type, _i, _len;
+      var $body, $title, controls, label, options, plugin, type, _i, _len;
       if (!($element.is('.semantic-container') || ($element.is('.alternates') && $element.parents('figure').length))) {
         $element.addClass('aloha-oer-block');
         if ($element.parent().is('.aloha-editable')) {
@@ -184,10 +188,13 @@
             break;
           }
         }
+        controls = blockControls.clone();
+        label = blockIdentifier($element);
+        controls.find('.semantic-delete').attr('title', "Remove this " + label + ".");
+        controls.find('.copy').attr('title', "Copy this " + label + ".");
         if (type === null) {
-          $element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock();
+          $element.wrap(blockTemplate).parent().append(controls).alohaBlock();
         } else {
-          controls = blockControls.clone();
           if (type.options) {
             if (typeof type.options === 'function') {
               options = type.options($element);

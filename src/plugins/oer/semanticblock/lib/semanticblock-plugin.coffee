@@ -124,14 +124,8 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).parents('.semantic-container').removeClass('focused')
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
       wrapped = jQuery(this).children('.aloha-oer-block').first()
-      label = wrapped.length and getLabel(wrapped)
-      if label
-        elementName = label.toLowerCase()
-      else
-        # Show the classes involved, filter out the aloha ones
-        classes = (c for c in wrapped.attr('class').split(/\s+/) when not /^aloha/.test(c))
-        elementName = classes.length and "element (class='#{classes.join(' ')}')" or 'element'
-      jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{elementName} to another location.")
+      label = wrapped.length and blockIdentifier(wrapped)
+      jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{label} to another location.")
   ,
     name: 'mouseout'
     selector: '.semantic-container'
@@ -156,6 +150,15 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       if $element.is(type.selector)
         return type.getLabel $element
 
+  blockIdentifier = ($element) ->
+    label = getLabel($element)
+    if label
+      elementName = label.toLowerCase()
+    else
+      # Show the classes involved, filter out the aloha ones
+      classes = (c for c in $element.attr('class').split(/\s+/) when not /^aloha/.test(c))
+      elementName = classes.length and "element (class='#{classes.join(' ')}')" or 'element'
+
   activate = ($element) ->
     unless $element.is('.semantic-container') or ($element.is('.alternates') and $element.parents('figure').length)
       $element.addClass 'aloha-oer-block'
@@ -172,10 +175,13 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           type = plugin
           break
 
+      controls = blockControls.clone()
+      label = blockIdentifier($element)
+      controls.find('.semantic-delete').attr('title', "Remove this #{label}.")
+      controls.find('.copy').attr('title', "Copy this #{label}.")
       if type == null
-        $element.wrap(blockTemplate).parent().append(blockControls.clone()).alohaBlock()
+        $element.wrap(blockTemplate).parent().append(controls).alohaBlock()
       else
-        controls = blockControls.clone()
         # Ask `type` plugin about the controls it wants
         if type.options
           if typeof type.options == 'function'
