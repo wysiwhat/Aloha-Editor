@@ -35,7 +35,7 @@
         if (localStorage) {
           localStorage.alohaOerCopySrcPath = srcpath;
         }
-        return jQuery('.action.paste').fadeIn('fast');
+        return this.pastebutton.enable();
       },
       init: function() {
         var focusHeading, plugin,

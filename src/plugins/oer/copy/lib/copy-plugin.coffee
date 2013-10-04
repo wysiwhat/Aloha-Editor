@@ -34,7 +34,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       localStorage.alohaOerCopyBuffer = buffer if localStorage
       localStorage.alohaOerCopySrcPath = srcpath if localStorage
 
-      jQuery('.action.paste').fadeIn('fast')
+      @pastebutton.enable()
 
     init: ->
       plugin = @
