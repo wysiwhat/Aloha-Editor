@@ -125,6 +125,22 @@
     padding: 0;
 }
 
+.semantic-controls-top {
+    position: absolute;
+    right: 3em;
+    white-space: nowrap;
+    display: none;
+}
+
+.semantic-controls-top a {
+    color: #666666 !important;
+    cursor: pointer;
+}
+
+.semantic-container.focused > .semantic-controls-top {
+    display: block;
+}
+
 .aloha-oer-block {
   padding: 20px 10px 5px 20px;
   min-height: 50px;

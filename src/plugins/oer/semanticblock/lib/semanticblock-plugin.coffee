@@ -25,11 +25,15 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     </div>'''
 
   blockTemplate = jQuery('<div class="semantic-container aloha-ephemera-wrapper"></div>')
+  topControls = jQuery('''
+    <div class="semantic-controls-top aloha-ephemera">
+      <a class="copy" title="Copy this element."><i class="icon-copy"></i> Copy element</button>
+    </div>
+  ''')
   blockControls = jQuery('''
     <div class="semantic-controls aloha-ephemera">
       <button class="semantic-delete" title="Remove this element."><i class="icon-remove"></i></button>
       <button class="semantic-settings" title="advanced options."><i class="icon-cog"></i></button>
-      <button class="copy" title="Copy this element."><i class="icon-copy"></i></button>
     </div>''')
   blockDragHelper = jQuery('''
     <div class="semantic-drag-helper aloha-ephemera">
@@ -78,7 +82,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
         jQuery(this).remove()
   ,
     name: 'click'
-    selector: '.semantic-container .semantic-controls .copy'
+    selector: '.semantic-container .semantic-controls-top .copy'
     callback: (e) ->
       # grab the content of the block that was just clicked
       $element = jQuery(this).parents('.semantic-container').first()
@@ -176,11 +180,12 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
           break
 
       controls = blockControls.clone()
+      top = topControls.clone()
       label = blockIdentifier($element)
       controls.find('.semantic-delete').attr('title', "Remove this #{label}.")
-      controls.find('.copy').attr('title', "Copy this #{label}.")
+      top.find('.copy').attr('title', "Copy #{label}.")
       if type == null
-        $element.wrap(blockTemplate).parent().append(controls).alohaBlock()
+        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock()
       else
         # Ask `type` plugin about the controls it wants
         if type.options
@@ -193,9 +198,9 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
             # We deliberately don't allow people to drop the delete button. At
             # least until we know whether that is even needed!
             controls.find('button.semantic-settings').remove() if 'settings' not in options.buttons
-            controls.find('button.copy').remove() if 'copy' not in options.buttons
+            top.find('a.copy').remove() if 'copy' not in options.buttons
 
-        $element.wrap(blockTemplate).parent().append(controls).alohaBlock()
+        $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock()
         type.activate $element
         return
  
