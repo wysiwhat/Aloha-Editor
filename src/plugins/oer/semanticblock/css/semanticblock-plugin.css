@@ -60,6 +60,9 @@
 .semantic-container.focused {
     border: 1px solid #ccc;
 }
+.semantic-container.copy-preview {
+    background-color: #F2F2F2;
+}
 
 .semantic-container .aloha-block-handle {
     background-image:

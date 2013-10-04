@@ -71,6 +71,20 @@
           return Copy.buffer($element.outerHtml(), Copy.getCurrentPath());
         }
       }, {
+        name: 'mouseover',
+        selector: '.semantic-container .semantic-controls-top .copy',
+        callback: function(e) {
+          var $elements;
+          $elements = jQuery(this).parents('.semantic-container');
+          return $elements.removeClass('copy-preview').first().addClass('copy-preview');
+        }
+      }, {
+        name: 'mouseout',
+        selector: '.semantic-container .semantic-controls-top .copy',
+        callback: function(e) {
+          return jQuery(this).parents('.semantic-container').removeClass('copy-preview');
+        }
+      }, {
         name: 'click',
         selector: '.semantic-container .semantic-settings',
         callback: function(e) {

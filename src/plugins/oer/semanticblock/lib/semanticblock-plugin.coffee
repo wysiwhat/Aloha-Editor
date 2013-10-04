@@ -88,6 +88,18 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       $element = jQuery(this).parents('.semantic-container').first()
       Copy.buffer $element.outerHtml(), Copy.getCurrentPath()
   ,
+    name: 'mouseover'
+    selector: '.semantic-container .semantic-controls-top .copy'
+    callback: (e) ->
+      # grab the content of the block that was just clicked
+      $elements = jQuery(this).parents('.semantic-container')
+      $elements.removeClass('copy-preview').first().addClass('copy-preview')
+  ,
+    name: 'mouseout'
+    selector: '.semantic-container .semantic-controls-top .copy'
+    callback: (e) ->
+      jQuery(this).parents('.semantic-container').removeClass('copy-preview')
+  ,
     name: 'click'
     selector: '.semantic-container .semantic-settings'
     callback: (e) ->
