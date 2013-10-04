@@ -35,6 +35,7 @@
         if (localStorage) {
           localStorage.alohaOerCopySrcPath = srcpath;
         }
+        this.copybutton.disable();
         return this.pastebutton.enable();
       },
       init: function() {

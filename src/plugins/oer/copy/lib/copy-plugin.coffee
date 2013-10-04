@@ -34,6 +34,10 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       localStorage.alohaOerCopyBuffer = buffer if localStorage
       localStorage.alohaOerCopySrcPath = srcpath if localStorage
 
+      # Disable copy button, it will re-enable when you move the cursor. This
+      # gives visual feedback and prevents you from copying the same thing
+      # twice.  Enable the paste button explicitly.
+      @copybutton.disable()
       @pastebutton.enable()
 
     init: ->
