@@ -26,6 +26,7 @@
         }
       },
       buffer: function(content, path) {
+        var _base;
         buffer = content;
         buffer = buffer.replace(/id="[^"]+"/, '');
         srcpath = path;
@@ -36,7 +37,8 @@
           localStorage.alohaOerCopySrcPath = srcpath;
         }
         this.copybutton.disable();
-        return this.pastebutton.enable();
+        this.pastebutton.enable();
+        return typeof (_base = this.pastebutton).flash === "function" ? _base.flash() : void 0;
       },
       init: function() {
         var focusHeading, plugin,

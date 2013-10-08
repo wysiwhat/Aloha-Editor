@@ -39,6 +39,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       # twice.  Enable the paste button explicitly.
       @copybutton.disable()
       @pastebutton.enable()
+      @pastebutton.flash?()
 
     init: ->
       plugin = @
