@@ -2,7 +2,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
    
   buffer = ''
   srcpath = null
- 
+
   Plugin.create 'copy',
     getCurrentPath: ->
       # When copy/pasting html, the images contained therein might have
