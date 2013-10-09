@@ -37,7 +37,11 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       jQuery('.action.paste').fadeIn('fast')
 
     copySection: ($el) ->
-      selector = "h1,h2,h3".substr(0, "h1,h2,h3".indexOf($el[0].nodeName.toLowerCase())+2)
+      headings = ['h1', 'h2', 'h3']
+      level = headings.indexOf $el[0].nodeName.toLowerCase()
+      # Pick up all elements until the next heading of the same level or higher
+      selector = headings.slice(0, level+1).join(',')
+
       if $el.addBack
         # Jquery >= 1.8
         $el = $el.nextUntil(selector).addBack()
