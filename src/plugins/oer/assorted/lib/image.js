@@ -192,10 +192,12 @@
 
       }
       $dialog.find('input[name="image-source-selection"]').click(function(evt) {
+        var inputs;
+        inputs = jQuery('.source-selection-allowed').find('input,select');
         if (jQuery(this).val() === 'i-got-permission') {
-          jQuery('.source-selection-allowed').find('input,select').removeAttr('disabled');
+          inputs.removeAttr('disabled');
         } else {
-          jQuery('.source-selection-allowed').find('input,select').attr('disabled', 'disabled');
+          inputs.attr('disabled', 'disabled');
         }
         evt.stopPropagation();
       });
