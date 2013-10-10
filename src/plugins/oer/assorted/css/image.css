@@ -119,11 +119,13 @@ figure.aloha-oer-block .image-wrapper .image-edit.passive {
 }
 
 i.icon-warning {
+  display: inline-block;
   background-image: url(../img/warning-01.png);
   background-position: 0 0;
   margin-right: 4px;
   margin-left: 4px;
   width: 16px;
+  height: 16px;
 }
 
 .warning-text {
