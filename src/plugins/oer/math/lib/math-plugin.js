@@ -83,8 +83,9 @@
         $content = $('<div />').append(content);
         if ($content.has('span.math-element').length && $content.has('script').length) {
           e.preventDefault();
-          return e.originalEvent.clipboardData.setData('text/oerpub-content', $content.html());
+          e.originalEvent.clipboardData.setData('text/oerpub-content', $content.html());
         }
+        return Copy.buffer($content.html(), Copy.getCurrentPath());
       });
       editable.obj.on('paste', function(e) {
         var content;
