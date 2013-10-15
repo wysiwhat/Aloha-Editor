@@ -88,11 +88,30 @@
         return Copy.buffer($content.html(), Copy.getCurrentPath());
       });
       editable.obj.on('paste', function(e) {
-        var content;
+        var $content, content, math, range;
         content = e.originalEvent.clipboardData.getData('text/oerpub-content');
         if (content) {
           e.preventDefault();
-          return Aloha.execCommand('insertHTML', false, content);
+          $content = jQuery('<div class="aloha-ephemera-wrapper newly-pasted-content" />').append(content).hide();
+          $content.find('*[id]').removeAttr('id');
+          range = Aloha.getSelection().getRangeAt(0);
+          range.insertNode($content.get(0));
+          math = [];
+          $content.find('.math-element').each(function(idx, el) {
+            var deferred;
+            deferred = $.Deferred();
+            math.push(deferred);
+            return triggerMathJax(jQuery(el), function() {
+              return deferred.resolve();
+            });
+          });
+          return $.when.apply($content, math).done(function() {
+            return $content.each(function() {
+              var $$$;
+              $$$ = jQuery(this);
+              return $$$.replaceWith($$$.contents());
+            });
+          });
         }
       });
       editable.obj.bind('keydown', 'ctrl+m', function(evt) {

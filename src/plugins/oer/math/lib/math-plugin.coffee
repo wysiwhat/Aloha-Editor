@@ -162,9 +162,29 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       content = e.originalEvent.clipboardData.getData('text/oerpub-content')
       if content
         e.preventDefault()
-        # Using insertHTML here allows pasted content to be cleaned up by the
-        # contenthandler plugin.
-        Aloha.execCommand('insertHTML', false, content)
+        $content = jQuery(
+          '<div class="aloha-ephemera-wrapper newly-pasted-content" />')
+          .append(content).hide()
+
+        # Remove ids, new ones will be assigned
+        $content.find('*[id]').removeAttr('id')
+
+        # Paste content into editor
+        range = Aloha.getSelection().getRangeAt(0)
+        range.insertNode($content.get(0))
+
+        # Re-typeset math, because we need our context menu back
+        math = []
+        $content.find('.math-element').each (idx, el) ->
+          deferred = $.Deferred()
+          math.push(deferred)
+          triggerMathJax jQuery(el), () -> deferred.resolve()
+
+        # When we're done typesetting, show the content and unwrap it.
+        $.when.apply($content, math).done ->
+          $content.each () ->
+            $$$ = jQuery(@)
+            $$$.replaceWith $$$.contents()
 
     # Bind ctrl+m to math insert/mathify
     editable.obj.bind 'keydown', 'ctrl+m', (evt) ->
