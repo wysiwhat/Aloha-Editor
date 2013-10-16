@@ -150,13 +150,13 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       # Check that we also have a script tag in our selection, that occurs
       # towards the end of the math and ensures we have the whole of it.
       # The idea is to only do custom copy/paste if we need it, and let the
-      # browser handle other content.
+      # browser handle other content. Also buffer it in our local copy buffer.
       if $content.has('span.math-element').length and $content.has('script').length
         e.preventDefault()
         e.originalEvent.clipboardData.setData 'text/oerpub-content', $content.html()
-
-      # Also buffer it in our local copy buffer
-      Copy.buffer $content.html()
+        Copy.buffer $content.html(), 'text/oerpub-content'
+      else
+        Copy.buffer $content.html()
 
     editable.obj.on 'paste', (e) ->
       content = e.originalEvent.clipboardData.getData('text/oerpub-content')
@@ -511,7 +511,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
   MathJax.Callback.Queue MathJax.Hub.Register.StartupHook "MathMenu Ready", () ->
     copyCommand = MathJax.Menu.ITEM.COMMAND "Copy Math", (e,f,g) ->
       $script = jQuery(document.getElementById(MathJax.Menu.jax.inputID))
-      Copy.buffer $script.parent().parent().outerHtml()
+      Copy.buffer $script.parent().parent().outerHtml(), 'text/oerpub-content'
     MathJax.Menu.menu.items.unshift copyCommand
 
   ob =

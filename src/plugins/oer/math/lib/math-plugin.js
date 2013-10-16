@@ -84,8 +84,10 @@
         if ($content.has('span.math-element').length && $content.has('script').length) {
           e.preventDefault();
           e.originalEvent.clipboardData.setData('text/oerpub-content', $content.html());
+          return Copy.buffer($content.html(), 'text/oerpub-content');
+        } else {
+          return Copy.buffer($content.html());
         }
-        return Copy.buffer($content.html());
       });
       editable.obj.on('paste', function(e) {
         var $content, content, math, range;
@@ -426,7 +428,7 @@
       copyCommand = MathJax.Menu.ITEM.COMMAND("Copy Math", function(e, f, g) {
         var $script;
         $script = jQuery(document.getElementById(MathJax.Menu.jax.inputID));
-        return Copy.buffer($script.parent().parent().outerHtml());
+        return Copy.buffer($script.parent().parent().outerHtml(), 'text/oerpub-content');
       });
       return MathJax.Menu.menu.items.unshift(copyCommand);
     }));
