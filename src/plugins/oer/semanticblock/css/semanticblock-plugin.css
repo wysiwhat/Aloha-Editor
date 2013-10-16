@@ -28,7 +28,8 @@
 .aloha-oer-block-placeholder {
     background: #C5DAE9;
     border: 1px dashed #1b86d2;
-    min-height: 100px;
+    min-height: 50px;
+    margin: 10px 0;
 }
 
 /* Make titles inline so they show up next to the type dropdown if there is one */
