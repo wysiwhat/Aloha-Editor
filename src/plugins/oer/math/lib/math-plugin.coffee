@@ -156,7 +156,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
         e.originalEvent.clipboardData.setData 'text/oerpub-content', $content.html()
 
       # Also buffer it in our local copy buffer
-      Copy.buffer $content.html(), Copy.getCurrentPath()
+      Copy.buffer $content.html()
 
     editable.obj.on 'paste', (e) ->
       content = e.originalEvent.clipboardData.getData('text/oerpub-content')

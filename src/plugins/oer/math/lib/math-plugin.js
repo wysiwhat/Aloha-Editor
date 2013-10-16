@@ -85,7 +85,7 @@
           e.preventDefault();
           e.originalEvent.clipboardData.setData('text/oerpub-content', $content.html());
         }
-        return Copy.buffer($content.html(), Copy.getCurrentPath());
+        return Copy.buffer($content.html());
       });
       editable.obj.on('paste', function(e) {
         var $content, content, math, range;

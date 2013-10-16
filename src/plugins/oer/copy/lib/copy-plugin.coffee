@@ -29,7 +29,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
     buffer: (content, path) ->
       buffer = content
       buffer = buffer.replace /id="[^"]+"/, ''
-      srcpath = path
+      srcpath = path or @getCurrentPath()
 
       localStorage.alohaOerCopyBuffer = buffer if localStorage
       localStorage.alohaOerCopySrcPath = srcpath if localStorage
@@ -56,11 +56,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       html = ''
       html += jQuery(e).outerHtml() for e in $el
 
-      path = @getCurrentPath()
-      if path != null
-        @buffer html, path
-      else
-        @buffer html
+      @buffer html
 
     init: ->
       plugin = @
