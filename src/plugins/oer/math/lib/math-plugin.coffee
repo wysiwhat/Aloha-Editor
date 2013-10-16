@@ -144,7 +144,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     # type again when pasting. Prevent the browser default. This will only work
     # in browsers that support event.clipboardData, chrome and safari to date.
     editable.obj.on 'copy', (e) ->
-      content = Aloha.getSelection().getRangeAt(0).cloneContents()
+      content = e.oerContent or Aloha.getSelection().getRangeAt(0).cloneContents()
       $content = $('<div />').append(content)
       # If there is math among the content we're copying, treat it specially.
       # Check that we also have a script tag in our selection, that occurs
@@ -153,13 +153,14 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       # browser handle other content. Also buffer it in our local copy buffer.
       if $content.has('span.math-element').length and $content.has('script').length
         e.preventDefault()
-        e.originalEvent.clipboardData.setData 'text/oerpub-content', $content.html()
-        Copy.buffer $content.html(), 'text/oerpub-content'
+        clipboard = e.clipboardData or e.originalEvent.clipboardData
+        clipboard.setData 'text/oerpub-content', $content.html()
       else
         Copy.buffer $content.html()
 
     editable.obj.on 'paste', (e) ->
-      content = e.originalEvent.clipboardData.getData('text/oerpub-content')
+      clipboard = e.clipboardData or e.originalEvent.clipboardData
+      content = clipboard.getData('text/oerpub-content')
       if content
         e.preventDefault()
         $content = jQuery(

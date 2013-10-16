@@ -78,20 +78,21 @@
         return;
       }
       editable.obj.on('copy', function(e) {
-        var $content, content;
-        content = Aloha.getSelection().getRangeAt(0).cloneContents();
+        var $content, clipboard, content;
+        content = e.oerContent || Aloha.getSelection().getRangeAt(0).cloneContents();
         $content = $('<div />').append(content);
         if ($content.has('span.math-element').length && $content.has('script').length) {
           e.preventDefault();
-          e.originalEvent.clipboardData.setData('text/oerpub-content', $content.html());
-          return Copy.buffer($content.html(), 'text/oerpub-content');
+          clipboard = e.clipboardData || e.originalEvent.clipboardData;
+          return clipboard.setData('text/oerpub-content', $content.html());
         } else {
           return Copy.buffer($content.html());
         }
       });
       editable.obj.on('paste', function(e) {
-        var $content, content, math, range;
-        content = e.originalEvent.clipboardData.getData('text/oerpub-content');
+        var $content, clipboard, content, math, range;
+        clipboard = e.clipboardData || e.originalEvent.clipboardData;
+        content = clipboard.getData('text/oerpub-content');
         if (content) {
           e.preventDefault();
           $content = jQuery('<div class="aloha-ephemera-wrapper newly-pasted-content" />').append(content).hide();
