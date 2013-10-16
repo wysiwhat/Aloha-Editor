@@ -4,6 +4,22 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
   srcpath = null
   content_type = null
 
+  getSection = ($el) ->
+    headings = ['h1', 'h2', 'h3']
+    level = headings.indexOf $el[0].nodeName.toLowerCase()
+    # Pick up all elements until the next heading of the same level or higher
+    selector = headings.slice(0, level+1).join(',')
+
+    if $el.addBack
+      # Jquery >= 1.8
+      $el = $el.nextUntil(selector).addBack()
+    else
+      # Jquery < 1.8
+      $el = $el.nextUntil(selector).andSelf()
+    html = ''
+    html += jQuery(e).outerHtml() for e in $el
+    return html
+
   Plugin.create 'copy',
     getCurrentPath: ->
       # When copy/pasting html, the images contained therein might have
@@ -51,21 +67,16 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       @pastebutton.flash?()
 
     copySection: ($el) ->
-      headings = ['h1', 'h2', 'h3']
-      level = headings.indexOf $el[0].nodeName.toLowerCase()
-      # Pick up all elements until the next heading of the same level or higher
-      selector = headings.slice(0, level+1).join(',')
+      content = getSection($el)
 
-      if $el.addBack
-        # Jquery >= 1.8
-        $el = $el.nextUntil(selector).addBack()
-      else
-        # Jquery < 1.8
-        $el = $el.nextUntil(selector).andSelf()
-      html = ''
-      html += jQuery(e).outerHtml() for e in $el
-
-      @buffer html
+      # Fire a copy event, allow something more suitable to handle this.
+      evt = $.Event('copy')
+      evt.oerContent = content
+      evt.clipboardData =
+        setData: (t, c) => @buffer c, t
+      Aloha.activeEditable.obj.trigger(evt)
+      if not evt.isDefaultPrevented()
+        @buffer content
 
     init: ->
       plugin = @
@@ -94,7 +105,19 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
         tooltip: 'Paste',
         click: (e) ->
           e.preventDefault()
-          range = Aloha.Selection.getRangeObject()
+
+          # Fire a paste event, allow something else to handle this, if that
+          # something deems itself more suitable.
+          evt = $.Event('paste')
+          evt.clipboardData =
+            getData: (t) ->
+              if t == plugin.getContentType()
+                return plugin.getBuffer()
+              return null
+          Aloha.activeEditable.obj.trigger(evt)
+          return if evt.isDefaultPrevented()
+
+          # Default paste behaviour follows
           $elements = jQuery plugin.getBuffer()
 
           dstpath = plugin.getCurrentPath()
@@ -116,6 +139,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
                 else
                   console.log "Image path already absolute: #{imgpath}"
 
+          range = Aloha.Selection.getRangeObject()
           GENTICS.Utils.Dom.insertIntoDOM $elements, range, Aloha.activeEditable.obj
 
       @copybutton = UI.adopt "copy", Button,
