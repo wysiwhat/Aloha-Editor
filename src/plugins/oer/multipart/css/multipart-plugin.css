@@ -12,10 +12,13 @@
     margin-left: 20px;
 }
 
-.multipart,
-.problemset {
+.aloha-oer-block.multipart,
+.aloha-oer-block.problemset {
     min-height: 50px;
     counter-reset: problems;
+    border: 0;
+    padding: 0;
+    margin: 0 0 0 10px;
 }
 
 .multipart > .semantic-container,
