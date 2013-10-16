@@ -2,6 +2,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
    
   buffer = ''
   srcpath = null
+  content_type = null
 
   Plugin.create 'copy',
     getCurrentPath: ->
@@ -26,13 +27,21 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
       else
         return srcpath
 
-    buffer: (content, path) ->
+    getContentType: ->
+      if localStorage
+        return localStorage.alohaOerCopyContentType
+      else
+        return content_type
+
+    buffer: (content, type, path) ->
       buffer = content
       buffer = buffer.replace /id="[^"]+"/, ''
+      content_type = type or 'text/html'
       srcpath = path or @getCurrentPath()
 
       localStorage.alohaOerCopyBuffer = buffer if localStorage
       localStorage.alohaOerCopySrcPath = srcpath if localStorage
+      localStorage.alohaOerCopyContentType = content_type if localStorage
 
       # Disable copy button, it will re-enable when you move the cursor. This
       # gives visual feedback and prevents you from copying the same thing
