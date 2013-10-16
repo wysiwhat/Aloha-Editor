@@ -30,7 +30,22 @@
 .multipart .exercise-controls,
 .problemset .exercise-controls {
     text-align: center;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    -webkit-transition: opacity .5s ease-in-out, height .5s ease-in-out;
+    -moz-transition: opacity .5s ease-in-out, height .5s ease-in-out;
+    -ms-transition: opacity .5s ease-in-out, height .5s ease-in-out;
+    -o-transition: opacity .5s ease-in-out, height .5s ease-in-out;
+    transition: opacity .5s ease-in-out, height .5s ease-in-out;
 }
+
+.semantic-container:hover > .multipart > .exercise-controls, 
+.semantic-container:hover > .problemset > .exercise-controls {
+    height: 20px;
+    opacity: 1;
+}
+
 .multipart .exercise-controls a,
 .problemset .exercise-controls a {
     text-decoration: none;
