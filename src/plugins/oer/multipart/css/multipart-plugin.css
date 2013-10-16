@@ -14,7 +14,6 @@
 
 .aloha-oer-block.multipart,
 .aloha-oer-block.problemset {
-    min-height: 50px;
     counter-reset: problems;
     border: 0;
     padding: 0;
