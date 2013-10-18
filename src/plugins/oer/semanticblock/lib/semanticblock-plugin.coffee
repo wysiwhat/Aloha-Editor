@@ -141,7 +141,7 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
       wrapped = jQuery(this).children('.aloha-oer-block').first()
       label = wrapped.length and blockIdentifier(wrapped)
-      jQuery(this).find('.aloha-block-handle').attr('title', "Drag this #{label} to another location.")
+      jQuery(this).find('.aloha-block-handle').first().attr('title', "Drag this #{label} to another location")
   ,
     name: 'mouseout'
     selector: '.semantic-container'

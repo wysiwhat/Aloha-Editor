@@ -136,7 +136,7 @@
           }
           wrapped = jQuery(this).children('.aloha-oer-block').first();
           label = wrapped.length && blockIdentifier(wrapped);
-          return jQuery(this).find('.aloha-block-handle').attr('title', "Drag this " + label + " to another location.");
+          return jQuery(this).find('.aloha-block-handle').first().attr('title', "Drag this " + label + " to another location");
         }
       }, {
         name: 'mouseout',
