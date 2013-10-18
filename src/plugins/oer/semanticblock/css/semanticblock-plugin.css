@@ -28,7 +28,8 @@
 .aloha-oer-block-placeholder {
     background: #C5DAE9;
     border: 1px dashed #1b86d2;
-    min-height: 100px;
+    min-height: 50px;
+    margin: 10px 0;
 }
 
 /* Make titles inline so they show up next to the type dropdown if there is one */
@@ -39,15 +40,33 @@
     height: auto !important;
 }
 
+.semantic-container.copy-preview, .semantic-container.copy-preview > .semantic-controls-top {
+    background-color: #F2F2F2;
+}
+.semantic-container.copy-preview .exercise-controls, 
+.semantic-container.copy-preview .solution-controls {
+    display: none !important;
+}
+
 .semantic-container.drag-active {
     background: #F0F0F0;
+}
+.semantic-container.drag-active .semantic-controls-top, 
+.semantic-container.drag-active .exercise-controls, 
+.semantic-container.drag-active .solution-controls {
+    display: none !important;
 }
 
 .semantic-container.delete-hover {
     background: #F0F0F0;
 }
-.semantic-container.delete-hover > .aloha-oer-block {
+.semantic-container.delete-hover > .aloha-oer-block{
     opacity: 0.3;
+}
+.semantic-container.delete-hover .semantic-controls-top, 
+.semantic-container.delete-hover .exercise-controls, 
+.semantic-container.delete-hover .solution-controls {
+    display: none !important;
 }
 
 .semantic-container {
@@ -56,12 +75,10 @@
     padding: 10px 0 10px;
     margin: 10px 0 10px 0;
     border: 1px solid transparent;
+    min-height: 15px;
 }
 .semantic-container.focused {
     border: 1px solid #ccc;
-}
-.semantic-container.copy-preview {
-    background-color: #F2F2F2;
 }
 
 .semantic-container .aloha-block-handle {
@@ -75,10 +92,10 @@
     border: 1px solid #ccc;
     height: 12px;
     width: 50px;
-    margin: 5px 0 0 0;
+    margin-left: -25px; /* This will better center the handle, since "left: 50%" starts at the handle's left edge */
     position: absolute;
     left: 50%;
-    top: -13px;
+    top: -8px;
     display: none !important; /* override the default aloha display logic for handles */
     cursor: -moz-grab !important;
     cursor: -webkit-grab !important;
@@ -102,13 +119,14 @@
 .semantic-container .semantic-controls {
     border-left: 1px solid #ccc;
     background: #F5F5F5;
-    padding-left: 1px;
     position: absolute;
     top: 0;
     right: 0;
     width: 15px;
     height: 100%;
     display: none;
+    text-align: center;
+    line-height: normal;
 }
 .semantic-container.focused > .semantic-controls {
     display: block;
@@ -117,27 +135,43 @@
     display: none;
 }
 
-.semantic-controls button:hover {
-    background: #CCC;
+.semantic-delete:hover{
+    background-color: #000;
+    color: #fff;
 }
+.semantic-settings:hover{
+    color: #000;
+}
+
 .semantic-controls button {
     outline: 0;
     border: 0;
     background: #F5F5F5;
     margin: 0;
     padding: 0;
+    color: #888;
+    width: 15px;
 }
 
 .semantic-controls-top {
     position: absolute;
-    right: 3em;
+    z-index: 2; /* otherwise sometimes it isn't fully clickable (e.g. in equations) */
+    top: 0;
+    right: 17px; /* put right next to .semantic-controls */
     white-space: nowrap;
     display: none;
+    font-size: 11px;
+    padding: 1px 6px;
+    background-color: #fff;
 }
 
 .semantic-controls-top a {
     color: #666666 !important;
     cursor: pointer;
+}
+
+.semantic-controls-top .icon-copy{
+    font-size: 12px; /* at least in my browser the icon messed up when displayed at 11px */
 }
 
 .semantic-container.focused > .semantic-controls-top {
@@ -146,7 +180,6 @@
 
 .aloha-oer-block {
   padding: 20px 10px 5px 20px;
-  min-height: 50px;
   margin: 0 30px 0 30px;
   border: 1px solid #333;
   border-top-color: #ccc;
