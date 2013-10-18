@@ -19,14 +19,14 @@
         name: 'mouseenter',
         selector: '.aloha-block-draghandle',
         callback: function() {
-          return jQuery(this).parents('.semantic-container').addClass('drag-active');
+          return jQuery(this).parent('.semantic-container').addClass('drag-active');
         }
       }, {
         name: 'mouseleave',
         selector: '.aloha-block-draghandle',
         callback: function() {
-          if (!jQuery(this).parents('.semantic-container').is('.aloha-oer-dragging')) {
-            return jQuery(this).parents('.semantic-container').removeClass('drag-active');
+          if (!jQuery(this).parent('.semantic-container').is('.aloha-oer-dragging')) {
+            return jQuery(this).parent('.semantic-container').removeClass('drag-active');
           }
         }
       }, {

@@ -46,13 +46,13 @@ define ['aloha', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'j
     name: 'mouseenter'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container').addClass 'drag-active'
+      jQuery(this).parent('.semantic-container').addClass 'drag-active'
   ,
     name: 'mouseleave'
     selector: '.aloha-block-draghandle'
     callback: ->
-      jQuery(this).parents('.semantic-container')
-        .removeClass 'drag-active'  unless jQuery(this).parents('.semantic-container').is('.aloha-oer-dragging')
+      jQuery(this).parent('.semantic-container')
+        .removeClass 'drag-active'  unless jQuery(this).parent('.semantic-container').is('.aloha-oer-dragging')
   ,
     name: 'mouseenter'
     selector: '.semantic-delete'
