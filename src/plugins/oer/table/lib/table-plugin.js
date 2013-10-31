@@ -375,7 +375,7 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
                 icon: "aloha-icon aloha-icon-deletetable",
                 scope: this.name,
                 click: function(){
-                    that.currentTable.remove();
+                    that.currentTable.parents('.semantic-container').remove();
                     that.currentTable = $();
                     that.renumberCaptions(Aloha.activeEditable.obj);
                 },
