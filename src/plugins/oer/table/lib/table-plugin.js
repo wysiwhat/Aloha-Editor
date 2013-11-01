@@ -93,11 +93,7 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
 
     function prepareTable(plugin, table){
         // Wrap table in ui-wrappper
-        var w1 = $('<div class="canvas-wrap aloha-ephemera-wrapper" />');
-        var w2 = $('<div class="table canvas aloha-ephemera-wrapper" />');
-        var w3 = $('<div class="canvas-inner aloha-ephemera-wrapper" />');
-
-        table.wrap(w1).wrap(w2).wrap(w3);
+        table.wrap('<div class="table aloha-ephemera-wrapper aloha-oer-block"/>');
 
         // glue a mouseover event onto it
         table.on('mouseenter', function(e){
