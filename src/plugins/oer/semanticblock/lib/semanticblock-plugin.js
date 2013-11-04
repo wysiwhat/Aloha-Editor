@@ -3,7 +3,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define(['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/pluginmanager', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'copy/copy-plugin', 'css!semanticblock/css/semanticblock-plugin.css'], function(Aloha, Block, BlockManager, Plugin, pluginManager, jQuery, Ephemera, UI, Button, Copy) {
-    var DIALOG_HTML, activate, bindEvents, blockControls, blockDragHelper, blockIdentifier, blockTemplate, cleanIds, cleanWhitespace, copyBuffer, deactivate, getLabel, insertElement, pluginEvents, registeredTypes, semanticBlock, topControls;
+    var DIALOG_HTML, activate, bindEvents, blockControls, blockDragHelper, blockIdentifier, blockTemplate, cleanIds, cleanWhitespace, copyBuffer, deactivate, getLabel, getType, insertElement, pluginEvents, registeredTypes, semanticBlock, topControls;
     if (pluginManager.plugins.semanticblock) {
       return pluginManager.plugins.semanticblock;
     }
@@ -163,14 +163,18 @@
       }
     ];
     insertElement = function(element) {};
-    getLabel = function($element) {
+    getType = function($element) {
       var type, _i, _len;
       for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
         type = registeredTypes[_i];
         if ($element.is(type.selector)) {
-          return type.getLabel($element);
+          return type;
         }
       }
+    };
+    getLabel = function($element) {
+      var _ref;
+      return (_ref = getType($element)) != null ? _ref.getLabel($element) : void 0;
     };
     blockIdentifier = function($element) {
       var c, classes, elementName, label;
@@ -194,21 +198,14 @@
       }
     };
     activate = function($element) {
-      var $body, $title, controls, label, options, plugin, top, type, _i, _len;
+      var $body, $title, controls, label, options, top, type;
       if (!($element.is('.semantic-container') || ($element.is('.alternates') && $element.parents('figure').length))) {
         $element.addClass('aloha-oer-block');
         if ($element.parent().is('.aloha-editable')) {
           jQuery('<p class="aloha-oer-ephemera-if-empty"></p>').insertBefore($element);
           jQuery('<p class="aloha-oer-ephemera-if-empty"></p>').insertAfter($element);
         }
-        type = null;
-        for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
-          plugin = registeredTypes[_i];
-          if ($element.is(plugin.selector)) {
-            type = plugin;
-            break;
-          }
-        }
+        type = getType($element);
         controls = blockControls.clone();
         top = topControls.clone();
         label = blockIdentifier($element);
@@ -255,15 +252,13 @@
       }
     };
     deactivate = function($element) {
-      var $title, content, type, _i, _len;
+      var $title, content, type;
       $element.removeClass('aloha-oer-block ui-draggable');
       $element.removeAttr('style');
-      for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
-        type = registeredTypes[_i];
-        if ($element.is(type.selector)) {
-          type.deactivate($element);
-          return;
-        }
+      type = getType($element);
+      if (type) {
+        type.deactivate($element);
+        return;
       }
       $title = $element.children('.title').first().mahalo().removeClass('aloha-editable aloha-block-blocklevel-sortable ui-sortable').removeAttr('hover-placeholder');
       content = $element.children('.body');
@@ -354,7 +349,17 @@
           sortableInterval = setInterval(function() {
             if ($root.data('sortable')) {
               clearInterval(sortableInterval);
+              if ($root.data('disableDropTarget')) {
+                $root.removeClass('aloha-block-blocklevel-sortable aloha-block-dropzone');
+              }
+              $root.sortable('option', 'change', function(e, ui) {
+                return ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'));
+              });
               $root.sortable('option', 'stop', function(e, ui) {
+                if (ui.item.data('disableDrop')) {
+                  jQuery(this).sortable("cancel");
+                  return;
+                }
                 $root = jQuery(ui.item);
                 if ($root.is(selector)) {
                   return activate($root);

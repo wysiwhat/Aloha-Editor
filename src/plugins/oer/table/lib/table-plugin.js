@@ -133,6 +133,7 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
             .insertAfter($element)
             .append($element)
             .aloha()
+            .data('disableDropTarget', true)
             ;
 
           // this reference is broken by the above rejiggering
