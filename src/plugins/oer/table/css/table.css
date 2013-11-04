@@ -1,7 +1,5 @@
-.aloha-oer-block.table {
+.aloha-editable .table {
   margin: 1em 0 0 !important; /* !important in order to override ID-based selector in oerpub-content.less */
-  padding: 0;
-  border: 0;
 }
 
 .aloha-editable table {
