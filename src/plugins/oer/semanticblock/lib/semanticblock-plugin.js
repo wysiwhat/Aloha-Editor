@@ -165,6 +165,9 @@
     insertElement = function(element) {};
     getType = function($element) {
       var type, _i, _len;
+      if ($element.is('.semantic-container')) {
+        $element = $element.find('.aloha-oer-block').first();
+      }
       for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
         type = registeredTypes[_i];
         if ($element.is(type.selector)) {
@@ -356,14 +359,16 @@
                 return ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'));
               });
               $root.sortable('option', 'stop', function(e, ui) {
+                var _ref;
                 if (ui.item.data('disableDrop')) {
                   jQuery(this).sortable("cancel");
                   return;
                 }
                 $root = jQuery(ui.item);
                 if ($root.is(selector)) {
-                  return activate($root);
+                  activate($root);
                 }
+                return (_ref = getType($root)) != null ? typeof _ref.onDrop === "function" ? _ref.onDrop($root) : void 0 : void 0;
               });
               $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera');
             }

@@ -127,6 +127,9 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
         getLabel: function() {
           return 'Table';
         },
+        onDrop: function($element) {
+          plugin.renumberCaptions($element.parents('.aloha-editable').last());
+        },
         activate: function($element) {
 
           var $body = $('<div class="body">')
@@ -143,7 +146,7 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
           prepareTable(plugin, $element);
 
           // renumber things
-          this.renumberCaptions($element.parents('.aloha-editable').last());
+          plugin.renumberCaptions($element.parents('.aloha-editable').last());
         },
         deactivate: function($element) {
           $element.parents('.body').first().children().unwrap();

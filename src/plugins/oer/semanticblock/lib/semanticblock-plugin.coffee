@@ -167,6 +167,8 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   insertElement = (element) ->
   
   getType = ($element) ->
+    $element = $element.find('.aloha-oer-block').first() if $element.is('.semantic-container')
+
     for type in registeredTypes
       if $element.is(type.selector)
         return type
@@ -352,6 +354,8 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
               $root = jQuery(ui.item)
               activate $root if $root.is(selector)
+              getType($root)?.onDrop?($root)
+
             $root.sortable 'option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera',
           100
 
