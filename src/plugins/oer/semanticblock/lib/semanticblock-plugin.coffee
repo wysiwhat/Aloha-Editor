@@ -144,7 +144,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
     callback: ->
       jQuery(this).parents('.semantic-container').removeClass('focused')
       jQuery(this).addClass('focused') unless jQuery(this).find('.focused').length
-      wrapped = jQuery(this).children('.aloha-oer-block').first()
+      wrapped = jQuery(this).find('.aloha-oer-block').first()
       label = wrapped.length and blockIdentifier(wrapped)
       jQuery(this).find('.aloha-block-handle').first().attr('title', "Drag this #{label} to another location")
   ,
