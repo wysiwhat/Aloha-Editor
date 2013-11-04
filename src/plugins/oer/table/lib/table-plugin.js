@@ -132,9 +132,8 @@ function(Aloha, plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
         },
         activate: function($element) {
 
-          var $body = $('<div class="body">')
-            .insertAfter($element)
-            .append($element)
+          var $body = $element.wrap('<div class="body">')
+            .parent()
             .aloha()
             .data('disableDropTarget', true)
             ;
