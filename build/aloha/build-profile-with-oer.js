@@ -242,7 +242,7 @@
     //The directory path to save the output. If not specified, then
     //the path will default to be a directory called "build" as a sibling
     //to the build file. All relative paths are relative to the build file.
-    dir: "../../target/build-profile-with-common-extra-plugins/rjs-output",
+    dir: "../../target/build-profile-with-oer/rjs-output",
 
     //As of RequireJS 2.0.2, the dir above will be deleted before the
     //build starts again. If you have a big build and are not doing
