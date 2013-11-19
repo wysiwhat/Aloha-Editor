@@ -457,33 +457,14 @@
             include: [
                 // all common plugins
                 "ui/ui-plugin",
-                "link/link-plugin",
                 "format/format-plugin",
                 "list/list-plugin",
                 "image/image-plugin",
                 "highlighteditables/highlighteditables-plugin",
                 "dom-to-xhtml/dom-to-xhtml-plugin",
                 "contenthandler/contenthandler-plugin",
-                "characterpicker/characterpicker-plugin",
-                "commands/commands-plugin",
                 "block/block-plugin",
-                "align/align-plugin",
-                "abbr/abbr-plugin",
-                "horizontalruler/horizontalruler-plugin",
                 "paste/paste-plugin",
-                // some extra plugins
-                'toc/toc-plugin',
-                'cite/cite-plugin',
-                'flag-icons/flag-icons-plugin',
-                'numerated-headers/numerated-headers-plugin',
-                'formatlesspaste/formatlesspaste-plugin',
-                'linkbrowser/linkbrowser-plugin',
-                'imagebrowser/imagebrowser-plugin',
-                'ribbon/ribbon-plugin',
-                'wai-lang/wai-lang-plugin',
-                'headerids/headerids-plugin',
-                'metaview/metaview-plugin',
-                'listenforcer/listenforcer-plugin',
 
                 // OER Plugins
                 'overlay/overlay-plugin',
