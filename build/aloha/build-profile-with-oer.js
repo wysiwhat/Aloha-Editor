@@ -216,6 +216,7 @@
         'toolbar'     : '../plugins/oer/toolbar/lib',
         'toolbar/css' : '../plugins/oer/toolbar/css',
         'math'     : '../plugins/oer/math/lib',
+        'math/css' : '../plugins/oer/math/css',
         'assorted' : '../plugins/oer/assorted/lib',
         'assorted/css': '../plugins/oer/assorted/css',
         'note'     : '../plugins/oer/note/lib',
