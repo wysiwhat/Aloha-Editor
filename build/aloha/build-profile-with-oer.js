@@ -443,6 +443,11 @@
     //removed from the output folder.
     removeCombined: true,
 
+    // Put CSS in a separate file. None of the common aloha modules include
+    // css dependencies, so this should cause only the oer css to be collected
+    // into one file, in lib/aloha.css.
+    separateCSS: true,
+
     //List the modules that will be optimized. All their immediate and deep
     //dependencies will be included in the module's file when the build is
     //done. If that module or any of its dependencies includes i18n bundles,
