@@ -1255,7 +1255,7 @@ define([
 			// however I could not manage to hide them completely
 			jQuery('.ui-wrapper')
 				.attr('contentEditable', false)
-				.addClass('aloha-image-box-active Aloha_Image_Resize aloha')
+				.addClass('aloha-image-box-active Aloha_Image_Resize aloha aloha-ephemera-wrapper')
 				.css({
 					position: 'relative',
 					display: 'inline-block',
@@ -1266,7 +1266,9 @@ define([
 				})
 				.bind('mouseup', function (e) {
 					e.originalEvent.stopSelectionUpdate = true;
-				});
+				})
+        .find('.ui-resizable-handle')
+          .addClass('aloha-ephemera');
 		},
 
 		/**

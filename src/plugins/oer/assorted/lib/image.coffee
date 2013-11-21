@@ -392,6 +392,8 @@ define [
 
         deferred.resolve({target: $img[0]})
         $figure.removeClass('aloha-ephemera')
+        editableId = $figure.parents('.aloha-editable').last().attr('id')
+        Aloha.getEditableById(editableId).smartContentChange({type: 'block-change'})
 
       $dialog.off('click').on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
@@ -438,17 +440,18 @@ define [
 
   $('body').bind 'aloha-image-resize', ->
     setWidth Image.imageObj
+    Aloha.activeEditable.smartContentChange({type: 'block-change'})
 
   getWidth = ($image) ->
     image = $image.get(0)
     if image
-      return image.width
+      return image.width or image.naturalWidth
     return 0
 
   setWidth = (image) ->
     wrapper = image.parents('.image-wrapper')
     if wrapper.length
-      wrapper.width(getWidth(image)+16)
+      wrapper.width(getWidth(image))
 
   setThankYou = (wrapper) ->
     editDiv = wrapper.children('.image-edit')
@@ -527,9 +530,7 @@ define [
       plugin = @
       settings = Aloha.require('assorted/assorted-plugin').settings
       xhr = new XMLHttpRequest()
-      if xhr.upload
-        if not settings.image.uploadurl
-          throw new Error("uploadurl not defined")
+      if xhr.upload and settings.image.uploadurl
 
         xhr.onload = () ->
           if settings.image.parseresponse
