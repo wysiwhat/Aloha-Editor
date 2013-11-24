@@ -260,7 +260,11 @@ define [
         deferred.resolve({target: $el[0], files: $uploadImage[0].files})
 
       dialog.on 'shown', () =>
-        dialog.find('input,textarea,select').filter(':visible').first().focus()
+
+        if not dialog.find('[name=alt]').val().length
+          dialog.find('[name=alt]').focus()
+        else
+          dialog.find('input,textarea,select').filter(':visible').first().focus()
         
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form

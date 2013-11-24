@@ -122,7 +122,11 @@
         });
       });
       dialog.on('shown', function() {
-        return dialog.find('input,textarea,select').filter(':visible').first().focus();
+        if (!dialog.find('[name=alt]').val().length) {
+          return dialog.find('[name=alt]').focus();
+        } else {
+          return dialog.find('input,textarea,select').filter(':visible').first().focus();
+        }
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
