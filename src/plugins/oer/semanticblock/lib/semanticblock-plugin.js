@@ -355,6 +355,8 @@
               if ($root.data('disableDropTarget')) {
                 $root.removeClass('aloha-block-blocklevel-sortable aloha-block-dropzone');
               }
+              $root.sortable('option', 'helper', 'clone');
+              $root.sortable('option', 'appendTo', jQuery('#content').parent());
               $root.sortable('option', 'change', function(e, ui) {
                 return ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'));
               });

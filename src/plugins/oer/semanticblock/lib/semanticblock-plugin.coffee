@@ -346,6 +346,11 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
             if $root.data('disableDropTarget')
               $root.removeClass('aloha-block-blocklevel-sortable aloha-block-dropzone')
 
+            $root.sortable 'option', 'helper', 'clone'
+
+            # FIXME - this binding is gh-book specific
+            $root.sortable 'option', 'appendTo', jQuery('#content').parent()
+
             $root.sortable 'option', 'change', (e, ui) ->
               ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'))
 
