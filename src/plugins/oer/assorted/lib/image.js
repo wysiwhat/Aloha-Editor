@@ -131,18 +131,17 @@
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
-        if (!editing) {
-          $el.parents('.semantic-container').remove();
-        }
         deferred.reject({
-          target: $el[0]
+          target: $el[0],
+          editing: editing
         });
         return dialog.modal('hide');
       });
       dialog.on('hidden', function(event) {
         if (deferred.state() === 'pending') {
           deferred.reject({
-            target: $el[0]
+            target: $el[0],
+            editing: editing
           });
         }
         return dialog.remove();
@@ -294,7 +293,8 @@
           $img.parents('.semantic-container').remove();
         }
         deferred.reject({
-          target: $img[0]
+          target: $img[0],
+          editing: editing
         });
         return $dialog.modal('hide');
       });
@@ -318,20 +318,21 @@
         return showModalDialog2($figure, $img, $dialog, editing);
       };
       promise.then(function(data) {
-        var promise2;
         if (data.files.length) {
           newEl.addClass('aloha-image-uploading');
-          _this.uploadImage(data.files[0], newEl, function(url) {
+          return _this.uploadImage(data.files[0], newEl, function(url) {
             if (url) {
               jQuery(data.target).attr('src', url);
             }
             return newEl.removeClass('aloha-image-uploading');
           });
         }
-        promise2 = source_this_image_dialog();
-        return promise2.then(function() {
-          $dialog.modal('hide');
-        });
+      }).then(source_this_image_dialog).then(function() {
+        return $dialog.modal('hide');
+      }).fail(function(data) {
+        if (!data.editing) {
+          return jQuery(data.target).parents('.semantic-container').remove();
+        }
       });
     };
     $('body').bind('aloha-image-resize', function() {
