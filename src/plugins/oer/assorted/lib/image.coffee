@@ -241,14 +241,18 @@ define [
 
         altAdded = (not $el.attr 'alt') and dialog.find('[name=alt]').val()
 
+        changed = true if dialog.find('[name=alt]').val() != $el.attr('alt')
+
         $el.attr 'src', imageSource
         $el.attr 'alt', dialog.find('[name=alt]').val()
 
         if dialog.find('.image-title').val()
+          changed = true if dialog.find('.image-title').val() != $title.text()
           $title.html dialog.find('.image-title').val()
         # else probably should remove the $title element
 
         if dialog.find('.image-caption').val()
+          changed = true if dialog.find('.image-caption').val() != $caption.text()
           $caption.html dialog.find('.image-caption').val()
         # else probably should remove the $caption element
 
@@ -256,6 +260,10 @@ define [
           setThankYou $el.parent()
         else
           setEditText $el.parent()
+
+        if changed
+          editableId = $el.parents('.aloha-editable').last().attr('id')
+          Aloha.getEditableById(editableId).smartContentChange({type: 'block-change'})
 
         deferred.resolve({target: $el[0], files: $uploadImage[0].files})
 
