@@ -224,7 +224,9 @@ define [
           else
             loadLocalFile files[0]
 
-      $uploadUrl.on 'change', () ->
+      # When the url input changes, or if the user presses enter, update the
+      # image and preview it if configured to do so.
+      showRemoteImage = () ->
         $previewImg = $placeholder.find('img')
         url = $uploadUrl.val()
         setImageSource(url)
@@ -232,6 +234,11 @@ define [
           $previewImg.attr 'src', url
           $placeholder.show()
           $imageselect.hide()
+
+      $uploadUrl.on 'change', showRemoteImage
+      $uploadUrl.on 'keydown', null, 'return', (e) ->
+        e.preventDefault()
+        showRemoteImage()
 
       # On save update the actual img tag. Use the submit event because this
       # allows the use of html5 validation.
