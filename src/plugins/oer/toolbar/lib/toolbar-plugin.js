@@ -58,17 +58,17 @@
           return this.enable(false);
         };
 
-        ItemRelay.prototype.setActiveButton = function(a, b) {
-          return console && console.log("" + slot + " TODO:SETACTIVEBUTTON:", a, b);
+        ItemRelay.prototype.setActiveButton = function(subslot) {
+          if (subslot) {
+            return $ROOT.find(".action." + slot + " .subaction." + subslot).addClass('active');
+          } else {
+            return $ROOT.find(".action." + slot + " .subaction." + subslot).removeClass('active');
+          }
         };
 
-        ItemRelay.prototype.focus = function(a) {
-          return console && console.log("" + slot + " TODO:FOCUS:", a);
-        };
+        ItemRelay.prototype.focus = function() {};
 
-        ItemRelay.prototype.foreground = function(a) {
-          return console && console.log("" + slot + " TODO:FOREGROUND:", a);
-        };
+        ItemRelay.prototype.foreground = function() {};
 
         ItemRelay.prototype.flash = function() {
           var el, evt, i, _i, _results;

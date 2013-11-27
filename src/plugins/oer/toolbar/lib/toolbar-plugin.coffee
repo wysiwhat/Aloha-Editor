@@ -37,12 +37,25 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
           else
             btn.parent().addClass('disabled')
       disable: () -> @enable(false)
-      setActiveButton: (a, b) ->
-        console && console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
-      focus: (a) ->
-        console && console.log "#{slot} TODO:FOCUS:", a
-      foreground: (a) ->
-        console && console.log "#{slot} TODO:FOREGROUND:", a
+      setActiveButton: (subslot) ->
+        # Some aloha plugins (the format plugin) will register a multisplit
+        # button that contains other buttons. The setActiveButton call is used
+        # by that plugin to highlight the relevant nested button. At the moment
+        # we don't support any such use, but to provide some support for
+        # activating such a button, we will do the same thing we do for
+        # setActive, which is to look for a matching subaction.
+        if subslot
+          $ROOT.find(".action.#{slot} .subaction.#{subslot}").addClass(
+            'active')
+        else
+          $ROOT.find(".action.#{slot} .subaction.#{subslot}").removeClass(
+            'active')
+      focus: () ->
+        # When a UI component receives focus, this method is called to activate
+        # any child components. As this is not presently used, we simply do
+        # nothing.
+      foreground: () ->
+        # This is similar to focus above. Do nothing.
       flash: () ->
         # Allows a plugin to flash a button, thereby grabbing the user's
         # attention.
