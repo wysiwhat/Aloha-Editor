@@ -8,7 +8,7 @@
     DIALOG_HTML = '<div class="modal-header">\n  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n  <h3>Insert image</h3>\n</div>\n<div class="modal-body">\n  <div class="image-options">\n      <div class="image-selection">\n        <div class="dia-alternative">\n          <span class="upload-image-link btn-link">Choose an image to upload</span>\n          <input type="file" class="upload-image-input">\n        </div>\n        <div class="dia-alternative">\n          OR\n        </div>\n        <div class="dia-alternative">\n          <span class="upload-url-link btn-link">get image from the Web</span>\n          <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">\n        </div>\n      </div>\n      <div class="placeholder preview hide">\n        <img class="preview-image"/>\n      </div>\n  </div>\n  <fieldset>\n    <label><strong>Image title:</strong></label>\n    <textarea class="image-title" placeholder="Shows up above image" rows="1"></textarea>\n\n    <label><strong>Image caption:</strong></label>\n    <textarea class="image-caption" placeholder="Shows up below image" rows="1"></textarea>\n  </fieldset>\n  <div class="image-alt">\n    <div class="forminfo">\n      <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>\n    </div>\n    <div>\n      <textarea name="alt" placeholder="Enter description ..." rows="1"></textarea>\n    </div>\n  </div>\n</div>\n<div class="modal-footer">\n  <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>\n  <button class="btn action cancel">Cancel</button>\n</div>';
     DIALOG_HTML2 = '<div class="modal-header">\n  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n  <h3>Insert image</h3>\n</div>\n<div class="modal-body">\n  <div>\n    <strong>Source for this image (Required)</strong>\n  </div>\n  <div class="source-selection">\n    <ul style="list-style-type: none; padding: 0; margin: 0;">\n      <li id="listitem-i-own-this">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) \n        </label>\n      </li>\n      <li id="listitem-i-got-permission">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: \n        </label>\n        <div class="source-selection-allowed">\n          <fieldset>\n            <label>Who is the original author of this image?</label>\n            <input type="text" disabled="disabled" id="reuse-author">\n\n            <label>What organization owns this image?</label>\n            <input type="text" disabled="disabled" id="reuse-org">\n\n            <label>What is the original URL of this image?</label>\n            <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">\n\n            <label>Permission to reuse</label>\n            <select id="reuse-license" disabled="disabled">\n              <option value="">Choose a license</option>\n              <option value="http://creativecommons.org/licenses/by/3.0/">\n                Creative Commons Attribution - CC-BY</option>\n              <option value="http://creativecommons.org/licenses/by-nd/3.0/">\n                Creative Commons Attribution-NoDerivs - CC BY-ND</option>\n              <option value="http://creativecommons.org/licenses/by-sa/3.0/">\n                Creative Commons Attribution-ShareAlike - CC BY-SA</option>\n              <option value="http://creativecommons.org/licenses/by-nc/3.0/">\n                Creative Commons Attribution-NonCommercial - CC BY-NC</option>\n              <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">\n                Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>\n              <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">\n                Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>\n              <option value="http://creativecommons.org/publicdomain/">\n                Public domain</option>\n              <option>other</option>\n            </select>\n          </fieldset>\n        </div>\n      </li>\n      <li id="listitem-i-dont-know">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-dont-know">I don\'t know (skip citation for now)\n        </label>\n      </li>\n    </ul>\n  </div>\n</div>\n<div class="modal-footer">\n  <button type="submit" class="btn btn-primary action insert">Save</button>\n  <button class="btn action cancel">Cancel</button>\n</div>';
     showModalDialog = function($el) {
-      var $caption, $figure, $imageselect, $img, $placeholder, $submit, $title, $uploadImage, $uploadUrl, deferred, dialog, editing, imageAltText, imageSource, loadLocalFile, promise, root, setImageSource, settings,
+      var $caption, $figure, $imageselect, $img, $placeholder, $submit, $title, $uploadImage, $uploadUrl, deferred, dialog, editing, imageAltText, imageSource, loadLocalFile, promise, root, setImageSource, settings, showRemoteImage,
         _this = this;
       settings = Aloha.require('assorted/assorted-plugin').settings;
       root = Aloha.activeEditable.obj;
@@ -88,7 +88,7 @@
           }
         }
       });
-      $uploadUrl.on('change', function() {
+      showRemoteImage = function() {
         var $previewImg, url;
         $previewImg = $placeholder.find('img');
         url = $uploadUrl.val();
@@ -98,6 +98,11 @@
           $placeholder.show();
           return $imageselect.hide();
         }
+      };
+      $uploadUrl.on('change', showRemoteImage);
+      $uploadUrl.on('keydown', null, 'return', function(e) {
+        e.preventDefault();
+        return showRemoteImage();
       });
       deferred = $.Deferred();
       dialog.on('submit', function(evt) {
@@ -146,18 +151,17 @@
       });
       dialog.on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
-        if (!editing) {
-          $el.parents('.semantic-container').remove();
-        }
         deferred.reject({
-          target: $el[0]
+          target: $el[0],
+          editing: editing
         });
         return dialog.modal('hide');
       });
       dialog.on('hidden', function(event) {
         if (deferred.state() === 'pending') {
           deferred.reject({
-            target: $el[0]
+            target: $el[0],
+            editing: editing
           });
         }
         return dialog.remove();
@@ -309,7 +313,8 @@
           $img.parents('.semantic-container').remove();
         }
         deferred.reject({
-          target: $img[0]
+          target: $img[0],
+          editing: editing
         });
         return $dialog.modal('hide');
       });
@@ -333,20 +338,21 @@
         return showModalDialog2($figure, $img, $dialog, editing);
       };
       promise.then(function(data) {
-        var promise2;
         if (data.files.length) {
           newEl.addClass('aloha-image-uploading');
-          _this.uploadImage(data.files[0], newEl, function(url) {
+          return _this.uploadImage(data.files[0], newEl, function(url) {
             if (url) {
               jQuery(data.target).attr('src', url);
             }
             return newEl.removeClass('aloha-image-uploading');
           });
         }
-        promise2 = source_this_image_dialog();
-        return promise2.then(function() {
-          $dialog.modal('hide');
-        });
+      }).then(source_this_image_dialog).then(function() {
+        return $dialog.modal('hide');
+      }).fail(function(data) {
+        if (!data.editing) {
+          return jQuery(data.target).parents('.semantic-container').remove();
+        }
       });
     };
     $('body').bind('aloha-image-resize', function() {
