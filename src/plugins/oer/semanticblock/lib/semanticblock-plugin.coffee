@@ -57,7 +57,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
     selector: '.aloha-block-draghandle'
     callback: ->
       jQuery(this).parent('.semantic-container')
-        .removeClass 'drag-active'  unless jQuery(this).parent('.semantic-container').is('.aloha-oer-dragging')
+        .removeClass 'drag-active'  unless jQuery(this).parent('.semantic-container').is('.ui-sortable-helper')
   ,
     name: 'mouseenter'
     selector: '.semantic-delete'
@@ -68,17 +68,6 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
     selector: '.semantic-delete'
     callback: ->
       jQuery(this).parents('.semantic-container').removeClass 'delete-hover'
-  ,
-    name: 'mousedown'
-    selector: '.aloha-block-draghandle'
-    callback: (e) ->
-      e.preventDefault()
-      jQuery(this).parents('.semantic-container').addClass 'aloha-oer-dragging', true
-  ,
-    name: 'mouseup'
-    selector: '.aloha-block-draghandle'
-    callback: ->
-      jQuery(this).parents('.semantic-container').removeClass 'aloha-oer-dragging'
   ,
     name: 'click'
     selector: '.semantic-container .semantic-delete'
@@ -359,10 +348,13 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
                 jQuery(this).sortable("cancel")
                 return
 
-              $root = jQuery(ui.item)
-              activate $root if $root.is(selector)
-              getType($root)?.onDrop?($root)
+              $element = jQuery(ui.item)
+              activate $element if $element.is(selector)
+              getType($element)?.onDrop?($element)
               Aloha.activeEditable.smartContentChange({type: 'block-change'})
+
+              $element.removeClass('drag-active')
+
 
             $root.sortable 'option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera',
           100
