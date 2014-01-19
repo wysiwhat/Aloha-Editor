@@ -373,7 +373,7 @@
       var wrapper;
       wrapper = image.parents('.image-wrapper');
       if (wrapper.length) {
-        return wrapper.width(getWidth(image));
+        return wrapper.width(Math.min(getWidth(image), wrapper.parent().innerWidth() - 50));
       }
     };
     setThankYou = function(wrapper) {

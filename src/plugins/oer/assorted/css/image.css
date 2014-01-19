@@ -11,6 +11,10 @@
     overflow: hidden;
 }
 
+figure.aloha-oer-block img {
+    max-width: none;
+}
+
 .image-options .placeholder.preview img {
     max-height: 156px;
 }
@@ -55,13 +59,14 @@ figure.aloha-oer-block .image-wrapper {
     position: relative;
     display: block;
     margin: 0 auto;
+    overflow-x: auto;
 }
 
 figure.aloha-oer-block .image-wrapper .image-edit {
     position: absolute;
     cursor: pointer;
     top: 0;
-    left: -30px; /* Left padding + icon width + half icon margin */
+    left: 0;
     padding: 5px 10px;
     border: 1px solid transparent;
     border-radius: 4px;
