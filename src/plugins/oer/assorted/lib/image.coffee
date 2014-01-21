@@ -465,7 +465,7 @@ define [
   setWidth = (image) ->
     wrapper = image.parents('.image-wrapper')
     if wrapper.length
-      wrapper.width(getWidth(image))
+      wrapper.width(Math.min(getWidth(image), wrapper.parent().innerWidth() - 50))
 
   setThankYou = (wrapper) ->
     editDiv = wrapper.children('.image-edit')
