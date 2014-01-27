@@ -88,7 +88,7 @@ define([
 	 */
 	var $CLIPBOARD = $('<div style="position:absolute; ' +
 	                   'clip:rect(0px,0px,0px,0px); ' +
-	                   'width:1px; height:1px;"></div>').contentEditable(true);
+	                   'width:1px; height:1px; bottom:0;"></div>').contentEditable(true);
 
 	/**
 	 * Stored range, use to accomplish IE hack.
