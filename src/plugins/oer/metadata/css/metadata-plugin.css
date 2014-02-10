@@ -1,0 +1,13 @@
+
+[data-type=metadata] {
+  min-height:50px;
+  position: relative;
+  background: orange;
+}
+
+[data-type=metadata]:after {
+  content: "click here to edit authors, description";
+  top: 2px;
+  right: 5px;
+  position: absolute;
+}
