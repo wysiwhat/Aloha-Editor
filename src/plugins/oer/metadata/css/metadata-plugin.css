@@ -2,7 +2,8 @@
 [data-type=metadata] {
   min-height:50px;
   position: relative;
-  background: orange;
+  background: #eee;
+  padding: 5px;
 }
 
 [data-type=metadata]:after {

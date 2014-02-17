@@ -245,24 +245,23 @@ define [
   METADATA_TEMPLATE = '''
 <div
   data-type="metadata"
-  contenteditable="false"
   itemscope="itemscope"
   itemtype="http://schema.org/CreativeWork">
 </div>
 '''
 
   selectors =
-    title: 'h1[data-type="title"]'
-    authors: '.authors span'
-    editors: '.editors span'
-    illustrators: '.illustrators span'
-    translators: '.translators span'
-    publishers: '.publishers span'
-    copyright: '.copyright span'
-    licence: '.licence a'
-    keywords: '.keywords span'
-    subjects: '.subject span'
-    description: '.description p'
+    title:         {selector: 'h1[data-type="title"]', hasMany: false}
+    authors:       {selector: '.authors span',         hasMany: true}
+    editors:       {selector: '.editors span',         hasMany: true}
+    illustrators:  {selector: '.illustrators span',    hasMany: true}
+    translators:   {selector: '.translators span',     hasMany: true}
+    publishers:    {selector: '.publishers span',      hasMany: true}
+    rightsHolders: {selector: '.copyright span',       hasMany: true}
+    rightsUrl:     {selector: '.license a',            hasMany: false, prop: 'href'}
+    keywords:      {selector: '.keywords span',        hasMany: true}
+    subjects:      {selector: '.subject span',         hasMany: true}
+    description:   {selector: '.description p',        hasMany: false}
 
   Plugin.create 'metadata', {
 
@@ -271,19 +270,20 @@ define [
     $_element: null
 
     _showModal: ->
-      console.log('asdf')
-      $modal = $(METADATA_MODAL)
+      $modal = $('#module-metadata-modal')
+      $modal = $(METADATA_MODAL) if not $modal.length
 
       $languageSelect = $modal.find('select[name="language"]')
 
-      for label, key in languages
-        $('option')
+      for key, label of languages
+        $('<option></option>')
           .attr('value', key)
           .text(label)
           .appendTo($languageSelect)
 
       # populate book data in the form
       metadata = @_readMetadata()
+      console.log metadata
 
       $modal.find('[name="title"]').val(metadata.title)
       $modal.find('[name="language"]').val(metadata.language)
@@ -297,7 +297,7 @@ define [
         }) unless $(@).data('tagsinput')
         $(@).tagsinput('removeAll')
 
-      _.each metadata.subject, (subject) -> $modal.find('[name="subject"]').tagsinput('add', subject)
+      _.each metadata.subjects, (subject) -> $modal.find('[name="subject"]').tagsinput('add', subject)
       _.each metadata.keywords, (keyword) -> $modal.find('[name="keywords"]').tagsinput('add', keyword)
       _.each metadata.rightsHolders, (rightsHolder) -> $modal.find('[name="rights-holders"]').tagsinput('add', rightsHolder)
       _.each metadata.authors, (author) -> $modal.find('[name="authors"]').tagsinput('add', author)
@@ -308,13 +308,13 @@ define [
 
       $modal.find('.nav.nav-tabs li:first a').click()
 
-      $modal.find('[data-edit-toggle]').click ->
+      $modal.find('[data-edit-toggle]').off('click').click ->
         $(this).hide().siblings('input').show().focus()
-      .siblings('input').blur ->
+      .siblings('input').off('blur').blur ->
         $(this).hide().siblings('[data-edit-toggle]').show().find('[data-title]').text($(this).val())
       .trigger('blur')
 
-      $modal.find('a[data-toggle="tab"]').on('shown', (e) ->
+      $modal.find('a[data-toggle="tab"]').off('shown').on('shown', (e) ->
         if $(e.target).parents('li').next().length
           $modal.find('[data-tab-next]').text('Next')
         else
@@ -323,7 +323,7 @@ define [
 
       $modal.modal {show:true}
 
-      $modal.find('[data-tab-next]').click =>
+      $modal.find('[data-tab-next]').off('click').click =>
         next = $modal.find('.nav li.active').next()
 
         if next.length
@@ -359,10 +359,23 @@ define [
     _readMetadata: ->
       metadata = {}
 
-      for selector, key in selectors
-        metadata[key] = []
-        @$_element.find(selector).each ->
-          metadata.key.push($(this).text())
+      for key, entry of selectors
+        selector = entry.selector
+        hasMany  = entry.hasMany
+        getValue = (element) ->
+          if entry.prop
+            return element.attr(entry.prop)
+          else
+            return element.text()
+
+        if hasMany
+          metadata[key] = []
+          @$_element.find(selector).each ->
+            metadata[key].push(getValue($(this)))
+        else
+          metadata[key] = getValue(@$_element.find(selector))
+
+      metadata
 
     _setMetadata: (metadata) ->
       @$_element.empty()
@@ -406,7 +419,7 @@ define [
     _setPermissions: (permissions) ->
       $wrapper = $('<div>').addClass('permissions')
 
-      if permissions.rightsHolder
+      if permissions.rightsHolders
         @_handleGroup($wrapper, COPYRIGHT_TEMPLATE, permissions.rightsHolders)
 
       if permissions.rightsUrl && permissions.rights
@@ -429,7 +442,7 @@ define [
           .appendTo($groupTemplate)
 
         if values.length > 1 && i != values.length-1
-          $groupTemplate.append(',')
+          $groupTemplate.append(', ')
 
       $container.append($groupTemplate)
 
@@ -437,9 +450,10 @@ define [
       @$_editable = element
 
       if not @$_editable.find(@_selector).length
-        @$_editable.prepend(METADATA_TEMPLATE)
+        @$_editable.prepend($(METADATA_TEMPLATE))
 
       @$_element = @$_editable.find(@_selector)
+      @$_element.attr('contenteditable', false)
 
       @$_element.click =>
         @_showModal()
