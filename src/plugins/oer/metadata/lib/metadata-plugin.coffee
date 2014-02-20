@@ -221,7 +221,7 @@ define [
   LICENCE_TEMPLATE = '''
 <div class="license">
   Licensed:
-  <a data-type="license" itemprop="dc:license,lrmi:useRightsURL" href=""></a>
+  <a data-type="license" rel="license" href=""></a>
 </div>'''
 
   # other random metadata
@@ -243,7 +243,7 @@ define [
 </div>'''
   
   LANGUAGE_TEMPLATE = '''
-<meta data-type="langugage" itemprop="inLanguage" content="" />'''
+<meta data-type="language" itemprop="inLanguage" content="" />'''
 
   METADATA_TEMPLATE = '''
 <div
@@ -360,6 +360,7 @@ define [
           $modal.modal('hide')
 
     _readMetadata: ->
+      return @metadata if @metadata
       metadata = {}
 
       for key, entry of elements
@@ -378,18 +379,23 @@ define [
         else
           metadata[key] = getValue(@$_element.find(selector))
 
-      metadata
+      @metadata = metadata
 
     _setMetadata: (metadata) ->
+      # copy this so filters aren't applied to it
+      @metadata = JSON.parse(JSON.stringify(metadata))
       @$_element.empty()
+
+      @settings.setMetadata?(metadata)
+      @settings.filterMetadata?(metadata)
 
       $(TITLE_TEMPLATE)
         .text(metadata.title)
-        .appendTo(@$_element)
+        .appendTo(@$_element) if metadata.title
 
       $(LANGUAGE_TEMPLATE)
         .attr('content', metadata.language)
-        .appendTo(@$_element)
+        .appendTo(@$_element) if metadata.language
 
       @_setContributors(metadata)
     
@@ -457,10 +463,12 @@ define [
       @$_editable = element
 
       if not @$_editable.find(@_selector).length
-        @$_editable.prepend($(METADATA_TEMPLATE).append(@settings.default))
+        @$_editable.prepend($(METADATA_TEMPLATE))
 
       @$_element = @$_editable.find(@_selector)
       @$_element.attr('contenteditable', false)
+
+      @$_element.append(@settings.supplement)
 
       if not @$_element.find(elements.title.selector).length
         $(TITLE_TEMPLATE).prependTo(@$_element)

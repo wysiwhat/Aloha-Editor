@@ -10,11 +10,11 @@
     TRANSLATORS_TEMPLATE = '<div class="translators">\n  Translated by: \n  <span data-type="translator" itemprop="contributor"></span>\n</div>';
     PUBLISHERS_TEMPLATE = '<div class="publishers">\n  Published by: \n  <span data-type="publisher" itemprop="publisher"></span>\n</div>';
     COPYRIGHT_TEMPLATE = '<div class="copyright">\n  Copyright: \n  <span data-type="copyright-holder" itemprop="copyrightHolder"></span>\n</div>';
-    LICENCE_TEMPLATE = '<div class="license">\n  Licensed:\n  <a data-type="license" itemprop="dc:license,lrmi:useRightsURL" href=""></a>\n</div>';
+    LICENCE_TEMPLATE = '<div class="license">\n  Licensed:\n  <a data-type="license" rel="license" href=""></a>\n</div>';
     KEYWORDS_TEMPLATE = '<div class="keywords">\n  Keywords:\n  <span data-type="keyword" itemprop="keywords"></span>\n</div>';
     SUBJECTS_TEMPLATE = '<div class="subject">\n  Subject:\n  <span data-type="subject" itemprop="about"></span>\n</div>';
     DESCRIPTION_TEMPLATE = '<div data-type="description" itemprop="description" class="description">\n  <p class="summary"></p>\n</div>';
-    LANGUAGE_TEMPLATE = '<meta data-type="langugage" itemprop="inLanguage" content="" />';
+    LANGUAGE_TEMPLATE = '<meta data-type="language" itemprop="inLanguage" content="" />';
     METADATA_TEMPLATE = '<div\n  data-type="metadata"\n  itemscope="itemscope"\n  itemtype="http://schema.org/CreativeWork">\n</div>';
     elements = {
       title: {
@@ -189,6 +189,9 @@
       },
       _readMetadata: function() {
         var entry, getValue, hasMany, key, metadata, selector;
+        if (this.metadata) {
+          return this.metadata;
+        }
         metadata = {};
         for (key in elements) {
           entry = elements[key];
@@ -210,13 +213,24 @@
             metadata[key] = getValue(this.$_element.find(selector));
           }
         }
-        return metadata;
+        return this.metadata = metadata;
       },
       _setMetadata: function(metadata) {
-        var $description;
+        var $description, _base, _base1;
+        this.metadata = JSON.parse(JSON.stringify(metadata));
         this.$_element.empty();
-        $(TITLE_TEMPLATE).text(metadata.title).appendTo(this.$_element);
-        $(LANGUAGE_TEMPLATE).attr('content', metadata.language).appendTo(this.$_element);
+        if (typeof (_base = this.settings).setMetadata === "function") {
+          _base.setMetadata(metadata);
+        }
+        if (typeof (_base1 = this.settings).filterMetadata === "function") {
+          _base1.filterMetadata(metadata);
+        }
+        if (metadata.title) {
+          $(TITLE_TEMPLATE).text(metadata.title).appendTo(this.$_element);
+        }
+        if (metadata.language) {
+          $(LANGUAGE_TEMPLATE).attr('content', metadata.language).appendTo(this.$_element);
+        }
         this._setContributors(metadata);
         if (metadata.publishers.length) {
           this._handleGroup(this.$_element, PUBLISHERS_TEMPLATE, metadata.publishers);
@@ -288,10 +302,11 @@
           _this = this;
         this.$_editable = element;
         if (!this.$_editable.find(this._selector).length) {
-          this.$_editable.prepend($(METADATA_TEMPLATE).append(this.settings["default"]));
+          this.$_editable.prepend($(METADATA_TEMPLATE));
         }
         this.$_element = this.$_editable.find(this._selector);
         this.$_element.attr('contenteditable', false);
+        this.$_element.append(this.settings.supplement);
         if (!this.$_element.find(elements.title.selector).length) {
           $(TITLE_TEMPLATE).prependTo(this.$_element);
         }
