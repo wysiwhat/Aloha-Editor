@@ -314,8 +314,14 @@
           title = this.$_element.find('title').remove().text();
           this.$_element.find(elements.title.selector).text(title);
         }
-        return this.$_element.click(function() {
+        this.$_element.click(function() {
           return _this._showModal();
+        });
+        return $(document).on('click', '#module-metadata-modal [data-cancel]', function(e) {
+          e.preventDefault();
+          if (confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')) {
+            return $('#module-metadata-modal').modal('hide');
+          }
         });
       },
       init: function() {

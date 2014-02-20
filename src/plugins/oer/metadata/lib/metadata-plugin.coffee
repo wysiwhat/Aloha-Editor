@@ -479,6 +479,10 @@ define [
 
       @$_element.click =>
         @_showModal()
+      $(document).on 'click', '#module-metadata-modal [data-cancel]', (e) ->
+        e.preventDefault()
+        if confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')
+          $('#module-metadata-modal').modal('hide')
  
     init: () ->
 
