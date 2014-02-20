@@ -241,6 +241,9 @@ define [
 <div data-type="description" itemprop="description" class="description">
   <p class="summary"></p>
 </div>'''
+  
+  LANGUAGE_TEMPLATE = '''
+<meta data-type="langugage" itemprop="inLanguage" content="" />'''
 
   METADATA_TEMPLATE = '''
 <div
@@ -250,18 +253,19 @@ define [
 </div>
 '''
 
-  selectors =
-    title:         {selector: 'h1[data-type="title"]', hasMany: false}
-    authors:       {selector: '.authors span',         hasMany: true}
-    editors:       {selector: '.editors span',         hasMany: true}
-    illustrators:  {selector: '.illustrators span',    hasMany: true}
-    translators:   {selector: '.translators span',     hasMany: true}
-    publishers:    {selector: '.publishers span',      hasMany: true}
-    rightsHolders: {selector: '.copyright span',       hasMany: true}
-    rightsUrl:     {selector: '.license a',            hasMany: false, prop: 'href'}
-    keywords:      {selector: '.keywords span',        hasMany: true}
-    subjects:      {selector: '.subject span',         hasMany: true}
-    description:   {selector: '.description p',        hasMany: false}
+  elements =
+    title:         {selector: 'h1[data-type="title"]',  hasMany: false}
+    authors:       {selector: '.authors span',          hasMany: true}
+    editors:       {selector: '.editors span',          hasMany: true}
+    illustrators:  {selector: '.illustrators span',     hasMany: true}
+    translators:   {selector: '.translators span',      hasMany: true}
+    publishers:    {selector: '.publishers span',       hasMany: true}
+    rightsHolders: {selector: '.copyright span',        hasMany: true}
+    rightsUrl:     {selector: '.license a',             hasMany: false, prop: 'href'}
+    language:      {selector: '[data-type="language"]', hasMany: false, prop: 'content'}
+    keywords:      {selector: '.keywords span',         hasMany: true}
+    subjects:      {selector: '.subject span',          hasMany: true}
+    description:   {selector: '.description p',         hasMany: false}
 
   Plugin.create 'metadata', {
 
@@ -283,7 +287,6 @@ define [
 
       # populate book data in the form
       metadata = @_readMetadata()
-      console.log metadata
 
       $modal.find('[name="title"]').val(metadata.title)
       $modal.find('[name="language"]').val(metadata.language)
@@ -359,7 +362,7 @@ define [
     _readMetadata: ->
       metadata = {}
 
-      for key, entry of selectors
+      for key, entry of elements
         selector = entry.selector
         hasMany  = entry.hasMany
         getValue = (element) ->
@@ -382,6 +385,10 @@ define [
 
       $(TITLE_TEMPLATE)
         .text(metadata.title)
+        .appendTo(@$_element)
+
+      $(LANGUAGE_TEMPLATE)
+        .attr('content', metadata.language)
         .appendTo(@$_element)
 
       @_setContributors(metadata)
@@ -419,7 +426,7 @@ define [
     _setPermissions: (permissions) ->
       $wrapper = $('<div>').addClass('permissions')
 
-      if permissions.rightsHolders
+      if permissions.rightsHolders.length
         @_handleGroup($wrapper, COPYRIGHT_TEMPLATE, permissions.rightsHolders)
 
       if permissions.rightsUrl && permissions.rights
@@ -450,10 +457,17 @@ define [
       @$_editable = element
 
       if not @$_editable.find(@_selector).length
-        @$_editable.prepend($(METADATA_TEMPLATE))
+        @$_editable.prepend($(METADATA_TEMPLATE).append(@settings.default))
 
       @$_element = @$_editable.find(@_selector)
       @$_element.attr('contenteditable', false)
+
+      if not @$_element.find(elements.title.selector).length
+        $(TITLE_TEMPLATE).prependTo(@$_element)
+
+      if @$_element.find('title').length
+        title = @$_element.find('title').remove().text()
+        @$_element.find(elements.title.selector).text(title)
 
       @$_element.click =>
         @_showModal()
