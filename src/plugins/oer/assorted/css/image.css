@@ -11,6 +11,10 @@
     overflow: hidden;
 }
 
+figure [data-type="alternates"] {
+  text-align: center;
+}
+
 figure.aloha-oer-block img {
     max-width: none;
 }

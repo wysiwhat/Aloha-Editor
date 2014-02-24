@@ -328,11 +328,18 @@
           return jQuery(node).removeClass('aloha-block-dropzone aloha-editable-active aloha-editable aloha-block-blocklevel-sortable ui-sortable').removeAttr('contenteditable placeholder').get(0);
         });
         return Aloha.bind('aloha-editable-created', function(e, params) {
-          var $root, classes, selector, sortableInterval, type, _i, _len;
+          var $root, classes, selector, sortableInterval, type;
           $root = params.obj;
           classes = [];
-          for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
-            type = registeredTypes[_i];
+          if ((function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
+              type = registeredTypes[_i];
+              _results.push(type.selector);
+            }
+            return _results;
+          })()) {
             classes.push(type.selector);
           }
           selector = _this.settings.defaultSelector + ',' + classes.join();
@@ -400,6 +407,12 @@
             });
           }
         });
+      },
+      insertOverPlaceholder: function($element, $placeholder) {
+        $element.addClass('semantic-temp');
+        $placeholder.replaceWith($element);
+        $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
+        return activate($element);
       },
       insertAtCursor: function(template) {
         var $element, range;

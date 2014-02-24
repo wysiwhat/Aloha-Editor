@@ -321,7 +321,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
         $root = params.obj
 
         classes = []
-        classes.push type.selector for type in registeredTypes
+        classes.push type.selector if type.selector for type in registeredTypes
 
         selector = @settings.defaultSelector + ',' + classes.join()
 
@@ -383,6 +383,11 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
          
               refreshPositions: true
 
+    insertOverPlaceholder: ($element, $placeholder) ->
+      $element.addClass 'semantic-temp'
+      $placeholder.replaceWith($element)
+      $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
+      activate $element
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
