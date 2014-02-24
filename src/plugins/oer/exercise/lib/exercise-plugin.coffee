@@ -19,7 +19,7 @@ define [
 	'''
     TYPE_CONTAINER = '''
         <div class="type-container dropdown aloha-ephemera">
-            <span class="type btn-link" data-toggle="dropdown"></span>
+            <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
             <ul class="dropdown-menu">
                 <li><span class="btn-link" data-label="">Exercise</span></li>
                 <li><span class="btn-link" data-label="homework">Homework</span></li>
@@ -47,9 +47,9 @@ define [
       $solutions = $element.children('.solution')
 
       $element.children().not($problem).not($solutions).remove()
+      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>')
 
       $typeContainer = jQuery(TYPE_CONTAINER)
-      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
 
       $typeContainer.find('.dropdown-menu li').each (i, li) =>
         if jQuery(li).children('span').data('type') == type
@@ -68,7 +68,7 @@ define [
       jQuery('<div>')
         .addClass('solutions')
         .addClass('aloha-ephemera-wrapper')
-        .appendTo($element)
+        .appendTo($problemContainer)
         .append($solutions)
 
       jQuery('<div>')

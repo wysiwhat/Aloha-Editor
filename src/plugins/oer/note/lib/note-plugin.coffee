@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <span class="type btn-link" data-toggle="dropdown"></span>
+          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
@@ -97,8 +97,6 @@ define [
                   $element.attr('data-label', dropType.type)
                 else
                   $element.removeAttr('data-label')
-
-                typeContainer.find('.type').text(dropType.label)
 
                 # Remove all notish class names and then add this one in
                 for key of notishClasses

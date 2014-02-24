@@ -5,17 +5,17 @@
     var SOLUTION_TEMPLATE, SOLUTION_TYPE_CONTAINER, TEMPLATE, TYPE_CONTAINER, activateExercise, activateSolution, deactivateExercise, deactivateSolution;
     TEMPLATE = '<div class="exercise">\n    <div class="problem"></div>\n</div>';
     SOLUTION_TEMPLATE = '<div class="solution">\n</div>';
-    TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-label="">Exercise</span></li>\n        <li><span class="btn-link" data-label="homework">Homework</span></li>\n        <li><span class="btn-link" data-label="problem">Problem</span></li>\n        <li><span class="btn-link" data-label="question">Question</span></li>\n        <li><span class="btn-link" data-label="task">Task</span></li>\n        <li><span class="btn-link" data-label="Worked Example">Worked Example</span></li>\n    </ul>\n</div>';
+    TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-label="">Exercise</span></li>\n        <li><span class="btn-link" data-label="homework">Homework</span></li>\n        <li><span class="btn-link" data-label="problem">Problem</span></li>\n        <li><span class="btn-link" data-label="question">Question</span></li>\n        <li><span class="btn-link" data-label="task">Task</span></li>\n        <li><span class="btn-link" data-label="Worked Example">Worked Example</span></li>\n    </ul>\n</div>';
     SOLUTION_TYPE_CONTAINER = '<div class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n        <li><span class="btn-link" data-label="answer">Answer</span></li>\n        <li><span class="btn-link" data-label="solution">Solution</span></li>\n    </ul>\n</div>';
     activateExercise = function($element) {
-      var $content, $problem, $solutions, $typeContainer, type,
+      var $content, $problem, $problemContainer, $solutions, $typeContainer, type,
         _this = this;
       type = $element.attr('data-label') || 'exercise';
       $problem = $element.children('.problem');
       $solutions = $element.children('.solution');
       $element.children().not($problem).not($solutions).remove();
+      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>');
       $typeContainer = jQuery(TYPE_CONTAINER);
-      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
       $typeContainer.find('.dropdown-menu li').each(function(i, li) {
         if (jQuery(li).children('span').data('type') === type) {
           return jQuery(li).addClass('checked');
@@ -24,7 +24,7 @@
       $typeContainer.prependTo($element);
       $content = $problem.contents();
       $problem.empty().addClass('aloha-block-dropzone').attr('placeholder', "Type the text of your problem here.").aloha().append($content);
-      jQuery('<div>').addClass('solutions').addClass('aloha-ephemera-wrapper').appendTo($element).append($solutions);
+      jQuery('<div>').addClass('solutions').addClass('aloha-ephemera-wrapper').appendTo($problemContainer).append($solutions);
       jQuery('<div>').addClass('solution-controls').addClass('aloha-ephemera').append('<span class="add-solution btn-link">Click here to add an answer/solution</span>').append('<span class="solution-toggle">hide solution</span>').appendTo($element);
       if (!$solutions.length) {
         return $element.children('.solution-controls').children('.solution-toggle').hide();

@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!note/css/note-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TYPE_CONTAINER, notishClasses, types;
-    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
+    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
     notishClasses = {};
     types = [];
     return Plugin.create('note', {
@@ -73,7 +73,6 @@
                   } else {
                     $element.removeAttr('data-label');
                   }
-                  typeContainer.find('.type').text(dropType.label);
                   for (key in notishClasses) {
                     $element.removeClass(key);
                   }

@@ -3,7 +3,7 @@
 
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!example/css/example-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var TYPE_CONTAINER, exampleishClasses, types;
-    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <span class="type btn-link" href="#" data-toggle="dropdown"></span>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
+    TYPE_CONTAINER = jQuery('<span class="type-container dropdown aloha-ephemera">\n    <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>\n    <ul class="dropdown-menu">\n    </ul>\n</span>');
     exampleishClasses = {};
     types = [];
     return Plugin.create('example', {
@@ -102,7 +102,6 @@
                   } else {
                     $element.removeAttr('data-label');
                   }
-                  typeContainer.find('.type').text(dropType.label);
                   for (key in exampleishClasses) {
                     $element.removeClass(key);
                   }
@@ -113,7 +112,6 @@
               typeContainer.find('.dropdown-menu').remove();
               typeContainer.find('.type').removeAttr('data-toggle');
             }
-            typeContainer.find('.type').text(type.label);
             return typeContainer.prependTo($element);
           }
         });

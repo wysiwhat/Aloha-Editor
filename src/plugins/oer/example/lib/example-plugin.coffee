@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <span class="type btn-link" href="#" data-toggle="dropdown"></span>
+          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
@@ -96,8 +96,6 @@ define [
                 else
                   $element.removeAttr('data-label')
 
-                typeContainer.find('.type').text(dropType.label)
-
                 # Remove all notish class names and then add this one in
                 for key of exampleishClasses
                   $element.removeClass key
@@ -106,7 +104,6 @@ define [
             typeContainer.find('.dropdown-menu').remove()
             typeContainer.find('.type').removeAttr('data-toggle')
 
-          typeContainer.find('.type').text(type.label)
           typeContainer.prependTo($element)
 
       # Create the body and add some placeholder text
