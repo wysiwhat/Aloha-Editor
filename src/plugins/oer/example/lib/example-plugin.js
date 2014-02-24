@@ -10,38 +10,38 @@
       defaults: [
         {
           label: 'Activity',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'activity'
+          dataClass: 'activity'
         }, {
           label: 'Practical',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'practical'
+          dataClass: 'practical'
         }, {
           label: 'Demonstration',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'demonstration'
+          dataClass: 'demonstration'
         }, {
           label: 'Example',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true
         }, {
           label: 'Case in point',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'case-in-point'
+          dataClass: 'case-in-point'
         }, {
           label: 'Case study',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'case-study'
+          dataClass: 'case-study'
         }, {
           label: 'Illustration',
-          cls: 'example',
+          typeClass: 'example',
           hasTitle: true,
-          type: 'illustration'
+          dataClass: 'illustration'
         }
       ],
       getLabel: function($element) {
@@ -75,7 +75,7 @@
                 $option.text(dropType.label);
                 typeContainer.find('.type').on('click', function() {
                   return jQuery.each(types, function(i, dropType) {
-                    if ($element.attr('data-label') === dropType.type) {
+                    if ($element.attr('data-label') === dropType.dataClass) {
                       return typeContainer.find('.dropdown-menu li').each(function(i, li) {
                         jQuery(li).removeClass('checked');
                         if (jQuery(li).children('a').text() === dropType.label) {
@@ -97,15 +97,15 @@
                   } else {
                     $element.children('.title').remove();
                   }
-                  if (dropType.type) {
-                    $element.attr('data-label', dropType.type);
+                  if (dropType.dataClass) {
+                    $element.attr('data-label', dropType.dataClass);
                   } else {
                     $element.removeAttr('data-label');
                   }
                   for (key in exampleishClasses) {
                     $element.removeClass(key);
                   }
-                  return $element.addClass(dropType.cls);
+                  return $element.addClass(dropType.typeClass);
                 });
               });
             } else {
@@ -157,10 +157,10 @@
         types = this.settings;
         jQuery.each(types, function(i, type) {
           var className, hasTitle, label, newTemplate, tagName, titleTagName, typeName;
-          className = type.cls || (function() {
-            throw 'BUG Invalid configuration of example plugin. cls required!';
+          className = type.typeClass || (function() {
+            throw 'BUG Invalid configuration of example plugin. typeClass required!';
           })();
-          typeName = type.type;
+          typeName = type.dataClass;
           hasTitle = !!type.hasTitle;
           label = type.label || (function() {
             throw 'BUG Invalid configuration of example plugin. label required!';

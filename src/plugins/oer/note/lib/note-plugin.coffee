@@ -27,7 +27,7 @@ define [
     # The plugin can listen to various classes that should "behave" like a note.
     # For each notish element provide a:
     # - `label`: **Required** Shows up in dropdown
-    # - `cls` :  **Required** The classname to enable this plugin on
+    # - `typeClass` :  **Required** The classname to enable this plugin on
     # - `hasTitle`: **Required** `true` if the element allows optional titles
     # - `type`: value in the `data-label` attribute.
     # - `tagName`: Default: `div`. The HTML element name to use when creating a new note
@@ -35,12 +35,12 @@ define [
     #
     # For example, a Warning could look like this:
     #
-    #     { label:'Warning', cls:'note', hasTitle:false, type:'warning'}
+    #     { label:'Warning', typeClass:'note', hasTitle:false, type:'warning'}
     #
     # Then, when the user selects "Warning" from the dropdown the element's
     # class and type will be changed and its `> .title` will be removed.
     defaults: [
-      { label: 'Note', cls: 'note', hasTitle: true }
+      { label: 'Note', typeClass: 'note', hasTitle: true }
     ]
     getLabel: ($element) ->
       for type in types
@@ -74,7 +74,7 @@ define [
               $option.text(dropType.label)
               typeContainer.find('.type').on 'click', =>
                 jQuery.each types, (i, dropType) =>
-                  if $element.attr('data-label') == dropType.type
+                  if $element.attr('data-label') == dropType.dataClass
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
                       jQuery(li).removeClass('checked')
                       if jQuery(li).children('span').text() == dropType.label
@@ -93,15 +93,15 @@ define [
                   $element.children('.title').remove()
 
                 # Remove the `data-label` if this type does not have one
-                if dropType.type
-                  $element.attr('data-label', dropType.type)
+                if dropType.dataClass
+                  $element.attr('data-label', dropType.dataClass)
                 else
                   $element.removeAttr('data-label')
 
                 # Remove all notish class names and then add this one in
                 for key of notishClasses
                   $element.removeClass key
-                $element.addClass(dropType.cls)
+                $element.addClass(dropType.typeClass)
           else
             typeContainer.find('.dropdown-menu').remove()
             typeContainer.find('.type').removeAttr('data-toggle')
@@ -160,8 +160,8 @@ define [
       # Load up specific classes to listen to or use the default
       types = @settings
       jQuery.each types, (i, type) =>
-        className = type.cls or throw 'BUG Invalid configuration of note plugin. cls required!'
-        typeName = type.type
+        className = type.typeClass or throw 'BUG Invalid configuration of note plugin. typeClass required!'
+        typeName = type.dataClass
         hasTitle = !!type.hasTitle
         label = type.label or throw 'BUG Invalid configuration of note plugin. label required!'
 

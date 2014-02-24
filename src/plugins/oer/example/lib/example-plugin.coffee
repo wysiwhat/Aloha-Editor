@@ -34,13 +34,14 @@ define [
     # Then, when the user selects "Warning" from the dropdown the element's
     # class and type will be changed and its `> .title` will be removed.
     defaults: [
-      { label: 'Activity', cls: 'example', hasTitle: true, type: 'activity' },
-      { label: 'Practical', cls: 'example', hasTitle: true, type: 'practical' },
-      { label: 'Demonstration', cls: 'example', hasTitle: true, type: 'demonstration' },
-      { label: 'Example', cls: 'example', hasTitle: true },
-      { label: 'Case in point', cls: 'example', hasTitle: true, type: 'case-in-point' },
-      { label: 'Case study', cls: 'example', hasTitle: true, type: 'case-study' },
-      { label: 'Illustration', cls: 'example', hasTitle: true, type: 'illustration' },
+      # TODO: Allow a plain "example": { typeClass: 'example', hasTitle: true }
+      { label: 'Activity', typeClass: 'example', hasTitle: true, dataClass: 'activity' }
+      { label: 'Practical', typeClass: 'example', hasTitle: true, dataClass: 'practical' }
+      { label: 'Demonstration', typeClass: 'example', hasTitle: true, dataClass: 'demonstration' }
+      { label: 'Example', typeClass: 'example', hasTitle: true }
+      { label: 'Case in point', typeClass: 'example', hasTitle: true, dataClass: 'case-in-point' }
+      { label: 'Case study', typeClass: 'example', hasTitle: true, dataClass: 'case-study' }
+      { label: 'Illustration', typeClass: 'example', hasTitle: true, dataClass: 'illustration' }
     ]
     getLabel: ($element) ->
       for type in types
@@ -71,7 +72,7 @@ define [
               $option.text(dropType.label)
               typeContainer.find('.type').on 'click', =>
                 jQuery.each types, (i, dropType) =>
-                  if $element.attr('data-label') == dropType.type
+                  if $element.attr('data-label') == dropType.dataClass
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
                       jQuery(li).removeClass('checked')
                       if jQuery(li).children('a').text() == dropType.label
@@ -91,15 +92,15 @@ define [
                   $element.children('.title').remove()
 
                 # Remove the `data-label` if this type does not have one
-                if dropType.type
-                  $element.attr('data-label', dropType.type)
+                if dropType.dataClass
+                  $element.attr('data-label', dropType.dataClass)
                 else
                   $element.removeAttr('data-label')
 
                 # Remove all notish class names and then add this one in
                 for key of exampleishClasses
                   $element.removeClass key
-                $element.addClass(dropType.cls)
+                $element.addClass(dropType.typeClass)
           else
             typeContainer.find('.dropdown-menu').remove()
             typeContainer.find('.type').removeAttr('data-toggle')
@@ -159,8 +160,8 @@ define [
       # Load up specific classes to listen to or use the default
       types = @settings
       jQuery.each types, (i, type) =>
-        className = type.cls or throw 'BUG Invalid configuration of example plugin. cls required!'
-        typeName = type.type
+        className = type.typeClass or throw 'BUG Invalid configuration of example plugin. typeClass required!'
+        typeName = type.dataClass
         hasTitle = !!type.hasTitle
         label = type.label or throw 'BUG Invalid configuration of example plugin. label required!'
 

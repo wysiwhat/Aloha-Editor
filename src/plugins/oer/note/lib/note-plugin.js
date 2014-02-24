@@ -10,7 +10,7 @@
       defaults: [
         {
           label: 'Note',
-          cls: 'note',
+          typeClass: 'note',
           hasTitle: true
         }
       ],
@@ -47,7 +47,7 @@
                 $option.text(dropType.label);
                 typeContainer.find('.type').on('click', function() {
                   return jQuery.each(types, function(i, dropType) {
-                    if ($element.attr('data-label') === dropType.type) {
+                    if ($element.attr('data-label') === dropType.dataClass) {
                       return typeContainer.find('.dropdown-menu li').each(function(i, li) {
                         jQuery(li).removeClass('checked');
                         if (jQuery(li).children('span').text() === dropType.label) {
@@ -68,15 +68,15 @@
                   } else {
                     $element.children('.title').remove();
                   }
-                  if (dropType.type) {
-                    $element.attr('data-label', dropType.type);
+                  if (dropType.dataClass) {
+                    $element.attr('data-label', dropType.dataClass);
                   } else {
                     $element.removeAttr('data-label');
                   }
                   for (key in notishClasses) {
                     $element.removeClass(key);
                   }
-                  return $element.addClass(dropType.cls);
+                  return $element.addClass(dropType.typeClass);
                 });
               });
             } else {
@@ -131,10 +131,10 @@
         types = this.settings;
         jQuery.each(types, function(i, type) {
           var className, hasTitle, label, newTemplate, tagName, titleTagName, typeName;
-          className = type.cls || (function() {
-            throw 'BUG Invalid configuration of note plugin. cls required!';
+          className = type.typeClass || (function() {
+            throw 'BUG Invalid configuration of note plugin. typeClass required!';
           })();
-          typeName = type.type;
+          typeName = type.dataClass;
           hasTitle = !!type.hasTitle;
           label = type.label || (function() {
             throw 'BUG Invalid configuration of note plugin. label required!';
