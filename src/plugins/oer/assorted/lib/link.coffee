@@ -22,7 +22,7 @@ define [
   DIALOG_HTML = '''
     <form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="linkModalLabel">Edit link</h3>
       </div>
       <div class="modal-body">
