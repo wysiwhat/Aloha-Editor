@@ -2,8 +2,8 @@
 (function() {
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'ui/ui', 'ui/button', 'semanticblock/semanticblock-plugin', 'css!media-embed/css/media-embed-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) {
     var CONFIRM_DIALOG, DIALOG, TEMPLATE, embed, endpoints;
-    DIALOG = '<div id="mediaEmbedDialog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Add video, slides or other media</h3>\n  </div>\n  <div class="modal-body">\n    <form>\n      <label style="display: inline-block">\n        URL: \n        <input type="text" name="videoUrl" size="90">\n      </label>\n      <button class="btn">Go</button>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn cancel">Cancel</button>\n  </div>\n</div>';
-    CONFIRM_DIALOG = '<div id="mediaConfirmEmbedDialog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Add video, slides or other media</h3>\n  </div>\n  <div class="modal-body">\n    <div class="embed-preview"></div>\n    <form>\n      <label>\n        Figure Title: \n        <input type="text" name="figureTitle" size="120">\n      </label>\n      <em>shows above the embedded content</em>\n\n      <label>Figure Caption:</label>\n      <textarea name="figureCaption" rows="4"></textarea>\n      <em>shows below the embedded content</em>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn cancel">Back</button>\n    <button class="btn primary embed">Insert Now</button>\n  </div>\n</div>';
+    DIALOG = '<div id="mediaEmbedDialog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Add video, slides or other media</h3>\n  </div>\n  <div class="modal-body">\n    <form>\n      <label style="display: inline-block">\n        URL: \n        <input type="text" name="videoUrl" size="90">\n      </label>\n      <button class="btn">Go</button>\n\n      <div class="text-error hide">\n        We could not determine how to include the media. Please check the URL for the media and try again or cancel\n      </div>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn" data-dismiss="modal">Cancel</button>\n  </div>\n</div>';
+    CONFIRM_DIALOG = '<div id="mediaConfirmEmbedDialog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="false">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n    <h3>Add video, slides or other media</h3>\n  </div>\n  <div class="modal-body">\n    <div class="embed-preview"></div>\n    <form>\n      <label>\n        Figure Title: \n      </label>\n      <textarea name="figureTitle" rows="1"></textarea>\n      <em>shows above the embedded content</em>\n\n      <label>Figure Caption:</label>\n      <textarea name="figureCaption" rows="4"></textarea>\n      <em>shows below the embedded content</em>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn cancel">Back</button>\n    <button class="btn primary embed">Insert Now</button>\n  </div>\n</div>';
     TEMPLATE = '<figure data-type="embed" itemscope="itemscope" itemtype="http://schema.org/CreativeWork">\n  <div data-type="title"></div>\n  <div data-type="alternates"> \n  </div>\n  <meta itemprop="url" content=""/>\n  <span itemscope="itemscope" itemtype="http://schema.org/Person" itemprop="author">\n      <meta itemprop="name" content="Mr. Bees" />\n      <meta itemprop="url" content="http://www.flickr.com/photos/bees/" />\n  </span>\n  <meta itemprop="accessibilityFeature" content="captions" />\n  <figcaption>\n    <a itemprop="url" href="">Source</a>: by \n    <a itemprop="author" href=""></a>\n  </figcaption>\n</figure>';
     endpoints = {
       "default": 'http://noembed.com/embed'
@@ -33,6 +33,12 @@
             $dialog = $(CONFIRM_DIALOG);
           }
           $dialog.find('.embed-preview').empty().append(thing.html);
+          if ($dialog.find('iframe').attr('height') > 350) {
+            $dialog.find('iframe').attr('height', 350);
+          }
+          if ($dialog.find('iframe').attr('width') > 500) {
+            $dialog.find('iframe').attr('width', 500);
+          }
           $dialog.find('input,textarea').val('');
           if (thing.title) {
             $dialog.find('input[name="figureTitle"]').val(thing.title);
@@ -65,12 +71,13 @@
       })(this),
       embedByUrl: (function(_this) {
         return function(url) {
-          var bits, domain, endpoint;
+          var bits, domain, endpoint, promise;
           bits = url.match(/(?:https?:\/\/)?(?:www\.)?([^\.]*)/);
+          promise = new $.Deferred();
           if (bits.length === 2) {
             domain = bits[1];
             endpoint = endpoints[domain] || endpoints['default'];
-            return $.ajax({
+            $.ajax({
               url: endpoint,
               data: {
                 format: 'json',
@@ -78,17 +85,23 @@
               },
               dataType: 'json'
             }).done(function(data) {
-              return embed.confirm({
-                url: data.url || url,
-                html: data.html,
-                title: data.title,
-                author: data.author_name,
-                authorUrl: data.author_url
-              });
+              if (data.error) {
+                return promise.reject();
+              } else {
+                promise.resolve();
+                return embed.confirm({
+                  url: data.url || url,
+                  html: data.html,
+                  title: data.title,
+                  author: data.author_name,
+                  authorUrl: data.author_url
+                });
+              }
             }).fail(function() {
-              return console.log('foobar');
+              return promise.reject();
             });
           }
+          return promise;
         };
       })(this),
       showDialog: function() {
@@ -97,12 +110,16 @@
         if (!$dialog.length) {
           $dialog = $(DIALOG);
         }
+        $dialog.find('.text-error').hide();
         $dialog.find('input').val('');
         $dialog.find('form').off('submit').submit((function(_this) {
           return function(e) {
             e.preventDefault(true);
-            $dialog.modal('hide');
-            return _this.embedByUrl($dialog.find('input[name="videoUrl"]').val());
+            return _this.embedByUrl($dialog.find('input[name="videoUrl"]').val()).done(function() {
+              return $dialog.modal('hide');
+            }).fail(function() {
+              return $dialog.find('.text-error').show();
+            });
           };
         })(this));
         return $dialog.modal('show');

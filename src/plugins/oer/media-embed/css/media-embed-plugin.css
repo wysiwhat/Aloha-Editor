@@ -22,6 +22,7 @@
 }
 #mediaConfirmEmbedDialog .modal-body {
   max-height: 560px;
+  height: 560px;
 }
 #mediaConfirmEmbedDialog textarea {
   width: 95%;

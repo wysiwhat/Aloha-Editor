@@ -21,10 +21,14 @@ define [
         <input type="text" name="videoUrl" size="90">
       </label>
       <button class="btn">Go</button>
+
+      <div class="text-error hide">
+        We could not determine how to include the media. Please check the URL for the media and try again or cancel
+      </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn cancel">Cancel</button>
+    <button class="btn" data-dismiss="modal">Cancel</button>
   </div>
 </div>
 '''
@@ -39,8 +43,8 @@ define [
     <form>
       <label>
         Figure Title: 
-        <input type="text" name="figureTitle" size="120">
       </label>
+      <textarea name="figureTitle" rows="1"></textarea>
       <em>shows above the embedded content</em>
 
       <label>Figure Caption:</label>
@@ -104,6 +108,11 @@ define [
 
       $dialog.find('.embed-preview').empty().append(thing.html)
 
+      if $dialog.find('iframe').attr('height') > 350
+        $dialog.find('iframe').attr('height', 350)
+      if $dialog.find('iframe').attr('width') > 500
+        $dialog.find('iframe').attr('width', 500)
+
       $dialog.find('input,textarea').val('')
 
       $dialog.find('input[name="figureTitle"]').val(thing.title) if thing.title
@@ -131,6 +140,7 @@ define [
 
     embedByUrl: (url) =>
       bits = url.match(/(?:https?:\/\/)?(?:www\.)?([^\.]*)/)
+      promise = new $.Deferred()
 
       if bits.length == 2
         domain = bits[1]
@@ -143,26 +153,37 @@ define [
           dataType: 'json'
         )
         .done (data) ->
-          embed.confirm
-            url: data.url || url
-            html: data.html
-            title: data.title
-            author: data.author_name
-            authorUrl: data.author_url
+          if data.error
+            promise.reject()
+          else
+            promise.resolve()
+
+            embed.confirm
+              url: data.url || url
+              html: data.html
+              title: data.title
+              author: data.author_name
+              authorUrl: data.author_url
         .fail () =>
-          console.log 'foobar'
+          promise.reject()
+
+      promise
  
     showDialog: () ->
       $dialog = $('#mediaEmbedDialog')
       $dialog = $(DIALOG) if not $dialog.length
 
+      $dialog.find('.text-error').hide()
       $dialog.find('input').val('')
 
       $dialog.find('form').off('submit').submit (e) =>
         e.preventDefault(true)
 
-        $dialog.modal 'hide'
         @embedByUrl($dialog.find('input[name="videoUrl"]').val())
+          .done ->
+            $dialog.modal 'hide'
+          .fail ->
+            $dialog.find('.text-error').show()
 
       $dialog.modal 'show'
 
