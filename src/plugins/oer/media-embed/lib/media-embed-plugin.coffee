@@ -17,7 +17,7 @@ define [
   <div class="modal-body">
     <form>
       <label style="display: inline-block">
-        Video URL: 
+        URL: 
         <input type="text" name="videoUrl" size="90">
       </label>
       <button class="btn">Go</button>
