@@ -23,7 +23,7 @@ define [
       <button class="btn">Go</button>
 
       <div class="text-error hide">
-        We could not determine how to include the media. Please check the URL for the media and try again or cancel
+        We could not determine how to include the media. Please check the URL for the media and try again or cancel.
       </div>
     </form>
   </div>
@@ -41,15 +41,11 @@ define [
   <div class="modal-body">
     <div class="embed-preview"></div>
     <form>
-      <label>
-        Figure Title: 
-      </label>
+      <label>Figure Title <em>(Shows up above the media)</em>:</label>
       <textarea name="figureTitle" rows="1"></textarea>
-      <em>shows above the embedded content</em>
 
-      <label>Figure Caption:</label>
+      <label>Figure Caption <em>(Shows up below the media.)</em>:</label>
       <textarea name="figureCaption" rows="4"></textarea>
-      <em>shows below the embedded content</em>
     </form>
   </div>
   <div class="modal-footer">
