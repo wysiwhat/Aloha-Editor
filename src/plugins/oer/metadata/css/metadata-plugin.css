@@ -2,12 +2,17 @@
 [data-type=metadata] {
   min-height:50px;
   position: relative;
-  background: #eee;
   padding: 5px;
 }
 
-[data-type=metadata]:after {
-  content: "click here to edit authors, description";
+[data-type=metadata]:hover {
+  -webkit-transition: background 250ms;
+  transition: background 250ms; 
+  background: #eee;
+}
+
+[data-type=metadata]:hover:after {
+  content: "Click to edit title, authors, license, etc.";
   top: 2px;
   right: 5px;
   position: absolute;
