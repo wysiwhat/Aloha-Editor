@@ -2,7 +2,7 @@
 (function() {
   define(['aloha', 'aloha/plugin', 'jquery', 'aloha/ephemera', 'semanticblock/semanticblock-plugin', './languages', 'css!metadata/css/metadata-plugin.css'], function(Aloha, Plugin, jQuery, Ephemera, SemanticBlock, languages) {
     var AUTHORS_TEMPLATE, COPYRIGHT_TEMPLATE, DESCRIPTION_TEMPLATE, EDITORS_TEMPLATE, ILLUSTRATORS_TEMPLATE, KEYWORDS_TEMPLATE, LANGUAGE_TEMPLATE, LICENCE_TEMPLATE, METADATA_MODAL, METADATA_TEMPLATE, PUBLISHERS_TEMPLATE, SUBJECTS_TEMPLATE, TITLE_TEMPLATE, TRANSLATORS_TEMPLATE, elements;
-    METADATA_MODAL = '<div id="module-metadata-modal" class="modal fade" tabindex="-1" role="dialog" style="width: 660px;">\n  <div class="modal-header">\n    <button type="button" class="close" data-cancel aria-hidden="true">×</button>\n    <h3>Edit the authors and other metadata on this module</h3>\n  </div>\n  <div class="modal-body" style="max-height: 435px;">\n\n    <form>\n      <h4 style="display:inline-block;">Title (required):</h4>\n      <h4 style="display:inline-block;" class="toc-color" data-edit-toggle>\n        <span data-title>title title title</span>\n        <small><em>click to edit</em></small>\n      </h4>\n      <input\n        type="text"\n        name="title"\n        style="display: none;"\n        class="input-xlarge">\n    </form>\n\n    <ul class="nav nav-tabs">\n      <li class="active"><a href="#module-metadata-about" data-toggle="tab">About</a></li>\n      <li><a href="#module-metadata-authors" data-toggle="tab">Authors</a></li>\n      <li><a href="#module-metadata-summary" data-toggle="tab">Summary</a></li>\n    </ul>\n\n    <form class="form-horizontal">\n      <div class="tab-content">\n        <div class="tab-pane active" id="module-metadata-about" style="width: 560px;">\n          <div class="control-group">\n            <label class="control-label"> Subject </label>\n            <div class="controls">\n              <input\n                type="text"\n                name="subject"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Language </label>\n            <div class="controls">\n              <select name="language">\n              </select>\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Keywords </label>\n            <div class="controls">\n              <input\n                type="text"\n                name="keywords"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Licence </label>\n            <div class="controls">\n              <select name="rights">\n                <option value="">Choose a license</option>\n                <option value="http://creativecommons.org/licenses/by/3.0/">\n                  Creative Commons Attribution - CC-BY</option>\n                <option value="http://creativecommons.org/licenses/by-nd/3.0/">\n                  Creative Commons Attribution-NoDerivs - CC BY-ND</option>\n                <option value="http://creativecommons.org/licenses/by-sa/3.0/">\n                  Creative Commons Attribution-ShareAlike - CC BY-SA</option>\n                <option value="http://creativecommons.org/licenses/by-nc/3.0/">\n                  Creative Commons Attribution-NonCommercial - CC BY-NC</option>\n                <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">\n                  Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>\n                <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">\n                  Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>\n                <option value="http://creativecommons.org/publicdomain/">\n                  Public domain</option>\n                <option>other</option>\n              </select>\n            </div>\n          </div>\n        </div>\n        <div class="tab-pane" id="module-metadata-authors">\n          <div class="control-group">\n            <label class="control-label">Authors</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="authors"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Copyright Holders</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="rights-holders"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Publisher (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="publishers"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Editors (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="editors"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Translators (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="translators"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Illustrator (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="illustrators"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n        </div>\n        <div class="tab-pane" id="module-metadata-summary">\n          <div class="control-group">\n            <label class="control-label">Summary</label>\n            <div class="controls">\n              <textarea name="description" rows="10" class="span5"></textarea>\n            </div>\n          </div>\n        </div>\n      </div>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn" data-cancel>Close</button>\n    <button class="btn" data-tab-next>Next</button>\n  </div>\n</div>';
+    METADATA_MODAL = '<div id="module-metadata-modal" class="modal fade" tabindex="-1" role="dialog" style="width: 660px;">\n  <div class="modal-header">\n    <button type="button" class="close" data-cancel aria-hidden="true">×</button>\n    <h3>Edit the authors and other metadata on this module</h3>\n  </div>\n  <div class="modal-body" style="max-height: 435px;">\n\n    <form>\n      <h4 style="display:inline-block;">Title (required):</h4>\n      <h4 style="display:inline-block;" class="toc-color" data-edit-toggle>\n        <span data-title>title title title</span>\n        <small><em>click to edit</em></small>\n      </h4>\n      <input\n        type="text"\n        name="title"\n        style="display: none;"\n        class="input-xlarge">\n    </form>\n\n    <ul class="nav nav-tabs">\n      <li class="active"><a href="#module-metadata-about" data-toggle="tab">About</a></li>\n      <li><a href="#module-metadata-authors" data-toggle="tab">Authors</a></li>\n      <li><a href="#module-metadata-summary" data-toggle="tab">Summary</a></li>\n    </ul>\n\n    <form class="form-horizontal">\n      <div class="tab-content">\n        <div class="tab-pane active" id="module-metadata-about" style="width: 560px;">\n          <div class="control-group">\n            <label class="control-label"> Subject </label>\n            <div class="controls">\n              <input\n                type="text"\n                name="subject"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Language </label>\n            <div class="controls">\n              <select name="language">\n              </select>\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Keywords </label>\n            <div class="controls">\n              <input\n                type="text"\n                name="keywords"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label"> Licence </label>\n            <div class="controls">\n              <select name="rights">\n                <option value="">Choose a license</option>\n                <option value="http://creativecommons.org/licenses/by/3.0/">\n                  Creative Commons Attribution - CC-BY</option>\n                <option value="http://creativecommons.org/licenses/by-nd/3.0/">\n                  Creative Commons Attribution-NoDerivs - CC BY-ND</option>\n                <option value="http://creativecommons.org/licenses/by-sa/3.0/">\n                  Creative Commons Attribution-ShareAlike - CC BY-SA</option>\n                <option value="http://creativecommons.org/licenses/by-nc/3.0/">\n                  Creative Commons Attribution-NonCommercial - CC BY-NC</option>\n                <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">\n                  Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>\n                <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">\n                  Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>\n                <option value="http://creativecommons.org/publicdomain/">\n                  Public domain</option>\n                <option>other</option>\n              </select>\n            </div>\n          </div>\n        </div>\n        <div class="tab-pane" id="module-metadata-authors">\n          <div class="control-group">\n            <label class="control-label">Authors</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="authors"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Copyright Holders</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="rights-holders"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Publisher (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="publishers"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Editors (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="editors"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Translators (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="translators"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n          <div class="control-group">\n            <label class="control-label">Illustrator (optional)</label>\n            <div class="controls">\n              <input\n                type="text"\n                name="illustrators"\n                data-role="tagsinput"\n                placeholder="Use comma, or tab to separate   "\n              >\n            </div>\n          </div>\n        </div>\n        <div class="tab-pane" id="module-metadata-summary">\n          <div class="control-group">\n            <label class="control-label">Summary</label>\n            <div class="controls">\n              <textarea name="description" rows="10" class="span5"></textarea>\n            </div>\n          </div>\n        </div>\n      </div>\n    </form>\n  </div>\n  <div class="modal-footer">\n    <button class="btn" data-cancel>Close without saving</button>\n    <button class="btn" data-save>Close and save</button>\n    <button class="btn" data-tab-next>Next</button>\n  </div>\n</div>';
     TITLE_TEMPLATE = '<h1 data-type="title" itemprop="name"></h1>';
     AUTHORS_TEMPLATE = '<div class="authors">\n  By:\n  <span itemscope="itemscope" itemtype="http://schema.org/Person" data-type="author" itemprop="author"></span>\n</div>';
     EDITORS_TEMPLATE = '<div class="editors">\n  Edited by:\n  <span data-type="editor" itemprop="editor"></span>\n</div>';
@@ -129,68 +129,69 @@
         }).trigger('blur');
         $modal.find('a[data-toggle="tab"]').off('shown').on('shown', function(e) {
           if ($(e.target).parents('li').next().length) {
-            return $modal.find('[data-tab-next]').text('Next');
+            return $modal.find('[data-tab-next]').show();
           } else {
-            return $modal.find('[data-tab-next]').text('Save');
+            return $modal.find('[data-tab-next]').hide();
           }
         });
-        $modal.find('[data-cancel]').off('click').click(function(e) {
-          e.preventDefault();
-          if (confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')) {
-            return $('#module-metadata-modal').modal('hide');
+        $modal.find('[data-cancel]').off('click').click(function() {
+          if (confirm('Are you sure you want to close without saving? The title, authors, and other information about this book will retain their previous values.')) {
+            return $modal.modal('hide');
+          }
+        });
+        $modal.find('[data-tab-next]').off('click').click(function() {
+          var next;
+          next = $modal.find('.nav li.active').next();
+          if (next.length) {
+            return next.find('a').click();
           }
         });
         $modal.modal({
           show: true
         });
-        return $modal.find('[data-tab-next]').off('click').click((function(_this) {
+        return $modal.find('[data-save]').off('click').click((function(_this) {
           return function() {
-            var next, now, rights, rightsUrl;
-            next = $modal.find('.nav li.active').next();
-            if (next.length) {
-              return next.find('a').click();
+            var now, rights, rightsUrl;
+            rightsUrl = $modal.find('[name="rights"]').val();
+            if (rightsUrl.length) {
+              rights = $modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim();
             } else {
-              rightsUrl = $modal.find('[name="rights"]').val();
-              if (rightsUrl.length) {
-                rights = $modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim();
-              } else {
-                rights = '';
-              }
-              now = new Date();
-              _this._setMetadata({
-                title: $modal.find('[name="title"]').val(),
-                description: $modal.find('[name="description"]').val(),
-                language: $modal.find('[name="language"]').val(),
-                rights: rights,
-                rightsUrl: rightsUrl,
-                dateModified: "" + (now.getFullYear()) + "-" + (now.getMonth() + 1) + "-" + (now.getDate()),
-                subjects: $modal.find('[name="subject"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                keywords: $modal.find('[name="keywords"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                rightsHolders: $modal.find('[name="rights-holders"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                authors: $modal.find('[name="authors"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                publishers: $modal.find('[name="publishers"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                editors: $modal.find('[name="editors"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                translators: $modal.find('[name="translators"]').val().split(',').filter(function(i) {
-                  return i;
-                }),
-                illustrators: $modal.find('[name="illustrators"]').val().split(',').filter(function(i) {
-                  return i;
-                })
-              });
-              return $modal.modal('hide');
+              rights = '';
             }
+            now = new Date();
+            _this._setMetadata({
+              title: $modal.find('[name="title"]').val(),
+              description: $modal.find('[name="description"]').val(),
+              language: $modal.find('[name="language"]').val(),
+              rights: rights,
+              rightsUrl: rightsUrl,
+              dateModified: "" + (now.getFullYear()) + "-" + (now.getMonth() + 1) + "-" + (now.getDate()),
+              subjects: $modal.find('[name="subject"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              keywords: $modal.find('[name="keywords"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              rightsHolders: $modal.find('[name="rights-holders"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              authors: $modal.find('[name="authors"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              publishers: $modal.find('[name="publishers"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              editors: $modal.find('[name="editors"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              translators: $modal.find('[name="translators"]').val().split(',').filter(function(i) {
+                return i;
+              }),
+              illustrators: $modal.find('[name="illustrators"]').val().split(',').filter(function(i) {
+                return i;
+              })
+            });
+            return $modal.modal('hide');
           };
         })(this));
       },

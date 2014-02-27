@@ -170,7 +170,8 @@ define [
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-cancel>Close</button>
+    <button class="btn" data-cancel>Close without saving</button>
+    <button class="btn" data-save>Close and save</button>
     <button class="btn" data-tab-next>Next</button>
   </div>
 </div>
@@ -319,50 +320,48 @@ define [
 
       $modal.find('a[data-toggle="tab"]').off('shown').on('shown', (e) ->
         if $(e.target).parents('li').next().length
-          $modal.find('[data-tab-next]').text('Next')
+          $modal.find('[data-tab-next]').show()
         else
-          $modal.find('[data-tab-next]').text('Save')
+          $modal.find('[data-tab-next]').hide()
       )
 
-      $modal.find('[data-cancel]').off('click').click (e) ->
-        e.preventDefault()
-        if confirm('Are you sure you want to cancel? The title, authors, and other information about this book will retain their previous values.')
-          $('#module-metadata-modal').modal('hide')
+      $modal.find('[data-cancel]').off('click').click ->
+        if confirm('Are you sure you want to close without saving? The title, authors, and other information about this book will retain their previous values.')
+          $modal.modal('hide')
+
+      $modal.find('[data-tab-next]').off('click').click ->
+        next = $modal.find('.nav li.active').next()
+        next.find('a').click() if next.length
 
       $modal.modal {show:true}
 
-      $modal.find('[data-tab-next]').off('click').click =>
-        next = $modal.find('.nav li.active').next()
+      $modal.find('[data-save]').off('click').click =>
+        rightsUrl = $modal.find('[name="rights"]').val()
 
-        if next.length
-          next.find('a').click()
+        if rightsUrl.length
+          rights = $modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
         else
-          rightsUrl = $modal.find('[name="rights"]').val()
+          rights = ''
 
-          if rightsUrl.length
-            rights = $modal.find('[name="rights"] option[value="' + rightsUrl + '"]').text().trim()
-          else
-            rights = ''
+        now = new Date()
 
-          now = new Date()
+        @_setMetadata
+          title: $modal.find('[name="title"]').val()
+          description: $modal.find('[name="description"]').val()
+          language: $modal.find('[name="language"]').val()
+          rights: rights
+          rightsUrl: rightsUrl
+          dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
+          subjects: $modal.find('[name="subject"]').val().split(',').filter (i) -> i
+          keywords: $modal.find('[name="keywords"]').val().split(',').filter (i) -> i
+          rightsHolders: $modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
+          authors: $modal.find('[name="authors"]').val().split(',').filter (i) -> i
+          publishers: $modal.find('[name="publishers"]').val().split(',').filter (i) -> i
+          editors: $modal.find('[name="editors"]').val().split(',').filter (i) -> i
+          translators: $modal.find('[name="translators"]').val().split(',').filter (i) -> i
+          illustrators: $modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
 
-          @_setMetadata
-            title: $modal.find('[name="title"]').val()
-            description: $modal.find('[name="description"]').val()
-            language: $modal.find('[name="language"]').val()
-            rights: rights
-            rightsUrl: rightsUrl
-            dateModified: "#{now.getFullYear()}-#{now.getMonth()+1}-#{now.getDate()}"
-            subjects: $modal.find('[name="subject"]').val().split(',').filter (i) -> i
-            keywords: $modal.find('[name="keywords"]').val().split(',').filter (i) -> i
-            rightsHolders: $modal.find('[name="rights-holders"]').val().split(',').filter (i) -> i
-            authors: $modal.find('[name="authors"]').val().split(',').filter (i) -> i
-            publishers: $modal.find('[name="publishers"]').val().split(',').filter (i) -> i
-            editors: $modal.find('[name="editors"]').val().split(',').filter (i) -> i
-            translators: $modal.find('[name="translators"]').val().split(',').filter (i) -> i
-            illustrators: $modal.find('[name="illustrators"]').val().split(',').filter (i) -> i
-
-          $modal.modal('hide')
+        $modal.modal('hide')
 
     _readMetadata: ->
       return @metadata if @metadata
