@@ -268,7 +268,7 @@ define [
     subjects:      {selector: '.subject span',          hasMany: true}
     description:   {selector: '.description p',         hasMany: false}
 
-  Plugin.create 'metadata', {
+  plugin = Plugin.create 'metadata', {
 
     _selector: '[data-type="metadata"]'
     $_editable: null
@@ -483,10 +483,22 @@ define [
 
       @$_element.click =>
         @_showModal()
+
+    extendMetadata: (newMetadata) ->
+
+      metadata = plugin._readMetadata()
+      
+      for key, value of newMetadata
+        console.log 'meta', key, value
+        metadata[key] = value
+       
+      plugin._setMetadata(metadata)
  
     init: () ->
 
       SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *')
+
+      @settings.extendMetadata = @extendMetadata
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         @_init(params.obj) if params.obj.is('.aloha-root-editable')
