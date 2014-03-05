@@ -400,6 +400,8 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
       $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
       activate $element
 
+      $element
+
     insertAtCursor: (template) ->
       $element = jQuery(template)
       range = Aloha.Selection.getRangeObject()

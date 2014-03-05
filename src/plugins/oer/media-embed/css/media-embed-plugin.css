@@ -1,5 +1,4 @@
 
-
 #mediaEmbedDialog input[type=text],
 #mediaConfirmEmbedDialog input[type=text] {
   margin-bottom: 0px;
@@ -10,9 +9,6 @@
   margin-top: 5px;
 }
 
-#mediaConfirmEmbedDialog {
-  height: 700px;
-}
 #mediaConfirmEmbedDialog .embed-preview {
   text-align: center;
 }
@@ -20,18 +16,10 @@
   margin-top: 5px;
   margin-bottom: 0px;
 }
-#mediaConfirmEmbedDialog .modal-body {
-  max-height: 560px;
-  height: 560px;
-}
 #mediaConfirmEmbedDialog textarea {
   width: 95%;
   margin-bottom: 0px;
 }
-
-
-
-
 
 
 .noembed-meta-info {

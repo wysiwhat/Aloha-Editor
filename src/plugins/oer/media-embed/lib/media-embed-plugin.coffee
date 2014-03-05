@@ -5,8 +5,9 @@ define [
   'aloha/ephemera'
   'ui/ui'
   'ui/button'
+  'figure/figure-plugin'
   'semanticblock/semanticblock-plugin'
-  'css!media-embed/css/media-embed-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, semanticBlock) ->
+  'css!media-embed/css/media-embed-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, UI, Button, Figure, semanticBlock) ->
 
   DIALOG = '''
 <div id="mediaEmbedDialog" class="modal hide fade" tabindex="-1" role="dialog" data-backdrop="false">
@@ -40,13 +41,6 @@ define [
   </div>
   <div class="modal-body">
     <div class="embed-preview"></div>
-    <form>
-      <label>Figure Title <em>(Shows up above the media)</em>:</label>
-      <textarea name="figureTitle" rows="1"></textarea>
-
-      <label>Figure Caption <em>(Shows up below the media.)</em>:</label>
-      <textarea name="figureCaption" rows="4"></textarea>
-    </form>
   </div>
   <div class="modal-footer">
     <button class="btn cancel">Back</button>
@@ -56,7 +50,7 @@ define [
 '''
 
   TEMPLATE = '''
-<figure data-type="embed" itemscope="itemscope" itemtype="http://schema.org/CreativeWork">
+<figure>
   <div data-type="title"></div>
   <div data-type="alternates"> 
   </div>
@@ -96,7 +90,10 @@ define [
       $thing.find('figcaption').append(thing.caption)
       $thing.find('[data-type="alternates"]').html(thing.html)
 
-      semanticBlock.insertOverPlaceholder($thing, $('.oer-placeholder'))
+      $caption = $thing.find('figcaption').remove()
+      $figure  = Figure.insertOverPlaceholder($thing.contents())
+
+      $figure.find('figcaption').find('.aloha-editable').html($caption.contents())
 
     confirm: (thing) =>
       $dialog = $('#mediaConfirmEmbedDialog')
@@ -117,18 +114,13 @@ define [
         e.preventDefault(true)
         $dialog.modal 'hide'
         embed.showDialog()
-      $dialog.find('.embed').off('.embed').click (e) ->
-        e.preventDefault(true)
-        $(@).parents('.modal').first().find('form').submit()
 
-      $dialog.find('form').off('submit').submit (e) ->
+      $dialog.find('.embed').off('.embed').click (e) ->
         e.preventDefault(true)
         $dialog.modal 'hide'
         embed.create
           url: thing.url
           html: thing.html
-          title: $dialog.find('[name="figureTitle"]').val()
-          caption: $dialog.find('[name="figureCaption"]').val()
           author: thing.author
           authorUrl: thing.authorUrl
 
@@ -192,9 +184,7 @@ define [
       # For legacy toolbars
       UI.adopt "insertMediaEmbed", Button,
         click: =>
-          range = Aloha.Selection.getRangeObject()
-          GENTICS.Utils.Dom.insertIntoDOM $('<span class="aloha-ephemera oer-placeholder"></span>'), range, Aloha.activeEditable.obj
-          
+          Figure.insertPlaceholder()
           @showDialog()
 
       semanticBlock.register(this)

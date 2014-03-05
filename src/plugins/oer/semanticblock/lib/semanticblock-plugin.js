@@ -419,7 +419,8 @@
         $element.addClass('semantic-temp');
         $placeholder.replaceWith($element);
         $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
-        return activate($element);
+        activate($element);
+        return $element;
       },
       insertAtCursor: function(template) {
         var $element, range;
