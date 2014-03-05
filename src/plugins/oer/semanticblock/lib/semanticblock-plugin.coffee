@@ -14,14 +14,12 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
         <h3></h3>
       </div>
       <div class="modal-body">
-        <div style="margin: 20px 10px 20px 10px; padding: 10px; border: 1px solid grey;">
             <strong>Custom class</strong>
             <p>
                 Give this element a custom "class". Nothing obvious will change in your document.
                 This is for advanced book styling and requires support from the publishing system.
             </p>
             <input type="text" placeholder="custom element class" name="custom_class">
-        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary action submit">Save changes</button>
@@ -404,9 +402,12 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
       $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
       activate $element
 
+    ignore: (selector) ->
+      @settings.defaultSelector += ':not('+selector+')'
+
     register: (plugin) ->
       registeredTypes.push(plugin)
-      @settings.defaultSelector += ':not('+plugin.ignore+')' if plugin.ignore
+      @ignore(plugin.ignore) if plugin.ignore
 
     registerEvent: (name, selector, callback) ->
       pluginEvents.push
