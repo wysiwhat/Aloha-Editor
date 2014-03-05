@@ -4,13 +4,13 @@ figure {
   overflow: auto;
 }
 
-figure div.title:not(:focus):empty:before {
+.semantic-container:hover figure div.title:not(:focus):empty:before {
   color: #AAA; 
   font-style: italic;  
   content: "Add a figure title (optional)"; 
 }
 
-figure figcaption > p:not(:focus):empty:before {
+.semantic-container:hover figure figcaption > p:not(:focus):empty:before {
   color: #AAA; 
   font-style: italic;  
   content: "Add a figure caption (optional)"; 
