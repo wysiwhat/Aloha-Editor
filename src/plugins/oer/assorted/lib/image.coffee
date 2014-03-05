@@ -59,8 +59,8 @@ define [
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>
         <button class="btn action cancel">Cancel</button>
+        <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>
       </div>'''
 
   DIALOG_HTML2 = '''
@@ -134,6 +134,7 @@ define [
     dialog.append(jQuery(DIALOG_HTML))
 
     dialog.find('.image-options').remove()
+    dialog.find('.btn.action.attribution').show()
 
     dialog.find('[name=alt]').val($el.attr('alt'))
     dialog.find('.btn.action.insert')
@@ -141,6 +142,10 @@ define [
       .removeAttr('disabled')
 
     deferred = $.Deferred()
+
+    dialog.find('.btn.action.attribution').click ->
+      deferred.done ->
+        showModalDialog2($el)
 
     dialog.on 'submit', (evt) =>
       evt.preventDefault() # Don't submit the form
@@ -267,34 +272,32 @@ define [
 
     return deferred.promise()
 
-  showModalDialog2 = ($figure, $img, $dialog, editing) ->
-    $dialog.children().remove()
+  showModalDialog2 = ($img) ->
+    $dialog = jQuery(DIALOG_HTML_CONTAINER)
     $dialog.append(jQuery(DIALOG_HTML2))
 
     src = $img.attr('src')
     if src and /^http/.test(src)
       $dialog.find('input#reuse-url').val src
 
-    if editing
-      creator    = $img.attr 'data-lrmi-creator'
-      if creator
-        $dialog.find('input#reuse-author').val creator
-      publisher  = $img.attr 'data-lrmi-publisher'
-      if publisher
-        $dialog.find('input#reuse-org').val publisher
-      basedOnURL = $img.attr 'data-lrmi-isBasedOnURL'
-      if basedOnURL
-        $dialog.find('input#reuse-url').val basedOnURL
-      rightsUrl  = $img.attr 'data-lrmi-useRightsURL'
-      if rightsUrl
-        $option = $dialog.find('select#reuse-license option[value="' + rightsUrl + '"]')
-        if $option
-          $option.prop 'selected', true
-      if creator or publisher or rightsUrl
-        $dialog.find('input[value="i-got-permission"]').prop 'checked', true
+    creator    = $img.attr 'data-lrmi-creator'
+    if creator
+      $dialog.find('input#reuse-author').val creator
+    publisher  = $img.attr 'data-lrmi-publisher'
+    if publisher
+      $dialog.find('input#reuse-org').val publisher
+    basedOnURL = $img.attr 'data-lrmi-isBasedOnURL'
+    if basedOnURL
+      $dialog.find('input#reuse-url').val basedOnURL
+    rightsUrl  = $img.attr 'data-lrmi-useRightsURL'
+    if rightsUrl
+      $option = $dialog.find('select#reuse-license option[value="' + rightsUrl + '"]')
+      if $option
+        $option.prop 'selected', true
+    if creator or publisher or rightsUrl
+      $dialog.find('input[value="i-got-permission"]').prop 'checked', true
 
-      $dialog.find('input[type=radio]').click()
-    else
+    $dialog.find('input[type=radio]').click()
 
     $dialog.find('input[name="image-source-selection"]').click (evt) ->
       inputs = jQuery('.source-selection-allowed').find('input,select')
@@ -370,16 +373,17 @@ define [
         $img.removeAttr 'data-lrmi-useRightsURL'
         $img.removeAttr 'data-tbook-permissionText'
 
-      deferred.resolve({target: $img[0]})
-      $figure.removeClass('aloha-ephemera')
-      editableId = $figure.parents('.aloha-editable').last().attr('id')
+      editableId = $img.parents('.aloha-editable').last().attr('id')
       Aloha.getEditableById(editableId).smartContentChange({type: 'block-change'})
+      deferred.resolve($img)
+      $dialog.modal('hide')
 
     $dialog.off('click').on 'click', '.btn.action.cancel', (evt) =>
       evt.preventDefault() # Don't submit the form
-      $img.parents('.semantic-container').remove() unless editing
-      deferred.reject(target: $img[0], editing: editing)
+      deferred.reject($img)
       $dialog.modal('hide')
+
+    $dialog.modal {show: true}
 
     return deferred.promise()
 
@@ -388,24 +392,7 @@ define [
 
     showCreateDialog().then (image) ->
       Figure.insertOverPlaceholder(image)
-
-    return
-    source_this_image_dialog = ()=>
-      editing = false
-      return showModalDialog2($figure, $img, $dialog, editing)
-
-    promise.then (data)=>
-      # upload image, if a local file was chosen
-      if data.files.length
-        newEl.addClass('aloha-image-uploading')
-        @uploadImage data.files[0], newEl, (url) ->
-          if url
-            jQuery(data.target).attr('src', url)
-          newEl.removeClass('aloha-image-uploading')
-    .then(source_this_image_dialog).then () =>
-      $dialog.modal 'hide'
-    .fail (data) =>
-      jQuery(data.target).parents('.semantic-container').remove() unless data.editing
+      showModalDialog2(image)
 
   $('body').bind 'aloha-image-resize', ->
     Aloha.activeEditable.smartContentChange({type: 'block-change'})

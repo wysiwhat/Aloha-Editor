@@ -5,7 +5,7 @@
     var DIALOG_HTML, DIALOG_HTML2, DIALOG_HTML_CONTAINER, WARNING_IMAGE_PATH, initialize, insertImage, setEditText, setThankYou, showCreateDialog, showEditDialog, showModalDialog2;
     WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png';
     DIALOG_HTML_CONTAINER = '<form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />';
-    DIALOG_HTML = '<div class="modal-header">\n  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n  <h3>Insert image</h3>\n</div>\n<div class="modal-body">\n  <div class="image-options">\n      <div class="image-selection">\n        <div class="dia-alternative">\n          <span class="upload-image-link btn-link">Choose an image to upload</span>\n          <input type="file" class="upload-image-input">\n        </div>\n        <div class="dia-alternative">\n          OR\n        </div>\n        <div class="dia-alternative">\n          <span class="upload-url-link btn-link">get image from the Web</span>\n          <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">\n        </div>\n      </div>\n      <div class="placeholder preview hide">\n        <img class="preview-image"/>\n      </div>\n  </div>\n  <div class="image-alt">\n    <div class="forminfo">\n      <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>\n    </div>\n    <div>\n      <textarea name="alt" placeholder="Enter description ..." rows="3"></textarea>\n    </div>\n  </div>\n</div>\n<div class="modal-footer">\n  <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>\n  <button class="btn action cancel">Cancel</button>\n</div>';
+    DIALOG_HTML = '<div class="modal-header">\n  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n  <h3>Insert image</h3>\n</div>\n<div class="modal-body">\n  <div class="image-options">\n      <div class="image-selection">\n        <div class="dia-alternative">\n          <span class="upload-image-link btn-link">Choose an image to upload</span>\n          <input type="file" class="upload-image-input">\n        </div>\n        <div class="dia-alternative">\n          OR\n        </div>\n        <div class="dia-alternative">\n          <span class="upload-url-link btn-link">get image from the Web</span>\n          <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">\n        </div>\n      </div>\n      <div class="placeholder preview hide">\n        <img class="preview-image"/>\n      </div>\n  </div>\n  <div class="image-alt">\n    <div class="forminfo">\n      <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>\n    </div>\n    <div>\n      <textarea name="alt" placeholder="Enter description ..." rows="3"></textarea>\n    </div>\n  </div>\n</div>\n<div class="modal-footer">\n  <button class="btn action cancel">Cancel</button>\n  <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>\n</div>';
     DIALOG_HTML2 = '<div class="modal-header">\n  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n  <h3>Insert image</h3>\n</div>\n<div class="modal-body">\n  <div>\n    <strong>Source for this image (Required)</strong>\n  </div>\n  <div class="source-selection">\n    <ul style="list-style-type: none; padding: 0; margin: 0;">\n      <li id="listitem-i-own-this">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) \n        </label>\n      </li>\n      <li id="listitem-i-got-permission">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: \n        </label>\n        <div class="source-selection-allowed">\n          <fieldset>\n            <label>Who is the original author of this image?</label>\n            <input type="text" disabled="disabled" id="reuse-author">\n\n            <label>What organization owns this image?</label>\n            <input type="text" disabled="disabled" id="reuse-org">\n\n            <label>What is the original URL of this image?</label>\n            <input type="text" disabled="disabled" id="reuse-url" placeholder="http://">\n\n            <label>Permission to reuse</label>\n            <select id="reuse-license" disabled="disabled">\n              <option value="">Choose a license</option>\n              <option value="http://creativecommons.org/licenses/by/3.0/">\n                Creative Commons Attribution - CC-BY</option>\n              <option value="http://creativecommons.org/licenses/by-nd/3.0/">\n                Creative Commons Attribution-NoDerivs - CC BY-ND</option>\n              <option value="http://creativecommons.org/licenses/by-sa/3.0/">\n                Creative Commons Attribution-ShareAlike - CC BY-SA</option>\n              <option value="http://creativecommons.org/licenses/by-nc/3.0/">\n                Creative Commons Attribution-NonCommercial - CC BY-NC</option>\n              <option value="http://creativecommons.org/licenses/by-nc-sa/3.0/">\n                Creative Commons Attribution-NonCommercial-ShareAlike - CC BY-NC-SA</option>\n              <option value="http://creativecommons.org/licenses/by-nc-nd/3.0/">\n                Creative Commons Attribution-NonCommercial-NoDerivs - CC BY-NC-ND</option>\n              <option value="http://creativecommons.org/publicdomain/">\n                Public domain</option>\n              <option>other</option>\n            </select>\n          </fieldset>\n        </div>\n      </li>\n      <li id="listitem-i-dont-know">\n        <label class="radio">\n          <input type="radio" name="image-source-selection" value="i-dont-know">I don\'t know (skip citation for now)\n        </label>\n      </li>\n    </ul>\n  </div>\n</div>\n<div class="modal-footer">\n  <button type="submit" class="btn btn-primary action insert">Save</button>\n  <button class="btn action cancel">Cancel</button>\n</div>';
     showEditDialog = function($el) {
       var deferred, dialog,
@@ -13,9 +13,15 @@
       dialog = jQuery(DIALOG_HTML_CONTAINER);
       dialog.append(jQuery(DIALOG_HTML));
       dialog.find('.image-options').remove();
+      dialog.find('.btn.action.attribution').show();
       dialog.find('[name=alt]').val($el.attr('alt'));
       dialog.find('.btn.action.insert').text('Save').removeAttr('disabled');
       deferred = $.Deferred();
+      dialog.find('.btn.action.attribution').click(function() {
+        return deferred.done(function() {
+          return showModalDialog2($el);
+        });
+      });
       dialog.on('submit', function(evt) {
         evt.preventDefault();
         setEditText($el);
@@ -142,42 +148,38 @@
       });
       return deferred.promise();
     };
-    showModalDialog2 = function($figure, $img, $dialog, editing) {
-      var $option, basedOnURL, creator, deferred, publisher, rightsUrl, src,
+    showModalDialog2 = function($img) {
+      var $dialog, $option, basedOnURL, creator, deferred, publisher, rightsUrl, src,
         _this = this;
-      $dialog.children().remove();
+      $dialog = jQuery(DIALOG_HTML_CONTAINER);
       $dialog.append(jQuery(DIALOG_HTML2));
       src = $img.attr('src');
       if (src && /^http/.test(src)) {
         $dialog.find('input#reuse-url').val(src);
       }
-      if (editing) {
-        creator = $img.attr('data-lrmi-creator');
-        if (creator) {
-          $dialog.find('input#reuse-author').val(creator);
-        }
-        publisher = $img.attr('data-lrmi-publisher');
-        if (publisher) {
-          $dialog.find('input#reuse-org').val(publisher);
-        }
-        basedOnURL = $img.attr('data-lrmi-isBasedOnURL');
-        if (basedOnURL) {
-          $dialog.find('input#reuse-url').val(basedOnURL);
-        }
-        rightsUrl = $img.attr('data-lrmi-useRightsURL');
-        if (rightsUrl) {
-          $option = $dialog.find('select#reuse-license option[value="' + rightsUrl + '"]');
-          if ($option) {
-            $option.prop('selected', true);
-          }
-        }
-        if (creator || publisher || rightsUrl) {
-          $dialog.find('input[value="i-got-permission"]').prop('checked', true);
-        }
-        $dialog.find('input[type=radio]').click();
-      } else {
-
+      creator = $img.attr('data-lrmi-creator');
+      if (creator) {
+        $dialog.find('input#reuse-author').val(creator);
       }
+      publisher = $img.attr('data-lrmi-publisher');
+      if (publisher) {
+        $dialog.find('input#reuse-org').val(publisher);
+      }
+      basedOnURL = $img.attr('data-lrmi-isBasedOnURL');
+      if (basedOnURL) {
+        $dialog.find('input#reuse-url').val(basedOnURL);
+      }
+      rightsUrl = $img.attr('data-lrmi-useRightsURL');
+      if (rightsUrl) {
+        $option = $dialog.find('select#reuse-license option[value="' + rightsUrl + '"]');
+        if ($option) {
+          $option.prop('selected', true);
+        }
+      }
+      if (creator || publisher || rightsUrl) {
+        $dialog.find('input[value="i-got-permission"]').prop('checked', true);
+      }
+      $dialog.find('input[type=radio]').click();
       $dialog.find('input[name="image-source-selection"]').click(function(evt) {
         var inputs;
         inputs = jQuery('.source-selection-allowed').find('input,select');
@@ -259,57 +261,28 @@
           $img.removeAttr('data-lrmi-useRightsURL');
           $img.removeAttr('data-tbook-permissionText');
         }
-        deferred.resolve({
-          target: $img[0]
-        });
-        $figure.removeClass('aloha-ephemera');
-        editableId = $figure.parents('.aloha-editable').last().attr('id');
-        return Aloha.getEditableById(editableId).smartContentChange({
+        editableId = $img.parents('.aloha-editable').last().attr('id');
+        Aloha.getEditableById(editableId).smartContentChange({
           type: 'block-change'
         });
+        deferred.resolve($img);
+        return $dialog.modal('hide');
       });
       $dialog.off('click').on('click', '.btn.action.cancel', function(evt) {
         evt.preventDefault();
-        if (!editing) {
-          $img.parents('.semantic-container').remove();
-        }
-        deferred.reject({
-          target: $img[0],
-          editing: editing
-        });
+        deferred.reject($img);
         return $dialog.modal('hide');
+      });
+      $dialog.modal({
+        show: true
       });
       return deferred.promise();
     };
     insertImage = function() {
-      var source_this_image_dialog,
-        _this = this;
       Figure.insertPlaceholder();
-      showCreateDialog().then(function(image) {
-        return Figure.insertOverPlaceholder(image);
-      });
-      return;
-      source_this_image_dialog = function() {
-        var editing;
-        editing = false;
-        return showModalDialog2($figure, $img, $dialog, editing);
-      };
-      return promise.then(function(data) {
-        if (data.files.length) {
-          newEl.addClass('aloha-image-uploading');
-          return _this.uploadImage(data.files[0], newEl, function(url) {
-            if (url) {
-              jQuery(data.target).attr('src', url);
-            }
-            return newEl.removeClass('aloha-image-uploading');
-          });
-        }
-      }).then(source_this_image_dialog).then(function() {
-        return $dialog.modal('hide');
-      }).fail(function(data) {
-        if (!data.editing) {
-          return jQuery(data.target).parents('.semantic-container').remove();
-        }
+      return showCreateDialog().then(function(image) {
+        Figure.insertOverPlaceholder(image);
+        return showModalDialog2(image);
       });
     };
     $('body').bind('aloha-image-resize', function() {
