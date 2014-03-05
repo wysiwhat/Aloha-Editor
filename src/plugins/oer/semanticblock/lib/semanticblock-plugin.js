@@ -328,21 +328,19 @@
           return jQuery(node).removeClass('aloha-block-dropzone aloha-editable-active aloha-editable aloha-block-blocklevel-sortable ui-sortable').removeAttr('contenteditable placeholder').get(0);
         });
         return Aloha.bind('aloha-editable-created', function(e, params) {
-          var $root, classes, selector, sortableInterval, type;
+          var $root, classes, selector, sortableInterval, type, _i, _len;
           $root = params.obj;
+          selector = _this.settings.defaultSelector;
           classes = [];
-          if ((function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
-              type = registeredTypes[_i];
-              _results.push(type.selector);
+          for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
+            type = registeredTypes[_i];
+            if (type.selector) {
+              classes.push(type.selector);
             }
-            return _results;
-          })()) {
-            classes.push(type.selector);
           }
-          selector = _this.settings.defaultSelector + ',' + classes.join();
+          if (classes.length) {
+            selector += ',' + classes.join();
+          }
           sortableInterval = setInterval(function() {
             if ($root.data('sortable')) {
               clearInterval(sortableInterval);
@@ -408,7 +406,16 @@
           }
         });
       },
+      insertPlaceholder: function() {
+        var range;
+        $('.oer-placeholder').remove();
+        range = Aloha.Selection.getRangeObject();
+        return GENTICS.Utils.Dom.insertIntoDOM($('<span class="aloha-ephemera oer-placeholder"></span>'), range, Aloha.activeEditable.obj);
+      },
       insertOverPlaceholder: function($element, $placeholder) {
+        if (!($placeholder != null ? $placeholder.length : void 0)) {
+          $placeholder = $('.oer-placeholder');
+        }
         $element.addClass('semantic-temp');
         $placeholder.replaceWith($element);
         $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
