@@ -345,7 +345,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     formula = $span.find('script[type]').html()
 
     # Set the language and fill in the formula
-    $editor.find("input[name=mime-type][value='#{mimeType}']").attr('checked', true)
+    $editor.find("input[name=mime-type][value='#{mimeType}']").prop('checked', true)
     $formula.val(formula)
 
     # Set the hidden pre that causes auto-sizing to the same value
@@ -402,13 +402,14 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
         $editor.find('.math-container pre span').text(
             $editor.find('.formula').val())
 
-    # Grr, Bootstrap doesn't set the cheked value properly on radios
     radios = $editor.find('input[name=mime-type]')
     radios.on 'click', () ->
-        radios.attr('checked', false)
-        jQuery(@).attr('checked', true)
-        clearTimeout(keyTimeout)
-        setTimeout(keyDelay.bind($formula), 500)
+      # The following lines are for bootstrap 2
+      # radios.prop('checked', false)
+      # jQuery(@).prop('checked', true)
+
+      clearTimeout(keyTimeout)
+      setTimeout(keyDelay.bind($formula), 500)
 
     $span.off('shown.math').on 'shown.math', () ->
       $span.css 'background-color', '#E5EEF5'
