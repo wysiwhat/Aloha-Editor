@@ -279,7 +279,15 @@ function(Aloha, Plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
                 icon: "aloha-icon aloha-icon-createTable",
                 scope: 'Aloha.continuoustext',
                 click: function(e){
+                    // Add a temporary indicator of where the table will be
+                    // going.
+                    var $insertionEl = $('<span class="aloha-ephemera table-placeholder"> </span>');
+                    GENTICS.Utils.Dom.insertIntoDOM($insertionEl, Aloha.Selection.getRangeObject(),
+                                                    Aloha.activeEditable.obj);
                     that.createLayer.show(e);
+                    $(that.createLayer).off('table-create-layer.closed').on('table-create-layer.closed', function(e){
+                        $insertionEl.remove();
+                    });
                 }
             });
 
