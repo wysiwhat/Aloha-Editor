@@ -317,11 +317,16 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
+        
+        selector = @settings.defaultSelector
 
         classes = []
-        classes.push type.selector for type in registeredTypes
 
-        selector = @settings.defaultSelector + ',' + classes.join()
+        for type in registeredTypes
+          if type.selector
+            classes.push type.selector
+
+        selector += ',' + classes.join() if classes.length
 
         # theres no really good way to do this. editables get made into sortables
         # on `aloha-editable-created` and there is no event following that, so we 
@@ -381,6 +386,21 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
          
               refreshPositions: true
 
+    insertPlaceholder: ->
+      $('.oer-placeholder').remove()
+
+      range = Aloha.Selection.getRangeObject()
+      GENTICS.Utils.Dom.insertIntoDOM $('<span class="aloha-ephemera oer-placeholder"></span>'), range, Aloha.activeEditable.obj
+
+    insertOverPlaceholder: ($element, $placeholder) ->
+      $placeholder = $('.oer-placeholder') if not $placeholder?.length
+
+      $element.addClass 'semantic-temp'
+      $placeholder.replaceWith($element)
+      $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
+      activate $element
+
+      $element
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
