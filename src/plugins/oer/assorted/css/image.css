@@ -112,3 +112,7 @@ i.icon-warning {
   height: 16px;
   vertical-align: bottom;
 }
+
+.oer-placeholder:before {
+    content: url(../img/insert-here-arrow.png);
+}

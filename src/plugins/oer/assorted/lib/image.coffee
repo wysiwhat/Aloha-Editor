@@ -20,7 +20,7 @@ define [
 ) ->
 
   # This will be prefixed with Aloha.settings.baseUrl
-  WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
+  WARNING_IMAGE_PATH = '/../plugins/oer/assorted/img/warning.png'
 
   DIALOG_HTML_CONTAINER = '''
       <form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
