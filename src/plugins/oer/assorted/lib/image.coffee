@@ -268,6 +268,9 @@ define [
       deferred.reject()
       dialog.modal('hide')
 
+    dialog.on 'hidden', () ->
+      deferred.reject()
+
     dialog.modal {show: true}
 
     return deferred.promise()
@@ -393,6 +396,8 @@ define [
     showCreateDialog().then (image) ->
       Figure.insertOverPlaceholder(image, marker)
       showModalDialog2(image)
+    .fail () ->
+      marker.remove()
 
   $('body').bind 'aloha-image-resize', ->
     Aloha.activeEditable.smartContentChange({type: 'block-change'})

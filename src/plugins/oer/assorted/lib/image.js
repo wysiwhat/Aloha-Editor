@@ -142,6 +142,9 @@
         deferred.reject();
         return dialog.modal('hide');
       });
+      dialog.on('hidden', function() {
+        return deferred.reject();
+      });
       dialog.modal({
         show: true
       });
@@ -283,6 +286,8 @@
       return showCreateDialog().then(function(image) {
         Figure.insertOverPlaceholder(image, marker);
         return showModalDialog2(image);
+      }).fail(function() {
+        return marker.remove();
       });
     };
     $('body').bind('aloha-image-resize', function() {
