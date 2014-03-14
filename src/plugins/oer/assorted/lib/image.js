@@ -278,9 +278,10 @@
       return deferred.promise();
     };
     insertImage = function() {
-      Figure.insertPlaceholder();
+      var marker;
+      marker = Figure.insertPlaceholder();
       return showCreateDialog().then(function(image) {
-        Figure.insertOverPlaceholder(image);
+        Figure.insertOverPlaceholder(image, marker);
         return showModalDialog2(image);
       });
     };

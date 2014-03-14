@@ -388,10 +388,10 @@ define [
     return deferred.promise()
 
   insertImage = () ->
-    Figure.insertPlaceholder()
+    marker = Figure.insertPlaceholder()
 
     showCreateDialog().then (image) ->
-      Figure.insertOverPlaceholder(image)
+      Figure.insertOverPlaceholder(image, marker)
       showModalDialog2(image)
 
   $('body').bind 'aloha-image-resize', ->
