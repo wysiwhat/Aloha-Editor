@@ -113,12 +113,12 @@ define [
 
       $dialog.find('input[name="figureTitle"]').val(thing.title) if thing.title
 
-      $dialog.find('.cancel').off('click').click (e) ->
+      $dialog.find('.cancel').off('click').on 'click', (e) ->
         e.preventDefault(true)
         $dialog.modal 'hide'
         embed.showDialog()
 
-      $dialog.find('.embed').off('.embed').click (e) ->
+      $dialog.find('.embed').off('.embed').on 'click', (e) ->
         e.preventDefault(true)
         $dialog.modal 'hide'
         embed.create

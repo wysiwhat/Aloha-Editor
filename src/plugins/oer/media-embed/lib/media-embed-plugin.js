@@ -45,12 +45,12 @@
         if (thing.title) {
           $dialog.find('input[name="figureTitle"]').val(thing.title);
         }
-        $dialog.find('.cancel').off('click').click(function(e) {
+        $dialog.find('.cancel').off('click').on('click', function(e) {
           e.preventDefault(true);
           $dialog.modal('hide');
           return embed.showDialog();
         });
-        $dialog.find('.embed').off('.embed').click(function(e) {
+        $dialog.find('.embed').off('.embed').on('click', function(e) {
           e.preventDefault(true);
           $dialog.modal('hide');
           return embed.create({
