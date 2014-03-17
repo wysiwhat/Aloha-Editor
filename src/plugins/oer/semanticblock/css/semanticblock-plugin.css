@@ -324,4 +324,5 @@
 
 .oer-placeholder:before {
     content: url(../img/insert-here-arrow.png);
+    opacity: 0.25;
 }
