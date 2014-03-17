@@ -10,7 +10,7 @@
       "default": 'http://noembed.com/embed'
     };
     return embed = Plugin.create('mediaEmbed', {
-      placeholder: void 0,
+      placeholder: null,
       ignore: '[data-type="title"],[data-type="alternates"],.noembed-embed,.noembed-embed *',
       create: function(thing) {
         var $caption, $figure, $thing;
@@ -25,6 +25,7 @@
         $thing.find('[data-type="alternates"]').html(thing.html);
         $caption = $thing.find('figcaption').remove();
         $figure = Figure.insertOverPlaceholder($thing.contents(), this.placeholder);
+        this.placeholder = null;
         return $figure.find('figcaption').find('.aloha-editable').html($caption.contents());
       },
       confirm: function(thing) {
@@ -58,6 +59,16 @@
             author: thing.author,
             authorUrl: thing.authorUrl
           });
+        });
+        $dialog.find('[data-dismiss]').on('click', function(e) {
+          embed.placeholder.remove();
+          return embed.placeholder = null;
+        });
+        $dialog.on('keyup.dismiss.modal', function(e) {
+          if (e.which === 27) {
+            _this.placeholder.remove();
+            return _this.placeholder = null;
+          }
         });
         return $dialog.modal({
           show: true
@@ -112,6 +123,16 @@
           }).fail(function() {
             return $dialog.find('.text-error').show();
           });
+        });
+        $dialog.find('[data-dismiss]').on('click', function(e) {
+          _this.placeholder.remove();
+          return _this.placeholder = null;
+        });
+        $dialog.on('keyup.dismiss.modal', function(e) {
+          if (e.which === 27) {
+            _this.placeholder.remove();
+            return _this.placeholder = null;
+          }
         });
         return $dialog.modal('show');
       },

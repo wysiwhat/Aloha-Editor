@@ -75,7 +75,7 @@ define [
 
   embed = Plugin.create 'mediaEmbed',
 
-    placeholder: undefined # Keep track of an inserted place holder
+    placeholder: null # Keep track of an inserted place holder
 
     ignore: '[data-type="title"],[data-type="alternates"],.noembed-embed,.noembed-embed *'
 
@@ -94,6 +94,7 @@ define [
 
       $caption = $thing.find('figcaption').remove()
       $figure  = Figure.insertOverPlaceholder($thing.contents(), @placeholder)
+      @placeholder = null
 
       $figure.find('figcaption').find('.aloha-editable').html($caption.contents())
 
@@ -126,6 +127,13 @@ define [
           author: thing.author
           authorUrl: thing.authorUrl
 
+      $dialog.find('[data-dismiss]').on 'click', (e) ->
+        embed.placeholder.remove()
+        embed.placeholder = null
+      $dialog.on 'keyup.dismiss.modal', (e) =>
+        if e.which == 27
+          @placeholder.remove()
+          @placeholder = null
       $dialog.modal {show: true}
 
     embedByUrl: (url) =>
@@ -175,6 +183,13 @@ define [
           .fail ->
             $dialog.find('.text-error').show()
 
+      $dialog.find('[data-dismiss]').on 'click', (e) =>
+        @placeholder.remove()
+        @placeholder = null
+      $dialog.on 'keyup.dismiss.modal', (e) =>
+        if e.which == 27
+          @placeholder.remove()
+          @placeholder = null
       $dialog.modal 'show'
 
     init: () ->
