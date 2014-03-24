@@ -5,7 +5,7 @@ define [
   'aloha/ephemera'
   'semanticblock/semanticblock-plugin'
   './languages'
-  'css!metadata/css/metadata-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, SemanticBlock, languages) ->
+  'css!metadata/css/metadata-plugin.css'], (Aloha, Plugin, $, Ephemera, SemanticBlock, languages) ->
 
   METADATA_MODAL = '''
 <div id="module-metadata-modal" class="modal fade" tabindex="-1" role="dialog" style="width: 660px;">
