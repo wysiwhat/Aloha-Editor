@@ -22,9 +22,12 @@ define [
   WARNING_IMAGE_PATH = '/../plugins/oer/image/img/warning.png'
 
   DIALOG_HTML_CONTAINER = '''
-      <form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
+      <form class="plugin image modal fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
 
   DIALOG_HTML = '''
+    <div class="modal-dialog">
+    <div class="modal-content">
+
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Insert image</h3>
@@ -67,9 +70,14 @@ define [
       <div class="modal-footer">
         <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>
         <button class="btn action cancel">Cancel</button>
-      </div>'''
+      </div>
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  '''
 
   DIALOG_HTML2 = '''
+    <div class="modal-dialog">
+    <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Insert image</h3>
@@ -82,12 +90,12 @@ define [
           <ul style="list-style-type: none; padding: 0; margin: 0;">
             <li id="listitem-i-own-this">
               <label class="radio">
-                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) 
+                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed)
               </label>
             </li>
             <li id="listitem-i-got-permission">
               <label class="radio">
-                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: 
+                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it:
               </label>
               <div class="source-selection-allowed">
                 <fieldset>
@@ -133,7 +141,9 @@ define [
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary action insert">Save</button>
         <button class="btn action cancel">Cancel</button>
-      </div>'''
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  '''
 
   showModalDialog = ($el) ->
       settings = Aloha.require('assorted/assorted-plugin').settings
@@ -210,7 +220,7 @@ define [
       dialog.find('.upload-url-link').on 'click', () ->
         $placeholder.hide()
         $uploadImage.hide()
-        $uploadUrl.show().focus()
+        $uploadUrl.show().removeClass('hide').focus()
 
       $uploadImage.on 'change', () ->
         files = $uploadImage[0].files
@@ -219,7 +229,7 @@ define [
           if settings.image.preview
             $previewImg = $placeholder.find('img')
             loadLocalFile files[0], $previewImg
-            $placeholder.show()
+            $placeholder.show().removeClass('hide')
             $imageselect.hide()
           else
             loadLocalFile files[0]
@@ -232,7 +242,7 @@ define [
         setImageSource(url)
         if settings.image.preview
           $previewImg.attr 'src', url
-          $placeholder.show()
+          $placeholder.show().removeClass('hide')
           $imageselect.hide()
 
       $uploadUrl.on 'change', showRemoteImage
@@ -274,19 +284,19 @@ define [
 
         deferred.resolve({target: $el[0], files: $uploadImage[0].files})
 
-      dialog.on 'shown', () =>
+      dialog.on 'shown shown.bs.modal', () =>
 
         if not dialog.find('[name=alt]').val().length
           dialog.find('[name=alt]').focus()
         else
           dialog.find('input,textarea,select').filter(':visible').first().focus()
-        
+
       dialog.on 'click', '.btn.action.cancel', (evt) =>
         evt.preventDefault() # Don't submit the form
         deferred.reject(target: $el[0], editing: editing)
         dialog.modal('hide')
 
-      dialog.on 'hidden', (event) ->
+      dialog.on 'hidden hidden.bs.modal', (event) ->
         # If hidden without being confirmed/cancelled, reject
         if deferred.state()=='pending'
           deferred.reject(target: $el[0], editing: editing)
@@ -298,7 +308,7 @@ define [
             show: (title) ->
               if title
                 dialog.find('.modal-header h3').text(title)
-              dialog.modal 'show'
+              dialog.modal('show')
       return {
           dialog: dialog,
           figure: $figure,
@@ -449,7 +459,7 @@ define [
       $dialog.modal 'hide'
     .fail (data) =>
       jQuery(data.target).parents('.semantic-container').remove() unless data.editing
-      
+
     return
 
   $('body').bind 'aloha-image-resize', ->
