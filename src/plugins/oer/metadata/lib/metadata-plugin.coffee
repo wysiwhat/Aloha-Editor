@@ -507,5 +507,10 @@ define [
       SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *')
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
-        @initEditable(params.obj) if params.obj.is('.aloha-root-editable')
+        if params.obj.is('.aloha-root-editable')
+          @initEditable(params.obj)
+
+          # If we have an initial metadata callback, call it
+          if @settings.getInitialMetadata
+            @extendMetadata @settings.getInitialMetadata()
   }

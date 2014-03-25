@@ -350,7 +350,10 @@
         return Aloha.bind('aloha-editable-created', (function(_this) {
           return function(e, params) {
             if (params.obj.is('.aloha-root-editable')) {
-              return _this.initEditable(params.obj);
+              _this.initEditable(params.obj);
+              if (_this.settings.getInitialMetadata) {
+                return _this.extendMetadata(_this.settings.getInitialMetadata());
+              }
             }
           };
         })(this));
