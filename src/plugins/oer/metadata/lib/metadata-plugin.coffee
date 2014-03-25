@@ -242,7 +242,7 @@ define [
 <div data-type="description" itemprop="description" class="description">
   <p class="summary"></p>
 </div>'''
-  
+
   LANGUAGE_TEMPLATE = '''
 <meta data-type="language" itemprop="inLanguage" content="" />'''
 
@@ -402,15 +402,15 @@ define [
         .appendTo(@$_element) if metadata.language
 
       @_setContributors(metadata)
-    
+
       if metadata.publishers.length
         @_handleGroup(@$_element, PUBLISHERS_TEMPLATE, metadata.publishers)
 
       @_setPermissions(metadata)
-    
+
       if metadata.keywords.length
         @_handleGroup(@$_element, KEYWORDS_TEMPLATE, metadata.keywords)
-    
+
       if metadata.subjects.length
         @_handleGroup(@$_element, SUBJECTS_TEMPLATE, metadata.subjects)
 
@@ -421,7 +421,7 @@ define [
 
     _setContributors: (contributors) ->
       $wrapper = $('<div>').addClass('contributors')
-      
+
       if contributors.authors.length
         @_handleGroup($wrapper, AUTHORS_TEMPLATE, contributors.authors)
       if contributors.editors.length
@@ -430,9 +430,9 @@ define [
         @_handleGroup($wrapper, ILLUSTRATORS_TEMPLATE, contributors.illustrators)
       if contributors.translators.length
         @_handleGroup($wrapper, TRANSLATORS_TEMPLATE, contributors.translators)
-      
+
       $wrapper.appendTo(@$_element) if not $wrapper.is(':empty')
- 
+
     _setPermissions: (permissions) ->
       $wrapper = $('<div>').addClass('permissions')
 
@@ -451,7 +451,7 @@ define [
       $groupTemplate = $(template)
       $item = $groupTemplate.find('span').clone()
       $groupTemplate.find('span').remove()
- 
+
       for value, i in values
         $item
           .clone()
@@ -495,13 +495,13 @@ define [
     extendMetadata: (newMetadata) ->
 
       metadata = plugin._readMetadata()
-      
+
       for key, value of newMetadata
         console.log 'meta', key, value
         metadata[key] = value
-       
+
       plugin._setMetadata(metadata)
- 
+
     init: () ->
 
       SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *')
@@ -511,14 +511,3 @@ define [
       Aloha.bind 'aloha-editable-created', (e, params) =>
         @_init(params.obj) if params.obj.is('.aloha-root-editable')
   }
-
-
-
-
-
-
-
-
-
-
-
