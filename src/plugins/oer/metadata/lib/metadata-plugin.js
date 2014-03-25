@@ -347,7 +347,6 @@
       },
       init: function() {
         SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *');
-        this.settings.extendMetadata = this.extendMetadata;
         return Aloha.bind('aloha-editable-created', (function(_this) {
           return function(e, params) {
             if (params.obj.is('.aloha-root-editable')) {
