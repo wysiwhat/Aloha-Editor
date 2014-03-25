@@ -463,7 +463,7 @@ define [
 
       $container.append($groupTemplate)
 
-    _init: (element) ->
+    initEditable: (element) ->
       @$_editable = element
 
       if not @$_editable.find(@_selector).length
@@ -507,5 +507,5 @@ define [
       SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *')
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
-        @_init(params.obj) if params.obj.is('.aloha-root-editable')
+        @initEditable(params.obj) if params.obj.is('.aloha-root-editable')
   }

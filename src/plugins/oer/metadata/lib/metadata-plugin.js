@@ -305,7 +305,7 @@
         }
         return $container.append($groupTemplate);
       },
-      _init: function(element) {
+      initEditable: function(element) {
         var title;
         this.$_editable = element;
         if (!this.$_editable.find(this._selector).length) {
@@ -350,7 +350,7 @@
         return Aloha.bind('aloha-editable-created', (function(_this) {
           return function(e, params) {
             if (params.obj.is('.aloha-root-editable')) {
-              return _this._init(params.obj);
+              return _this.initEditable(params.obj);
             }
           };
         })(this));
