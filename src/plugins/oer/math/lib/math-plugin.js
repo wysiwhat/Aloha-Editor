@@ -157,7 +157,7 @@
         jQuery(e.target).tooltip('destroy');
         $el = jQuery(e.target).closest('.math-element');
         $el.siblings('.math-element-spaceafter').remove();
-        $el.trigger('hide-popover').tooltip('destroy').remove();
+        $el.popover('hide').tooltip('destroy').remove();
         return Aloha.activeEditable.smartContentChange({
           type: 'block-change'
         });
@@ -240,13 +240,13 @@
       }
       $editor.find('.done').on('click', (function(_this) {
         return function() {
-          $span.trigger('hide-popover');
+          $span.popover('hide');
           return placeCursorAfter($span);
         };
       })(this));
       $editor.find('.remove').on('click', (function(_this) {
         return function() {
-          $span.trigger('hide-popover');
+          $span.popover('hide');
           return cleanupFormula($editor, $span, true);
         };
       })(this));

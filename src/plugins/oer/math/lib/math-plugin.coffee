@@ -246,7 +246,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       # Though the tooltip was bound to the editor and delegates
       # to these items, you still have to clean it up youself
       $el.siblings('.math-element-spaceafter').remove()
-      $el.trigger('hide-popover').tooltip('destroy').remove()
+      $el.popover('hide').tooltip('destroy').remove()
       Aloha.activeEditable.smartContentChange {type: 'block-change'}
     )
 
@@ -325,10 +325,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
 
     # Bind some actions for the buttons
     $editor.find('.done').on 'click', =>
-      $span.trigger 'hide-popover'
+      $span.popover('hide')
       placeCursorAfter($span)
     $editor.find('.remove').on 'click', =>
-      $span.trigger 'hide-popover'
+      $span.popover('hide')
       cleanupFormula($editor, $span, true)
     $editor.find('.copy').on 'click', =>
       Copy.buffer $span.outerHtml(), 'text/oerpub-content'
