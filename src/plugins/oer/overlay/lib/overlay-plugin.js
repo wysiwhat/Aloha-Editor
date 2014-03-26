@@ -220,7 +220,7 @@ There are 3 variables that are stored on each element;
         makePopovers = (function(_this) {
           return function($nodes) {
             return $nodes.each(function(i, node) {
-              var $node;
+              var $node, _ref2, _ref3, _ref4;
               $node = jQuery(node);
               if (!$node.data('popover')) {
                 if (_this.focus) {
@@ -232,6 +232,13 @@ There are 3 variables that are stored on each element;
                   $node.on('hide.bubble', function() {
                     return _this.blur.bind($node[0])($node.data('popover').$tip);
                   });
+                }
+                if ((_ref2 = $node.data('bs.popover')) != null) {
+                  if ((_ref3 = _ref2.tip()) != null) {
+                    if ((_ref4 = _ref3.find('.popover-content')) != null) {
+                      _ref4.empty();
+                    }
+                  }
                 }
                 return $node.popover({
                   html: true,

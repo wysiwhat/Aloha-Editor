@@ -253,6 +253,9 @@ define [ 'aloha', 'jquery', 'css!overlay/css/popover.css' ], (Aloha, jQuery) ->
               $node.on 'hide.bubble', =>
                 @blur.bind($node[0])($node.data('popover').$tip)
 
+            # Clear the content since HTML is appended (to preserve events)
+            $node.data('bs.popover')?.tip()?.find('.popover-content')?.empty()
+
             # Specifying 'container: body' has no effect on bootstrap<2.3,
             # but on the newer versions it places the popover outside
             # the editor area, which avoids selecttion-changed events
