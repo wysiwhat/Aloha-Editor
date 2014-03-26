@@ -558,7 +558,7 @@ define [
 
         xhr.onload = () ->
           if settings.image.parseresponse
-            url = parseresponse(xhr)
+            url = settings.image.parseresponse(xhr)
           else
             url = JSON.parse(xhr.response).url
           callback(url)
