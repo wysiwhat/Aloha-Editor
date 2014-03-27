@@ -47,7 +47,7 @@ define [
       $solutions = $element.children('.solution')
 
       $element.children().not($problem).not($solutions).remove()
-      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>')
+      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>').parent()
 
       $typeContainer = jQuery(TYPE_CONTAINER)
 
