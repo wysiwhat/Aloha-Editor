@@ -374,7 +374,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
               $element = jQuery(ui.item)
               activate $element if $element.is(selector)
               getType($element)?.onDrop?($element)
-              Aloha.activeEditable.smartContentChange({type: 'block-change'})
+              Aloha.activeEditable?.smartContentChange({type: 'block-change'})
 
               $element.removeClass('drag-active')
 

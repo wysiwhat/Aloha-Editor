@@ -377,7 +377,7 @@
                   return ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'));
                 });
                 $root.sortable('option', 'stop', function(e, ui) {
-                  var $element, _ref;
+                  var $element, _ref, _ref1;
                   if (ui.item.data('disableDrop')) {
                     jQuery(this).sortable("cancel");
                     return;
@@ -391,9 +391,11 @@
                       _ref.onDrop($element);
                     }
                   }
-                  Aloha.activeEditable.smartContentChange({
-                    type: 'block-change'
-                  });
+                  if ((_ref1 = Aloha.activeEditable) != null) {
+                    _ref1.smartContentChange({
+                      type: 'block-change'
+                    });
+                  }
                   return $element.removeClass('drag-active');
                 });
                 $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera');
