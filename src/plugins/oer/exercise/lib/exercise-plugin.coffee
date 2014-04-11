@@ -105,6 +105,7 @@ define [
 
       jQuery('<div>')
         .addClass('body')
+        .addClass('aloha-ephemera-wrapper')
         .addClass('aloha-block-dropzone')
         .appendTo($element)
         .aloha()
@@ -165,7 +166,7 @@ define [
 
           controls.children('.solution-toggle').text('hide solution').show()
 
-          semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.children('.solutions'))
+          semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.find('.solutions'))
         )
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', () ->
           exercise = jQuery(this).parents('.exercise').first()
