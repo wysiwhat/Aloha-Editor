@@ -21,6 +21,8 @@ define [
 
   DIALOG_HTML = '''
     <form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+      <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="linkModalLabel">Edit link</h3>
@@ -34,12 +36,14 @@ define [
         </div>
         <div id="link-url">
           <span for="link-external">Link to webpage</span>
-          <input class="link-input link-external" id="link-external" type="url" pattern="https?://.+"/>
+          <input class="link-input link-external" id="link-external" required="true" type="url" pattern="https?://.+"/>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+      </div>
       </div>
     </form>'''
 
@@ -137,30 +141,30 @@ define [
           # not missing.  if not valid, form validation will notify
           # and do not want to add http below in this case
         else
-          if not /^https?:\/\//.test(url)
-            $input.val 'http://' + url
+          unless /^https?:\/\//.test(url)
+            $input.val("http://#{url}")
 
       linkExternal.on 'blur', (evt) ->
-        massageUrlInput linkExternal
+        massageUrlInput(linkExternal)
 
       linkExternal.bind 'keydown', 'return', (evt) ->
-        massageUrlInput linkExternal
+        massageUrlInput(linkExternal)
 
       dialog.on 'submit', (evt) =>
         evt.preventDefault()
 
         if linkContents.val() and linkContents.val().trim()
           $el.contents().remove()
-          $el.append linkContents.val()
+          $el.append(linkContents.val())
 
         # Set the href based on the active tab
         active = dialog.find('.link-input[required]')
         href = active.val()
-        $el.attr 'href', href
+        $el.attr('href', href)
         dialog.modal('hide')
 
       dialog.modal('show')
-      dialog.on 'hidden', () ->
+      dialog.on 'hidden.bs.modal', () ->
         dialog.remove()
       dialog
 
@@ -302,7 +306,7 @@ define [
 
       # Wait until the dialog is closed before inserting it into the DOM
       # That way if it is cancelled nothing is inserted
-      dialog.on 'hidden', =>
+      dialog.on 'hidden.bs.modal', =>
 
         Aloha.activeEditable = editable
 

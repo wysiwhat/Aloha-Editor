@@ -2,7 +2,7 @@
 (function() {
   define(['aloha', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'aloha/console', 'aloha/ephemera', 'css!assorted/css/link.css'], function(Aloha, jQuery, Popover, UI, console, Ephemera) {
     var DETAILS_HTML, DIALOG_HTML, getContainerAnchor, populator, selector, shortString, shortUrl, showModalDialog, unlink;
-    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n    <div id="link-url">\n      <span for="link-external">Link to webpage</span>\n      <input class="link-input link-external" id="link-external" type="url" pattern="https?://.+"/>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n    <div id="link-url">\n      <span for="link-external">Link to webpage</span>\n      <input class="link-input link-external" id="link-external" required="true" type="url" pattern="https?://.+"/>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
     DETAILS_HTML = '<span class="link-popover-details">\n  <button class="btn-link edit-link" title="Change the link\'s text, location, or other properties">\n    <i class="icon-edit-link"></i>\n    <span>Edit link...</span>\n  </button>\n  <button class="btn-link delete-link">\n    <i class="icon-delete-link"></i>\n    <span title="Remove the link, leaving just the text">Unlink</span>\n  </button>\n  <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">\n    <i class="icon-external-link"></i>\n    <span class="title"></span></a>\n</span>\n<br/>';
     Ephemera.attributes('data-original-title');
     showModalDialog = function($el) {
@@ -70,7 +70,7 @@
 
         } else {
           if (!/^https?:\/\//.test(url)) {
-            return $input.val('http://' + url);
+            return $input.val("http://" + url);
           }
         }
       };
@@ -95,7 +95,7 @@
         };
       })(this));
       dialog.modal('show');
-      dialog.on('hidden', function() {
+      dialog.on('hidden.bs.modal', function() {
         return dialog.remove();
       });
       return dialog;
@@ -213,7 +213,7 @@
         } else {
           return;
         }
-        return dialog.on('hidden', (function(_this) {
+        return dialog.on('hidden.bs.modal', (function(_this) {
           return function() {
             var newLink;
             Aloha.activeEditable = editable;
