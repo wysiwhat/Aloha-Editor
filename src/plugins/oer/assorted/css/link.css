@@ -15,9 +15,9 @@
 
 /* style the  Edit LInk dialog box */
 
+/* For some reason all modals have this id. */
 #linkModal {
   height: auto;
-  width: 600px;
 }
 
 #link-contents {
