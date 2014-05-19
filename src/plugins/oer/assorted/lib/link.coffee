@@ -31,12 +31,25 @@ define [
         <div id="link-text">
           <span>Text to display</span>
           <div>
-            <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />
+            <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />
           </div>
         </div>
-        <div id="link-url">
-          <span for="link-external">Link to webpage</span>
-          <input class="link-input link-external" id="link-external" required="true" type="url" pattern="https?://.+"/>
+
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#link-tab-external" data-toggle="tab">External</a></li>
+          <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="link-tab-external">
+            <div id="link-url">
+              <span for="link-external">Link to webpage</span>
+              <input class="link-input link-external form-control" id="link-external" type="url"/>
+            </div>
+          </div>
+          <div class="tab-pane" id="link-tab-internal">
+            <select class="link-internal link-input form-control" name="linkinternal" id="link-internal"></select>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -88,13 +101,11 @@ define [
       # Combination of linkExternal and linkInternal
       linkInput    = dialog.find('.link-input')
 
-      appendOption = (id, contentsToClone) ->
-        clone = contentsToClone[0].cloneNode(true)
-        contents = jQuery(clone).contents()
+      appendOption = (id, text) ->
         option = jQuery('<option></option>')
-        option.attr 'value', '#' + id
-        option.append contents
-        option.appendTo linkInternal
+        option.attr('value', '#' + id)
+        option.append(text)
+        option.appendTo(linkInternal)
 
       orgElements = root.find('h1,h2,h3,h4,h5,h6')
       figuresAndTables = root.find('figure,table')
@@ -104,19 +115,15 @@ define [
       orgElements.each ->
         item = jQuery(@)
         id = item.attr('id')
-        appendOption id, item
+        clone = item.clone()
+        clone.find('.aloha-ephemera').remove()
+        appendOption id, clone.text()
 
       figuresAndTables.each ->
         item = jQuery(@)
         id = item.attr('id')
         caption = item.find('caption,figcaption')
         appendOption id, caption if caption[0]
-
-      dialog.find('a[data-toggle=tab]').on 'shown', (evt) ->
-        prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'))
-        newTab  = jQuery(jQuery(evt.target).attr('href'))
-        prevTab.find('.link-input').removeAttr('required')
-        newTab.find('.link-input').attr('required', true)
 
       # Activate the current tab
       href = $el.attr('href')
@@ -131,7 +138,6 @@ define [
       dialog.find(linkInputId)
       .addClass('active')
       .find('.link-input')
-      .attr('required', true)
       .val(href)
       dialog.find("a[href=#{linkInputId}]").parent().addClass('active')
 
@@ -158,8 +164,11 @@ define [
           $el.append(linkContents.val())
 
         # Set the href based on the active tab
-        active = dialog.find('.link-input[required]')
-        href = active.val()
+        allInputs = dialog.find('.link-input')
+        href = null
+        allInputs.each (i, el) ->
+          val = jQuery(el).val()
+          href = val if val and not href
         $el.attr('href', href)
         dialog.modal('hide')
 

@@ -2,7 +2,7 @@
 (function() {
   define(['aloha', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'aloha/console', 'aloha/ephemera', 'css!assorted/css/link.css'], function(Aloha, jQuery, Popover, UI, console, Ephemera) {
     var DETAILS_HTML, DIALOG_HTML, getContainerAnchor, populator, selector, shortString, shortUrl, showModalDialog, unlink;
-    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n    <div id="link-url">\n      <span for="link-external">Link to webpage</span>\n      <input class="link-input link-external" id="link-external" required="true" type="url" pattern="https?://.+"/>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n\n    <ul class="nav nav-tabs">\n      <li class="active"><a href="#link-tab-external" data-toggle="tab">External</a></li>\n      <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>\n    </ul>\n\n    <div class="tab-content">\n      <div class="tab-pane active" id="link-tab-external">\n        <div id="link-url">\n          <span for="link-external">Link to webpage</span>\n          <input class="link-input link-external form-control" id="link-external" type="url"/>\n        </div>\n      </div>\n      <div class="tab-pane" id="link-tab-internal">\n        <select class="link-internal link-input form-control" name="linkinternal" id="link-internal"></select>\n      </div>\n    </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
     DETAILS_HTML = '<span class="link-popover-details">\n  <button class="btn-link edit-link" title="Change the link\'s text, location, or other properties">\n    <i class="icon-edit-link"></i>\n    <span>Edit link...</span>\n  </button>\n  <button class="btn-link delete-link">\n    <i class="icon-delete-link"></i>\n    <span title="Remove the link, leaving just the text">Unlink</span>\n  </button>\n  <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">\n    <i class="icon-external-link"></i>\n    <span class="title"></span></a>\n</span>\n<br/>';
     Ephemera.attributes('data-original-title');
     showModalDialog = function($el) {
@@ -19,13 +19,11 @@
       linkInternal = dialog.find('.link-internal');
       linkSave = dialog.find('.link-save');
       linkInput = dialog.find('.link-input');
-      appendOption = function(id, contentsToClone) {
-        var clone, contents, option;
-        clone = contentsToClone[0].cloneNode(true);
-        contents = jQuery(clone).contents();
+      appendOption = function(id, text) {
+        var option;
         option = jQuery('<option></option>');
         option.attr('value', '#' + id);
-        option.append(contents);
+        option.append(text);
         return option.appendTo(linkInternal);
       };
       orgElements = root.find('h1,h2,h3,h4,h5,h6');
@@ -34,10 +32,12 @@
         return jQuery(this).attr('id', GENTICS.Utils.guid());
       });
       orgElements.each(function() {
-        var id, item;
+        var clone, id, item;
         item = jQuery(this);
         id = item.attr('id');
-        return appendOption(id, item);
+        clone = item.clone();
+        clone.find('.aloha-ephemera').remove();
+        return appendOption(id, clone.text());
       });
       figuresAndTables.each(function() {
         var caption, id, item;
@@ -48,20 +48,13 @@
           return appendOption(id, caption);
         }
       });
-      dialog.find('a[data-toggle=tab]').on('shown', function(evt) {
-        var newTab, prevTab;
-        prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'));
-        newTab = jQuery(jQuery(evt.target).attr('href'));
-        prevTab.find('.link-input').removeAttr('required');
-        return newTab.find('.link-input').attr('required', true);
-      });
       href = $el.attr('href');
       dialog.find('.active').removeClass('active');
       linkInputId = '#link-tab-external';
       if ($el.attr('href').match(/^#/)) {
         linkInputId = '#link-tab-internal';
       }
-      dialog.find(linkInputId).addClass('active').find('.link-input').attr('required', true).val(href);
+      dialog.find(linkInputId).addClass('active').find('.link-input').val(href);
       dialog.find("a[href=" + linkInputId + "]").parent().addClass('active');
       massageUrlInput = function($input) {
         var url;
@@ -82,14 +75,21 @@
       });
       dialog.on('submit', (function(_this) {
         return function(evt) {
-          var active;
+          var allInputs;
           evt.preventDefault();
           if (linkContents.val() && linkContents.val().trim()) {
             $el.contents().remove();
             $el.append(linkContents.val());
           }
-          active = dialog.find('.link-input[required]');
-          href = active.val();
+          allInputs = dialog.find('.link-input');
+          href = null;
+          allInputs.each(function(i, el) {
+            var val;
+            val = jQuery(el).val();
+            if (val && !href) {
+              return href = val;
+            }
+          });
           $el.attr('href', href);
           return dialog.modal('hide');
         };
