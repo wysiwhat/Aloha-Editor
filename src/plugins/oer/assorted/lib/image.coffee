@@ -60,7 +60,7 @@ define [
         </fieldset>
         <div class="image-alt">
           <div class="forminfo">
-            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
+            <i class="fa fa-warning icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
           </div>
           <div>
             <textarea name="alt" placeholder="Enter description ..." rows="1"></textarea>
@@ -479,7 +479,7 @@ define [
 
   setThankYou = (wrapper) ->
     editDiv = wrapper.children('.image-edit')
-    editDiv.html('<i class="icon-edit"></i> Thank You!').removeClass('passive')
+    editDiv.html('<i class="fa fa-edit icon-edit"></i> Thank You!').removeClass('passive')
     editDiv.addClass('thank-you')
     editDiv.animate({opacity: 0}, 2000, 'swing', -> setEditText wrapper)
 
@@ -487,9 +487,9 @@ define [
     alt = wrapper.children('img').attr('alt')
     editDiv = wrapper.children('.image-edit').removeClass('thank-you').css('opacity', 1)
     if alt
-        editDiv.html('<i class="icon-edit"></i>').addClass('passive')
+        editDiv.html('<i class="fa fa-edit icon-edit"></i>').addClass('passive')
     else
-        editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
+        editDiv.html('<i class="fa fa-warning icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
         editDiv.off('mouseenter').on 'mouseenter', (e) ->
           editDiv.find('.warning-text').text('Image is missing a description for the visually impaired. Click to provide one.')
         editDiv.off('mouseleave').on 'mouseleave', (e) ->

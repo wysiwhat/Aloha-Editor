@@ -44,12 +44,12 @@ form#linkModal:focus {
 figure.aloha-oer-block {
     display: block;
     border: 0;
-    padding-top: 0; 
+    padding-top: 0;
     padding-bottom: 0;
     margin: 0 32px 0 15px !important; /* !important in order to override ID-based selector from oerpub-content.less */
 }
 
-figure.aloha-oer-block > .title, 
+figure.aloha-oer-block > .title,
 figure.aloha-oer-block > figcaption {
     display: block;
     text-align: center
@@ -88,7 +88,7 @@ figure.aloha-oer-block .image-wrapper .image-edit:not(.passive):hover {
 
 figure.aloha-oer-block .image-wrapper .image-edit .warning-text{
   color: #fff;
-  text-shadow: 1px 1px 3px #000; 
+  text-shadow: 1px 1px 3px #000;
   font-style: italic;
 }
 
@@ -116,13 +116,7 @@ figure.aloha-oer-block .image-wrapper .image-edit.thank-you{
     display: block;
 }
 
-i.icon-warning {
-  display: inline-block;
-  background-image: url(../img/warning-01.png);
-  background-position: 0 bottom;
-  background-repeat: no-repeat;
-  margin-right: 8px;
-  width: 16px;
-  height: 16px;
+i.fa.fa-warning {
+  color: #dd3;
   vertical-align: bottom;
 }

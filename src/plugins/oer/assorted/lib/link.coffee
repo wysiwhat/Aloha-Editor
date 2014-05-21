@@ -66,11 +66,11 @@ define [
   DETAILS_HTML = '''
       <span class="link-popover-details">
         <button class="btn-link edit-link" title="Change the link's text, location, or other properties">
-          <i class="icon-edit-link"></i>
+          <!-- <i class="fa fa-edit icon-edit"></i> -->
           <span>Edit link...</span>
         </button>
         <button class="btn-link delete-link">
-          <i class="icon-delete-link"></i>
+          <!-- <i class="icon-delete"></i> -->
           <span title="Remove the link, leaving just the text">Unlink</span>
         </button>
         <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">
@@ -109,7 +109,7 @@ define [
       return 'fa fa-table' if $el.is('table')
       return ''
     else
-      return 'icon-external-link'
+      return 'fa fa-external-link icon-external-link'
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj

@@ -28,7 +28,7 @@ define ['aloha', 'jquery', 'aloha/console'], (Aloha, jQuery, console) ->
           $el.append(newCaption)
         $bubble.append($button)
 
-      $bubble.append('<button class="btn"><i class="icon-certificate"></i> Advanced Options</button>')
+      $bubble.append('<button class="btn"><i class="fa fa-certificate icon-certificate"></i> Advanced Options</button>')
       $bubble #.contents()
 
 

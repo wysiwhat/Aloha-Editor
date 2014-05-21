@@ -30,13 +30,13 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   blockTemplate = jQuery('<div class="semantic-container aloha-ephemera-wrapper"></div>')
   topControls = jQuery('''
     <div class="semantic-controls-top aloha-ephemera">
-      <a class="copy" title="Copy this element"><i class="icon-copy"></i> Copy element</button>
+      <a class="copy" title="Copy this element"><i class="fa fa-copy icon-copy"></i> Copy element</button>
     </div>
   ''')
   blockControls = jQuery('''
     <div class="semantic-controls aloha-ephemera">
-      <button class="semantic-delete" title="Remove this element"><i class="icon-remove"></i></button>
-      <button class="semantic-settings" title="Advanced options for this element"><i class="icon-cog"></i></button>
+      <button class="semantic-delete" title="Remove this element"><i class="fa fa-times icon-remove"></i></button>
+      <button class="semantic-settings" title="Advanced options for this element"><i class="fa fa-cog icon-cog"></i></button>
     </div>''')
   blockDragHelper = jQuery('''
     <div class="semantic-drag-helper aloha-ephemera">
