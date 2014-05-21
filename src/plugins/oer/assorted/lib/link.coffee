@@ -36,8 +36,8 @@ define [
         </div>
 
         <ul class="nav nav-tabs">
-          <li class="active"><a href="#link-tab-external" data-toggle="tab">External</a></li>
-          <li><a href="#link-tab-internal" data-toggle="tab">Internal</a></li>
+          <li class="active"><a data-bypass="true" href="#link-tab-external" data-toggle="tab">External</a></li>
+          <li><a data-bypass="true" href="#link-tab-internal" data-toggle="tab">Internal</a></li>
         </ul>
 
         <div class="tab-content">
