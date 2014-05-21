@@ -41,14 +41,16 @@ define [
         </ul>
 
         <div class="tab-content">
-          <div class="tab-pane active" id="link-tab-external">
+          <div class="tab-pane" id="link-tab-external">
             <div id="link-url">
               <span for="link-external">Link to webpage</span>
               <input class="link-input link-external form-control" id="link-external" type="url"/>
             </div>
           </div>
           <div class="tab-pane" id="link-tab-internal">
-            <select class="link-internal link-input form-control" name="linkinternal" id="link-internal"></select>
+            <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">
+              <option value="">None</option>
+            </select>
           </div>
         </div>
       </div>
@@ -72,14 +74,42 @@ define [
           <span title="Remove the link, leaving just the text">Unlink</span>
         </button>
         <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">
-          <i class="icon-external-link"></i>
-          <span class="title"></span></a>
+          <i class=""></i>
+          <span class="title"></span>
+        </a>
       </span>
       <br/>
   '''
 
   # have ephemera remove the attribute that bootstrap inserts for tooltips
   Ephemera.attributes('data-original-title')
+
+
+  getTitle = ($el) ->
+    if $el.is('h1,h2,h3,h4,h5,h6')
+      $clone = $el.clone()
+      $clone.find('.aloha-ephemera').remove()
+      $clone.text()
+    else if $el.is('figure')
+      caption = $el.find('figcaption')
+      caption.text() or 'Figure'
+    else if $el.is('table')
+      caption = $el.find('caption')
+      caption.text() or 'Table'
+    else
+      console.error('BUG! Trying to find title of unknown DOM element')
+      'GETTITLE_OF_UNKNOWN_ELEMENT'
+
+
+  getIcon = (href) ->
+    if /^#/.test(href)
+      $el = jQuery(href)
+      return 'fa fa-paragraph icon-paragraph' if $el.is('h1,h2,h3,h4,h5,h6')
+      return 'fa fa-file-image-o icon-image' if $el.is('figure')
+      return 'fa fa-table' if $el.is('table')
+      return ''
+    else
+      return 'icon-external-link'
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj
@@ -101,29 +131,43 @@ define [
       # Combination of linkExternal and linkInternal
       linkInput    = dialog.find('.link-input')
 
-      appendOption = (id, text) ->
+      appendOption = ($el, $optGroup, text) ->
         option = jQuery('<option></option>')
+        unless $el.attr('id')
+          $el.attr('id', GENTICS.Utils.guid())
+        id = $el.attr('id')
+        text = getTitle($el)
         option.attr('value', '#' + id)
         option.append(text)
-        option.appendTo(linkInternal)
+        option.appendTo($optGroup)
 
       orgElements = root.find('h1,h2,h3,h4,h5,h6')
       figuresAndTables = root.find('figure,table')
       orgElements.filter(':not([id])').each ->
         jQuery(@).attr 'id', GENTICS.Utils.guid()
 
-      orgElements.each ->
-        item = jQuery(@)
-        id = item.attr('id')
-        clone = item.clone()
-        clone.find('.aloha-ephemera').remove()
-        appendOption id, clone.text()
 
-      figuresAndTables.each ->
-        item = jQuery(@)
-        id = item.attr('id')
-        caption = item.find('caption,figcaption')
-        appendOption id, caption if caption[0]
+      if orgElements[0]
+        $optGroup = jQuery('<optgroup label="Headings"></optgroup>')
+        $optGroup.appendTo(linkInternal)
+
+        orgElements.each ->
+          item = jQuery(@)
+          appendOption item, $optGroup
+
+      if figuresAndTables[0]
+        $optGroup = jQuery('<optgroup label="Figures and Tables"></optgroup>')
+        $optGroup.appendTo(linkInternal)
+
+        figuresAndTables.each ->
+          item = jQuery(@)
+          appendOption item, $optGroup
+
+      dialog.find('a[data-toggle=tab]').on 'shown.bs.tab', (evt) ->
+        prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'))
+        newTab  = jQuery(jQuery(evt.target).attr('href'))
+        prevTab.find('.link-input').removeAttr('required')
+        newTab.find('.link-input').attr('required', true)
 
       # Activate the current tab
       href = $el.attr('href')
@@ -139,6 +183,7 @@ define [
       .addClass('active')
       .find('.link-input')
       .val(href)
+      .attr('required', true)
       dialog.find("a[href=#{linkInputId}]").parent().addClass('active')
 
       massageUrlInput = ($input) ->
@@ -164,11 +209,8 @@ define [
           $el.append(linkContents.val())
 
         # Set the href based on the active tab
-        allInputs = dialog.find('.link-input')
-        href = null
-        allInputs.each (i, el) ->
-          val = jQuery(el).val()
-          href = val if val and not href
+        active = dialog.find('.link-input[required]')
+        href = active.val()
         $el.attr('href', href)
         dialog.modal('hide')
 
@@ -261,8 +303,18 @@ define [
           Aloha.activeEditable = editable
           unlink($el)
 
-      details.find('.visit-link').attr 'href', href
-      details.find('.visit-link .title').text shortUrl(href,30)
+      # Fill in the link "Tooltip".
+      # For external links make them open in a new window and
+      # for internal links hide the "external link" icon.
+      $linkTooltip = details.find('.visit-link')
+      $linkTooltip.attr 'href', href
+
+      $linkTooltip.find('i').addClass(getIcon(href))
+      if /^#/.test(href)
+        $linkTooltip.removeAttr('target')
+        $linkTooltip.find('.title').text(getTitle(jQuery(href)))
+      else
+        $linkTooltip.find('.title').text shortUrl(href,30)
 
 
       $bubble.contents()
