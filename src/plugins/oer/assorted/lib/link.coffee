@@ -35,24 +35,18 @@ define [
           </div>
         </div>
 
-        <ul class="nav nav-tabs">
-          <li class="active"><a data-bypass="true" href="#link-tab-external" data-toggle="tab">External</a></li>
-          <li><a data-bypass="true" href="#link-tab-internal" data-toggle="tab">Internal</a></li>
-        </ul>
-
-        <div class="tab-content">
-          <div class="tab-pane" id="link-tab-external">
+          <div id="link-tab-external">
             <div id="link-url">
               <span for="link-external">Link to webpage</span>
               <input class="link-input link-external form-control" id="link-external" type="url"/>
             </div>
           </div>
-          <div class="tab-pane" id="link-tab-internal">
+          <div id="link-tab-internal">
+            <span for="link-internal">Or, link to something in this page:</span>
             <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">
               <option value="">None</option>
             </select>
           </div>
-        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
@@ -163,28 +157,19 @@ define [
           item = jQuery(@)
           appendOption item, $optGroup
 
-      dialog.find('a[data-toggle=tab]').on 'shown.bs.tab', (evt) ->
-        prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'))
-        newTab  = jQuery(jQuery(evt.target).attr('href'))
-        prevTab.find('.link-input').removeAttr('required')
-        newTab.find('.link-input').attr('required', true)
+      linkInternal.on 'change', () ->
+        linkExternal.val('')
+        linkSave.toggleClass('disabled', !linkInternal.val())
+
+      linkExternal.on 'change keyup', () ->
+        linkInternal.val('')
+        linkSave.toggleClass('disabled', !linkExternal.val())
+
 
       # Activate the current tab
       href = $el.attr('href')
 
-      # Clear up the active tabs
-      dialog.find('.active').removeClass('active')
-
-      linkInputId = '#link-tab-external'
-      linkInputId = '#link-tab-internal' if $el.attr('href').match(/^#/)
-
-      #dialog.find('#link-tab-internal').tab('show')
-      dialog.find(linkInputId)
-      .addClass('active')
-      .find('.link-input')
-      .val(href)
-      .attr('required', true)
-      dialog.find("a[href=#{linkInputId}]").parent().addClass('active')
+      linkSave.toggleClass('disabled', !href)
 
       massageUrlInput = ($input) ->
         url = $input.val()
@@ -209,10 +194,14 @@ define [
           $el.append(linkContents.val())
 
         # Set the href based on the active tab
-        active = dialog.find('.link-input[required]')
-        href = active.val()
-        $el.attr('href', href)
-        dialog.modal('hide')
+        href = null
+        dialog.find('.link-input').each (i, input) ->
+          $input = jQuery(input)
+          href = $input.val() if $input.val()
+
+        if href
+          $el.attr('href', href)
+          dialog.modal('hide')
 
       dialog.modal('show')
       dialog.on 'hidden.bs.modal', () ->
