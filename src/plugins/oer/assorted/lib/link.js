@@ -113,6 +113,8 @@
         url = $input.val();
         if (/^[^\/]*#[^\/]+/.test(url)) {
 
+        } else if (/^\/resources\/[^\/]{32}/.test(url)) {
+
         } else if (/^http/.test(url) || /^htp/.test(url) || /^htt/.test(url)) {
 
         } else {

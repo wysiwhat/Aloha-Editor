@@ -182,6 +182,8 @@ define [
         url = $input.val()
         if /^[^\/]*#[^\/]+/.test(url)
           # Inter-Module (page) links are OK (UUID followed by # followed by XML id)
+        else if /^\/resources\/[^\/]{32}/.test(url)
+          # Links to resources are OK
         else if /^http/.test(url) or /^htp/.test(url) or /^htt/.test(url)
           # not missing.  if not valid, form validation will notify
           # and do not want to add http below in this case
