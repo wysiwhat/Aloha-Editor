@@ -139,7 +139,7 @@ define([
 	 * @param {jQuery.Event} $event
 	 * @return {string|null} Modifier string or null if no modifier is in
 	 *                       effect.
-	 *                      
+	 *
 	 */
 	function keyModifier($event) {
 		return $event.altKey ? 'alt' :
@@ -435,7 +435,7 @@ define([
 				nodeName = el.nodeName.toLowerCase(),
 
 				// supported elements
-				textElements = ['a', 'abbr', 'address', 'article', 'aside', 'b', 'bdo', 'blockquote', 'cite', 'code', 'command', 'del', 'details', 'dfn', 'div', 'dl', 'em', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'i', 'ins', 'menu', 'nav', 'p', 'pre', 'q', 'ruby', 'section', 'small', 'span', 'strong', 'sub', 'sup', 'var'],
+				textElements = ['a', 'abbr', 'address', 'article', 'aside', 'b', 'bdo', 'blockquote', 'cite', 'code', 'command', 'del', 'details', 'dfn', 'div', 'dl', 'em', 'footer', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'i', 'ins', 'menu', 'nav', 'p', 'pre', 'q', 'ruby', 'section', 'small', 'span', 'strong', 'sub', 'sup', 'var'],
 				i,
 			    div;
 

@@ -420,7 +420,7 @@
       }
     };
     activate = function(element) {
-      var $img, edit, wrapper;
+      var $caption, $img, edit, wrapper;
       $img = element.find('img');
       wrapper = $('<div class="image-wrapper aloha-ephemera-wrapper">');
       edit = $('<div class="image-edit aloha-ephemera">');
@@ -432,6 +432,8 @@
       if (!element.find('figcaption').length) {
         element.append('<figcaption></figcaption>');
       }
+      $caption = element.find('figcaption');
+      $caption.aloha();
       setEditText(element.find('.image-wrapper').prepend(edit));
       $img.one('load', function() {
         return setWidth($(this));

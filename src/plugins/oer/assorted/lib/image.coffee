@@ -506,6 +506,9 @@ define [
     element.prepend('<div class="title"></div>') if not element.find('.title').length
     element.append('<figcaption></figcaption>') if not element.find('figcaption').length
 
+    $caption = element.find('figcaption')
+    $caption.aloha()
+
     setEditText element.find('.image-wrapper').prepend(edit)
 
     # For images, make sure the load event fires. For images loaded from cache,
