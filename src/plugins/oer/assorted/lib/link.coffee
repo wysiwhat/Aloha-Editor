@@ -38,7 +38,7 @@ define [
           <div id="link-tab-external">
             <div id="link-url">
               <span for="link-external">Link to webpage</span>
-              <input class="link-input link-external form-control" id="link-external" type="url"/>
+              <input class="link-input link-external form-control" id="link-external"/>
             </div>
           </div>
           <div id="link-tab-internal">
@@ -79,7 +79,7 @@ define [
   Ephemera.attributes('data-original-title')
 
 
-  getTitle = ($el) ->
+  getTitle = ($el, href) ->
     if $el.is('h1,h2,h3,h4,h5,h6')
       $clone = $el.clone()
       $clone.find('.aloha-ephemera').remove()
@@ -92,7 +92,7 @@ define [
       caption.text() or 'Table'
     else
       console.error('BUG! Trying to find title of unknown DOM element')
-      'GETTITLE_OF_UNKNOWN_ELEMENT'
+      href
 
 
   getIcon = (href) ->
@@ -129,9 +129,9 @@ define [
         option = jQuery('<option></option>')
         unless $el.attr('id')
           $el.attr('id', GENTICS.Utils.guid())
-        id = $el.attr('id')
-        text = getTitle($el)
-        option.attr('value', '#' + id)
+        href = "##{$el.attr('id')}"
+        text = getTitle($el, href)
+        option.attr('value', href)
         option.append(text)
         option.appendTo($optGroup)
 
@@ -169,11 +169,20 @@ define [
       # Activate the current tab
       href = $el.attr('href')
 
+      if /^#/.test(href)
+        linkExternal.val(href)
+      else
+        if linkInternal.children("option[value='#{href}']").length
+          linkInternal.val(href)
+        else linkExternal.val(href)
+
       linkSave.toggleClass('disabled', !href)
 
       massageUrlInput = ($input) ->
         url = $input.val()
-        if /^http/.test(url) or /^htp/.test(url) or /^htt/.test(url)
+        if /^[^\/]*#[^\/]+/.test(url)
+          # Inter-Module (page) links are OK (UUID followed by # followed by XML id)
+        else if /^http/.test(url) or /^htp/.test(url) or /^htt/.test(url)
           # not missing.  if not valid, form validation will notify
           # and do not want to add http below in this case
         else
@@ -301,7 +310,7 @@ define [
       $linkTooltip.find('i').addClass(getIcon(href))
       if /^#/.test(href)
         $linkTooltip.removeAttr('target')
-        $linkTooltip.find('.title').text(getTitle(jQuery(href)))
+        $linkTooltip.find('.title').text(getTitle(jQuery(href), href))
       else
         $linkTooltip.find('.title').text shortUrl(href,30)
 

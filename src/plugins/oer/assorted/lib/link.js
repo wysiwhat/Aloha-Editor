@@ -2,10 +2,10 @@
 (function() {
   define(['aloha', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'aloha/console', 'aloha/ephemera', 'css!assorted/css/link.css'], function(Aloha, jQuery, Popover, UI, console, Ephemera) {
     var DETAILS_HTML, DIALOG_HTML, getContainerAnchor, getIcon, getTitle, populator, selector, shortString, shortUrl, showModalDialog, unlink;
-    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n\n      <div id="link-tab-external">\n        <div id="link-url">\n          <span for="link-external">Link to webpage</span>\n          <input class="link-input link-external form-control" id="link-external" type="url"/>\n        </div>\n      </div>\n      <div id="link-tab-internal">\n        <span for="link-internal">Or, link to something in this page:</span>\n        <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">\n          <option value="">None</option>\n        </select>\n      </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n\n      <div id="link-tab-external">\n        <div id="link-url">\n          <span for="link-external">Link to webpage</span>\n          <input class="link-input link-external form-control" id="link-external"/>\n        </div>\n      </div>\n      <div id="link-tab-internal">\n        <span for="link-internal">Or, link to something in this page:</span>\n        <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">\n          <option value="">None</option>\n        </select>\n      </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
     DETAILS_HTML = '<span class="link-popover-details">\n  <button class="btn-link edit-link" title="Change the link\'s text, location, or other properties">\n    <!-- <i class="fa fa-edit icon-edit"></i> -->\n    <span>Edit link...</span>\n  </button>\n  <button class="btn-link delete-link">\n    <!-- <i class="icon-delete"></i> -->\n    <span title="Remove the link, leaving just the text">Unlink</span>\n  </button>\n  <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">\n    <i class=""></i>\n    <span class="title"></span>\n  </a>\n</span>\n<br/>';
     Ephemera.attributes('data-original-title');
-    getTitle = function($el) {
+    getTitle = function($el, href) {
       var $clone, caption;
       if ($el.is('h1,h2,h3,h4,h5,h6')) {
         $clone = $el.clone();
@@ -19,7 +19,7 @@
         return caption.text() || 'Table';
       } else {
         console.error('BUG! Trying to find title of unknown DOM element');
-        return 'GETTITLE_OF_UNKNOWN_ELEMENT';
+        return href;
       }
     };
     getIcon = function(href) {
@@ -55,14 +55,14 @@
       linkSave = dialog.find('.link-save');
       linkInput = dialog.find('.link-input');
       appendOption = function($el, $optGroup, text) {
-        var id, option;
+        var href, option;
         option = jQuery('<option></option>');
         if (!$el.attr('id')) {
           $el.attr('id', GENTICS.Utils.guid());
         }
-        id = $el.attr('id');
-        text = getTitle($el);
-        option.attr('value', '#' + id);
+        href = "#" + ($el.attr('id'));
+        text = getTitle($el, href);
+        option.attr('value', href);
         option.append(text);
         return option.appendTo($optGroup);
       };
@@ -98,11 +98,22 @@
         return linkSave.toggleClass('disabled', !linkExternal.val());
       });
       href = $el.attr('href');
+      if (/^#/.test(href)) {
+        linkExternal.val(href);
+      } else {
+        if (linkInternal.children("option[value='" + href + "']").length) {
+          linkInternal.val(href);
+        } else {
+          linkExternal.val(href);
+        }
+      }
       linkSave.toggleClass('disabled', !href);
       massageUrlInput = function($input) {
         var url;
         url = $input.val();
-        if (/^http/.test(url) || /^htp/.test(url) || /^htt/.test(url)) {
+        if (/^[^\/]*#[^\/]+/.test(url)) {
+
+        } else if (/^http/.test(url) || /^htp/.test(url) || /^htt/.test(url)) {
 
         } else {
           if (!/^https?:\/\//.test(url)) {
@@ -222,7 +233,7 @@
       $linkTooltip.find('i').addClass(getIcon(href));
       if (/^#/.test(href)) {
         $linkTooltip.removeAttr('target');
-        $linkTooltip.find('.title').text(getTitle(jQuery(href)));
+        $linkTooltip.find('.title').text(getTitle(jQuery(href), href));
       } else {
         $linkTooltip.find('.title').text(shortUrl(href, 30));
       }
