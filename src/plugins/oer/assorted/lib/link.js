@@ -2,7 +2,7 @@
 (function() {
   define(['aloha', 'jquery', 'overlay/overlay-plugin', 'ui/ui', 'aloha/console', 'aloha/ephemera', 'css!assorted/css/link.css'], function(Aloha, jQuery, Popover, UI, console, Ephemera) {
     var DETAILS_HTML, DIALOG_HTML, getContainerAnchor, getIcon, getTitle, populator, selector, shortString, shortUrl, showModalDialog, unlink;
-    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n\n      <div id="link-tab-external">\n        <div id="link-url">\n          <span for="link-external">Link to webpage</span>\n          <input class="link-input link-external form-control" id="link-external"/>\n        </div>\n      </div>\n      <div id="link-tab-internal">\n        <span for="link-internal">Or, link to something in this page:</span>\n        <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">\n          <option value="">None</option>\n        </select>\n      </div>\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
+    DIALOG_HTML = '<form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n  <div class="modal-content">\n  <div class="modal-header">\n    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\n    <h3 id="linkModalLabel">Edit link</h3>\n  </div>\n  <div class="modal-body">\n    <div id="link-text">\n      <span>Text to display</span>\n      <div>\n        <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />\n      </div>\n    </div>\n\n    <hr/>\n\n      <div class="radio">\n        <label>\n          <input type="radio" name="link-type" value="link-internal"/>Link to a part of this page\n        </label>\n      </div>\n      <select class="link-internal link-input form-control collapse" name="linkinternal" id="link-internal">\n        <option value="">None</option>\n      </select>\n      <div class="radio">\n        <label>\n          <input type="radio" name="link-type" value="link-external"/>Link to webpage\n        </label>\n      </div>\n      <input class="link-input link-external form-control collapse" id="link-external" placeholder="http://"/>\n<!--\n      <div class="radio">\n        <label>\n          <input type="radio" name="link-type" value="link-resource"/>Upload a Document and link to it\n        </label>\n      </div>\n      <div class="link-resource collapse">\n        <input id="link-resource" class="form-control" type="file" placeholder="path/to/file"/>\n      </div>\n-->\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary link-save">Submit</button>\n    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>\n  </div>\n  </div>\n  </div>\n</form>';
     DETAILS_HTML = '<span class="link-popover-details">\n  <button class="btn-link edit-link" title="Change the link\'s text, location, or other properties">\n    <!-- <i class="fa fa-edit icon-edit"></i> -->\n    <span>Edit link...</span>\n  </button>\n  <button class="btn-link delete-link">\n    <!-- <i class="icon-delete"></i> -->\n    <span title="Remove the link, leaving just the text">Unlink</span>\n  </button>\n  <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">\n    <i class=""></i>\n    <span class="title"></span>\n  </a>\n</span>\n<br/>';
     Ephemera.attributes('data-original-title');
     getTitle = function($el, href) {
@@ -41,7 +41,7 @@
       }
     };
     showModalDialog = function($el) {
-      var $optGroup, a, appendOption, dialog, figuresAndTables, href, linkContents, linkExternal, linkInput, linkInternal, linkSave, massageUrlInput, orgElements, root;
+      var $optGroup, a, appendOption, dialog, figuresAndTables, href, linkContents, linkExternal, linkInput, linkInternal, linkResource, linkSave, massageUrlInput, orgElements, radios, root;
       root = Aloha.activeEditable.obj;
       dialog = jQuery(DIALOG_HTML);
       dialog.attr('data-backdrop', false);
@@ -52,7 +52,9 @@
       }
       linkExternal = dialog.find('.link-external');
       linkInternal = dialog.find('.link-internal');
+      linkResource = dialog.find('.link-resource');
       linkSave = dialog.find('.link-save');
+      radios = dialog.find('[name="link-type"]');
       linkInput = dialog.find('.link-input');
       appendOption = function($el, $optGroup, text) {
         var href, option;
@@ -98,14 +100,14 @@
         return linkSave.toggleClass('disabled', !linkExternal.val());
       });
       href = $el.attr('href');
-      if (/^#/.test(href)) {
-        linkExternal.val(href);
+      if (!href || /^#/.test(href) && linkInternal.find("option[value='" + href + "']").length) {
+        linkInternal.val(href);
+        radios.val(['link-internal']);
+        linkInternal.addClass('in');
       } else {
-        if (linkInternal.children("option[value='" + href + "']").length) {
-          linkInternal.val(href);
-        } else {
-          linkExternal.val(href);
-        }
+        linkExternal.val(href);
+        radios.val(['link-external']);
+        linkExternal.addClass('in');
       }
       linkSave.toggleClass('disabled', !href);
       massageUrlInput = function($input) {
@@ -123,6 +125,22 @@
           }
         }
       };
+      dialog.on('change', '[name="link-type"]', function(evt) {
+        if (evt.target.value) {
+          linkExternal.removeClass('in').val('');
+          linkInternal.removeClass('in').val('');
+          linkResource.removeClass('in').val('');
+          linkSave.addClass('disabled');
+          switch (evt.target.value) {
+            case 'link-external':
+              return linkExternal.addClass('in');
+            case 'link-internal':
+              return linkInternal.addClass('in');
+            case 'link-resource':
+              return linkResource.addClass('in');
+          }
+        }
+      });
       linkExternal.on('blur', function(evt) {
         return massageUrlInput(linkExternal);
       });

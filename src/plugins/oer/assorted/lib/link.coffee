@@ -35,18 +35,32 @@ define [
           </div>
         </div>
 
-          <div id="link-tab-external">
-            <div id="link-url">
-              <span for="link-external">Link to webpage</span>
-              <input class="link-input link-external form-control" id="link-external"/>
-            </div>
+        <hr/>
+
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-internal"/>Link to a part of this page
+            </label>
           </div>
-          <div id="link-tab-internal">
-            <span for="link-internal">Or, link to something in this page:</span>
-            <select class="link-internal link-input form-control" name="linkinternal" id="link-internal">
-              <option value="">None</option>
-            </select>
+          <select class="link-internal link-input form-control collapse" name="linkinternal" id="link-internal">
+            <option value="">None</option>
+          </select>
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-external"/>Link to webpage
+            </label>
           </div>
+          <input class="link-input link-external form-control collapse" id="link-external" placeholder="http://"/>
+<!--
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-resource"/>Upload a Document and link to it
+            </label>
+          </div>
+          <div class="link-resource collapse">
+            <input id="link-resource" class="form-control" type="file" placeholder="path/to/file"/>
+          </div>
+-->
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
@@ -120,7 +134,9 @@ define [
       # Build the link options and then populate one of them.
       linkExternal = dialog.find('.link-external')
       linkInternal = dialog.find('.link-internal')
+      linkResource = dialog.find('.link-resource')
       linkSave     = dialog.find('.link-save')
+      radios       = dialog.find('[name="link-type"]')
 
       # Combination of linkExternal and linkInternal
       linkInput    = dialog.find('.link-input')
@@ -169,12 +185,15 @@ define [
       # Activate the current tab
       href = $el.attr('href')
 
-      if /^#/.test(href)
-        linkExternal.val(href)
+      if not href or /^#/.test(href) and linkInternal.find("option[value='#{href}']").length
+        linkInternal.val(href)
+        radios.val(['link-internal'])
+        linkInternal.addClass('in')
       else
-        if linkInternal.children("option[value='#{href}']").length
-          linkInternal.val(href)
-        else linkExternal.val(href)
+        linkExternal.val(href)
+        radios.val(['link-external'])
+        linkExternal.addClass('in')
+
 
       linkSave.toggleClass('disabled', !href)
 
@@ -190,6 +209,17 @@ define [
         else
           unless /^https?:\/\//.test(url)
             $input.val("http://#{url}")
+
+      dialog.on 'change', '[name="link-type"]', (evt) ->
+        if evt.target.value
+          linkExternal.removeClass('in').val('')
+          linkInternal.removeClass('in').val('')
+          linkResource.removeClass('in').val('')
+          linkSave.addClass('disabled')
+          switch evt.target.value
+            when 'link-external' then linkExternal.addClass('in')
+            when 'link-internal' then linkInternal.addClass('in')
+            when 'link-resource' then linkResource.addClass('in')
 
       linkExternal.on 'blur', (evt) ->
         massageUrlInput(linkExternal)
