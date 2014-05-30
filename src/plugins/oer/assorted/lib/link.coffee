@@ -51,16 +51,15 @@ define [
             </label>
           </div>
           <input class="link-input link-external form-control collapse" id="link-external" placeholder="http://"/>
-<!--
           <div class="radio">
             <label>
               <input type="radio" name="link-type" value="link-resource"/>Upload a Document and link to it
             </label>
           </div>
           <div class="link-resource collapse">
-            <input id="link-resource" class="form-control" type="file" placeholder="path/to/file"/>
+            <input id="link-resource-input" class="form-control" type="file" placeholder="path/to/file"/>
+            <input id="link-resource-url" class="link-input form-control hidden" placeholder="Upload a file first"/>
           </div>
--->
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
@@ -135,6 +134,8 @@ define [
       linkExternal = dialog.find('.link-external')
       linkInternal = dialog.find('.link-internal')
       linkResource = dialog.find('.link-resource')
+      linkResourceInput = dialog.find('#link-resource-input')
+      linkResourceUrl = dialog.find('#link-resource-url')
       linkSave     = dialog.find('.link-save')
       radios       = dialog.find('[name="link-type"]')
 
@@ -175,11 +176,57 @@ define [
 
       linkInternal.on 'change', () ->
         linkExternal.val('')
+        linkResourceUrl.val('')
         linkSave.toggleClass('disabled', !linkInternal.val())
 
       linkExternal.on 'change keyup', () ->
         linkInternal.val('')
+        linkResourceUrl.val('')
         linkSave.toggleClass('disabled', !linkExternal.val())
+
+
+      linkResourceUrl.on 'change keyup', () ->
+        linkInternal.val('')
+        linkExternal.val('')
+        linkSave.toggleClass('disabled', !linkResourceUrl.val())
+
+
+      uploadFile = (file, callback) ->
+        settings = Aloha.require('assorted/assorted-plugin').settings
+        xhr = new XMLHttpRequest()
+        # For testing without a backend to upload to
+        # unless settings.image.uploadurl
+        #   return callback('/resources/1234567')
+        if xhr.upload and settings.image.uploadurl
+
+          xhr.onload = () ->
+            if settings.image.parseresponse
+              url = settings.image.parseresponse(xhr)
+            else
+              url = JSON.parse(xhr.response).url
+            callback(url)
+
+          xhr.open("POST", settings.image.uploadurl, true)
+          xhr.setRequestHeader("Cache-Control", "no-cache")
+          if settings.image.uploadSinglepart
+            xhr.setRequestHeader "Content-Type", ""
+            xhr.setRequestHeader "X-File-Name", file.name
+            xhr.send file
+          else
+            f = new FormData()
+            f.append settings.image.uploadfield or 'upload', file, file.name
+            xhr.send f
+
+      linkResourceInput.on 'change', () ->
+        files = linkResourceInput[0].files
+        # Parse the file and if it's an image set the imageSource
+        if files.length > 0
+          uploadFile files[0], (url) ->
+            if url
+              linkResourceInput.addClass('hidden')
+              linkResourceUrl.val(url)
+              linkResourceUrl.removeClass('hidden')
+              linkResourceUrl.trigger('change')
 
 
       # Activate the current tab
@@ -189,6 +236,12 @@ define [
         linkInternal.val(href)
         radios.val(['link-internal'])
         linkInternal.addClass('in')
+      else if /^\/?resources\/.+/.test(href)
+        linkResourceInput.addClass('hidden')
+        linkResourceUrl.removeClass('hidden')
+        linkResourceUrl.val(href)
+        radios.val(['link-resource'])
+        linkResource.addClass('in')
       else
         linkExternal.val(href)
         radios.val(['link-external'])
@@ -214,7 +267,7 @@ define [
         if evt.target.value
           linkExternal.removeClass('in').val('')
           linkInternal.removeClass('in').val('')
-          linkResource.removeClass('in').val('')
+          linkResource.removeClass('in')
           linkSave.addClass('disabled')
           switch evt.target.value
             when 'link-external' then linkExternal.addClass('in')
