@@ -114,13 +114,13 @@
         xhr = new XMLHttpRequest();
         if (xhr.upload && settings.image.uploadurl) {
           xhr.onload = function() {
-            var url;
+            var status, url, _ref;
             if (settings.image.parseresponse) {
-              url = settings.image.parseresponse(xhr);
+              _ref = settings.image.parseresponse(xhr), status = _ref.status, url = _ref.url;
             } else {
               url = JSON.parse(xhr.response).url;
             }
-            return callback(url);
+            return callback(status, url);
           };
           xhr.open("POST", settings.image.uploadurl, true);
           xhr.setRequestHeader("Cache-Control", "no-cache");
@@ -139,12 +139,16 @@
         var files;
         files = linkResourceInput[0].files;
         if (files.length > 0) {
-          return uploadFile(files[0], function(url) {
-            if (url) {
-              linkResourceInput.addClass('hidden');
-              linkResourceUrl.val(url);
-              linkResourceUrl.removeClass('hidden');
-              return linkResourceUrl.trigger('change');
+          return uploadFile(files[0], function(status, url) {
+            if (status === 413) {
+              return alert('The file is too large. Please upload a smaller one');
+            } else {
+              if (url) {
+                linkResourceInput.addClass('hidden');
+                linkResourceUrl.val(url);
+                linkResourceUrl.removeClass('hidden');
+                return linkResourceUrl.trigger('change');
+              }
             }
           });
         }

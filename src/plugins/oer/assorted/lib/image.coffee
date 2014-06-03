@@ -451,8 +451,10 @@ define [
       # upload image, if a local file was chosen
       if data.files.length
         newEl.addClass('aloha-image-uploading')
-        @uploadImage data.files[0], newEl, (url) ->
-          if url
+        @uploadImage data.files[0], newEl, (status, url) ->
+          if status is 413
+            alert('The file is too large. Please upload a smaller one')
+          else if url
             jQuery(data.target).attr('src', url)
           newEl.removeClass('aloha-image-uploading')
     .then(source_this_image_dialog).then () =>
@@ -561,10 +563,10 @@ define [
 
         xhr.onload = () ->
           if settings.image.parseresponse
-            url = settings.image.parseresponse(xhr)
+            {status, url} = settings.image.parseresponse(xhr)
           else
             url = JSON.parse(xhr.response).url
-          callback(url)
+          callback(status, url)
 
         xhr.open("POST", settings.image.uploadurl, true)
         xhr.setRequestHeader("Cache-Control", "no-cache")

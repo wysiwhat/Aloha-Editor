@@ -351,8 +351,10 @@
         return function(data) {
           if (data.files.length) {
             newEl.addClass('aloha-image-uploading');
-            return _this.uploadImage(data.files[0], newEl, function(url) {
-              if (url) {
+            return _this.uploadImage(data.files[0], newEl, function(status, url) {
+              if (status === 413) {
+                alert('The file is too large. Please upload a smaller one');
+              } else if (url) {
                 jQuery(data.target).attr('src', url);
               }
               return newEl.removeClass('aloha-image-uploading');
@@ -486,13 +488,13 @@
         xhr = new XMLHttpRequest();
         if (xhr.upload && settings.image.uploadurl) {
           xhr.onload = function() {
-            var url;
+            var status, url, _ref;
             if (settings.image.parseresponse) {
-              url = settings.image.parseresponse(xhr);
+              _ref = settings.image.parseresponse(xhr), status = _ref.status, url = _ref.url;
             } else {
               url = JSON.parse(xhr.response).url;
             }
-            return callback(url);
+            return callback(status, url);
           };
           xhr.open("POST", settings.image.uploadurl, true);
           xhr.setRequestHeader("Cache-Control", "no-cache");
