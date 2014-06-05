@@ -215,6 +215,8 @@
         'overlay/css' : '../plugins/oer/overlay/css',
         'toolbar'     : '../plugins/oer/toolbar/lib',
         'toolbar/css' : '../plugins/oer/toolbar/css',
+        'figure'     : '../plugins/oer/figure/lib',
+        'figure/css' : '../plugins/oer/figure/css',
         'math'     : '../plugins/oer/math/lib',
         'math/css' : '../plugins/oer/math/css',
         'assorted' : '../plugins/oer/assorted/lib',
