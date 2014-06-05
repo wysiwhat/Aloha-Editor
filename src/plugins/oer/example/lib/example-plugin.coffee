@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
+          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span><span class="type"></span></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
@@ -70,7 +70,7 @@ define [
               $option.appendTo(typeContainer.find('.dropdown-menu'))
               $option = $option.children('a')
               $option.text(dropType.label)
-              typeContainer.find('.type').on 'click', =>
+              typeContainer.find('.type-dropdown').on 'click', =>
                 jQuery.each types, (i, dropType) =>
                   if $element.attr('data-label') == dropType.dataClass
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
@@ -91,6 +91,8 @@ define [
                 else
                   $element.children('.title').remove()
 
+                typeContainer.find('.type').text(dropType.label)
+
                 # Remove the `data-label` if this type does not have one
                 if dropType.dataClass
                   $element.attr('data-label', dropType.dataClass)
@@ -105,6 +107,7 @@ define [
             typeContainer.find('.dropdown-menu').remove()
             typeContainer.find('.type').removeAttr('data-toggle')
 
+          typeContainer.find('.type').text(type.label)
           typeContainer.prependTo($element)
 
       # Create the body and add some placeholder text

@@ -226,7 +226,6 @@ font-family: tahoma, verdana, arial, helvetica, sans-serif;
 
 #canvas ul{ 
   line-height: 1.25em;
-  list-style-type: square;
   margin: 0.5em 0 0 1.5em;
   padding: 0;
   /* Whoever wrote this forgot to bring the image. Commenting for now. */

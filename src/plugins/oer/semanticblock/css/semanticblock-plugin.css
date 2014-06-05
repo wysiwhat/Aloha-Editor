@@ -186,25 +186,6 @@
   border-left-color: #ccc;
 }
 
-/* Put a bullet/square before the element label/type.  Include "li *" (dropdown code) so that the check mark shares styling ... specifics will be overriden later */
-.aloha-oer-block .type:before , .aloha-oer-block .type-container li *:before{
-    content: "\25A0";
-    vertical-align: top;
-    font-size: .9em;
-    display: inline-block;
-    /* The following helps to account for size/weight differences of other marks (arrow, checkmark) without things jumping around so much */
-    width: 11px;
-}
-
-.focused .aloha-oer-block .dropdown .type:before {
-    /* Change to arrow when hovering block */
-    content: "\25BE";
-    /* Make adjustments so that arrow feels like same size/positioning as square */
-    font-size: 1.1em;
-    margin-left: -1px;
-    margin-right: 1px;
-}
-
 .semantic-container .type-container {
     margin-bottom: 10px;
     position: relative;
@@ -320,4 +301,9 @@
 
 .aloha-oer-block .aloha-editable {
     min-height: 20px;
+}
+
+.oer-placeholder:before {
+    content: url(../img/insert-here-arrow.png);
+    opacity: 0.25;
 }

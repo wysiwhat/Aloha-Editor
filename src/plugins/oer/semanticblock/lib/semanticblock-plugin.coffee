@@ -8,6 +8,8 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
   BlockManager.registerBlockType 'semanticBlock', semanticBlock
 
+  settings = {}
+
   DIALOG_HTML = '''
     <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
@@ -210,6 +212,10 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
         $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock({'aloha-block-type': 'semanticBlock'})
 
         type.activate $element
+
+        if not settings.showLabels
+          $element.find('.type-container .type').remove()
+
         return
 
       # if we make it this far none of the activators have run
@@ -293,6 +299,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   Plugin.create 'semanticblock',
 
     defaults: {
+      showLabels: true,
       defaultSelector: 'div:not(.title,.aloha-oer-block,.aloha-editable,.aloha-block,.aloha-ephemera-wrapper,.aloha-ephemera)'
     }
     makeClean: (content) ->
@@ -342,11 +349,19 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
         $root = params.obj
+        
+        selector = @settings.defaultSelector
 
         classes = []
-        classes.push type.selector for type in registeredTypes
+
+        settings = @settings
 
         selector = @settings.defaultSelector + ',' + classes.join()
+        for type in registeredTypes
+          if type.selector
+            classes.push type.selector
+
+        selector += ',' + classes.join() if classes.length
 
         # theres no really good way to do this. editables get made into sortables
         # on `aloha-editable-created` and there is no event following that, so we
@@ -387,6 +402,19 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
           $root.find(selector).each ->
             activate jQuery(@) if not jQuery(@).parents('.semantic-drag-source').length
 
+    insertPlaceholder: ->
+      placeholder = $('<span class="aloha-ephemera oer-placeholder"></span>')
+      range = Aloha.Selection.getRangeObject()
+      GENTICS.Utils.Dom.insertIntoDOM placeholder, range, Aloha.activeEditable.obj
+      return placeholder
+
+    insertOverPlaceholder: ($element, $placeholder) ->
+      $element.addClass 'semantic-temp'
+      $placeholder.replaceWith($element)
+      $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp')
+      activate $element
+
+      $element
 
     insertAtCursor: (template) ->
       $element = jQuery(template)
