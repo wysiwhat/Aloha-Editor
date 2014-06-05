@@ -250,6 +250,8 @@
     background: #DDD;
 }
 .semantic-drag-source > * {
+    font-size: 14px;
+    line-height: 20px;
     margin: 5px 0;
     padding: 4px 0 4px 10px;
     border: 1px solid #999;
