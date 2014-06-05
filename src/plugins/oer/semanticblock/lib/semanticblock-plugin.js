@@ -362,13 +362,19 @@
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, selector, sortableInterval, type, _i, _len;
           $root = params.obj;
+          selector = _this.settings.defaultSelector;
           classes = [];
-          for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
-            type = registeredTypes[_i];
-            classes.push(type.selector);
-          }
           settings = _this.settings;
           selector = _this.settings.defaultSelector + ',' + classes.join();
+          for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
+            type = registeredTypes[_i];
+            if (type.selector) {
+              classes.push(type.selector);
+            }
+          }
+          if (classes.length) {
+            selector += ',' + classes.join();
+          }
           sortableInterval = setInterval(function() {
             if ($root.data('sortable')) {
               clearInterval(sortableInterval);
@@ -412,6 +418,20 @@
             });
           }
         });
+      },
+      insertPlaceholder: function() {
+        var placeholder, range;
+        placeholder = $('<span class="aloha-ephemera oer-placeholder"></span>');
+        range = Aloha.Selection.getRangeObject();
+        GENTICS.Utils.Dom.insertIntoDOM(placeholder, range, Aloha.activeEditable.obj);
+        return placeholder;
+      },
+      insertOverPlaceholder: function($element, $placeholder) {
+        $element.addClass('semantic-temp');
+        $placeholder.replaceWith($element);
+        $element = Aloha.jQuery('.semantic-temp').removeClass('semantic-temp');
+        activate($element);
+        return $element;
       },
       insertAtCursor: function(template) {
         var $element, range;

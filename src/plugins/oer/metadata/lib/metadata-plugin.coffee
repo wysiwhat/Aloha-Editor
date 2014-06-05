@@ -5,7 +5,7 @@ define [
   'aloha/ephemera'
   'semanticblock/semanticblock-plugin'
   './languages'
-  'css!metadata/css/metadata-plugin.css'], (Aloha, Plugin, jQuery, Ephemera, SemanticBlock, languages) ->
+  'css!metadata/css/metadata-plugin.css'], (Aloha, Plugin, $, Ephemera, SemanticBlock, languages) ->
 
   METADATA_MODAL = '''
 <div id="module-metadata-modal" class="modal fade" tabindex="-1" role="dialog" style="width: 660px;">
@@ -242,7 +242,7 @@ define [
 <div data-type="description" itemprop="description" class="description">
   <p class="summary"></p>
 </div>'''
-  
+
   LANGUAGE_TEMPLATE = '''
 <meta data-type="language" itemprop="inLanguage" content="" />'''
 
@@ -402,15 +402,15 @@ define [
         .appendTo(@$_element) if metadata.language
 
       @_setContributors(metadata)
-    
+
       if metadata.publishers.length
         @_handleGroup(@$_element, PUBLISHERS_TEMPLATE, metadata.publishers)
 
       @_setPermissions(metadata)
-    
+
       if metadata.keywords.length
         @_handleGroup(@$_element, KEYWORDS_TEMPLATE, metadata.keywords)
-    
+
       if metadata.subjects.length
         @_handleGroup(@$_element, SUBJECTS_TEMPLATE, metadata.subjects)
 
@@ -421,7 +421,7 @@ define [
 
     _setContributors: (contributors) ->
       $wrapper = $('<div>').addClass('contributors')
-      
+
       if contributors.authors.length
         @_handleGroup($wrapper, AUTHORS_TEMPLATE, contributors.authors)
       if contributors.editors.length
@@ -430,9 +430,9 @@ define [
         @_handleGroup($wrapper, ILLUSTRATORS_TEMPLATE, contributors.illustrators)
       if contributors.translators.length
         @_handleGroup($wrapper, TRANSLATORS_TEMPLATE, contributors.translators)
-      
+
       $wrapper.appendTo(@$_element) if not $wrapper.is(':empty')
- 
+
     _setPermissions: (permissions) ->
       $wrapper = $('<div>').addClass('permissions')
 
@@ -451,7 +451,7 @@ define [
       $groupTemplate = $(template)
       $item = $groupTemplate.find('span').clone()
       $groupTemplate.find('span').remove()
- 
+
       for value, i in values
         $item
           .clone()
@@ -463,7 +463,7 @@ define [
 
       $container.append($groupTemplate)
 
-    _init: (element) ->
+    initEditable: (element) ->
       @$_editable = element
 
       if not @$_editable.find(@_selector).length
@@ -481,36 +481,36 @@ define [
         title = @$_element.find('title').remove().text()
         @$_element.find(elements.title.selector).text(title)
 
+      # If the user leaves a value hanging without using one of the confirmKeys
+      # to complete the tag, complete it for him.
+      $('body').on 'blur', '#module-metadata-modal .bootstrap-tagsinput input', () ->
+        t = $(this).val()
+        if t
+          $(this).parent().prev().tagsinput('add', t)
+          $(this).val('')
+
       @$_element.click =>
         @_showModal()
 
     extendMetadata: (newMetadata) ->
 
       metadata = plugin._readMetadata()
-      
+
       for key, value of newMetadata
         console.log 'meta', key, value
         metadata[key] = value
-       
+
       plugin._setMetadata(metadata)
- 
+
     init: () ->
 
       SemanticBlock.ignore('[data-type="metadata"],[data-type="metadata"] *')
 
-      @settings.extendMetadata = @extendMetadata
-
       Aloha.bind 'aloha-editable-created', (e, params) =>
-        @_init(params.obj) if params.obj.is('.aloha-root-editable')
+        if params.obj.is('.aloha-root-editable')
+          @initEditable(params.obj)
+
+          # If we have an initial metadata callback, call it
+          if @settings.getInitialMetadata
+            @extendMetadata @settings.getInitialMetadata()
   }
-
-
-
-
-
-
-
-
-
-
-
