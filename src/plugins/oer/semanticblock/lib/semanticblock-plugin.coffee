@@ -9,7 +9,10 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   BlockManager.registerBlockType 'semanticBlock', semanticBlock
 
   DIALOG_HTML = '''
-    <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
+    <div class="semantic-settings modal fade" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
+      <div class="modal-dialog">
+      <div class="modal-content">
+
       <div class="modal-header">
         <h3></h3>
       </div>
@@ -24,6 +27,9 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
       <div class="modal-footer">
         <button class="btn btn-primary action submit">Save changes</button>
         <button class="btn action cancel">Cancel</button>
+      </div>
+
+      </div>
       </div>
     </div>'''
 
