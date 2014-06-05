@@ -60,8 +60,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
           <label class="plaintext-label radio inline">
               <input type="radio" name="mime-type" value="text/plain"> Plain text
           </label>
-          <button class="btn btn-primary done">Done</button>
+
+          <button class="btn clear">Clear</button>
           <button class="btn copy">Copy</button>
+          <button class="btn btn-primary done">Done</button>
         </div>
     </div>
   '''
@@ -332,6 +334,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       cleanupFormula($editor, $span, true)
     $editor.find('.copy').on 'click', =>
       Copy.buffer $span.outerHtml(), 'text/oerpub-content'
+    $editor.find('.clear').on 'click', =>
+      $editor.find('.formula').val('')
 
     $formula = $editor.find('.formula')
 
