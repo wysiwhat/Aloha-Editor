@@ -10,7 +10,7 @@ define [
 
   TYPE_CONTAINER = jQuery '''
       <span class="type-container dropdown aloha-ephemera">
-          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
+          <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span><span class="type"></span></span>
           <ul class="dropdown-menu">
           </ul>
       </span>
@@ -29,6 +29,7 @@ define [
     # - `label`: **Required** Shows up in dropdown
     # - `typeClass` :  **Required** The classname to enable this plugin on
     # - `hasTitle`: **Required** `true` if the element allows optional titles
+    # - `dataClass` : subtype for this label 
     # - `type`: value in the `data-label` attribute.
     # - `tagName`: Default: `div`. The HTML element name to use when creating a new note
     # - `titleTagName`: Default: `div`. The HTML element name to use when creating a new title
@@ -40,6 +41,7 @@ define [
     # Then, when the user selects "Warning" from the dropdown the element's
     # class and type will be changed and its `> .title` will be removed.
     defaults: [
+      { label: 'Note2', typeClass: 'note', dataClass: 'note2', hasTitle: true },
       { label: 'Note', typeClass: 'note', hasTitle: true }
     ]
     getLabel: ($element) ->
@@ -72,7 +74,7 @@ define [
               $option.appendTo(typeContainer.find('.dropdown-menu'))
               $option = $option.children('span')
               $option.text(dropType.label)
-              typeContainer.find('.type').on 'click', =>
+              typeContainer.find('.type-dropdown').on 'click', =>
                 jQuery.each types, (i, dropType) =>
                   if $element.attr('data-label') == dropType.dataClass
                     typeContainer.find('.dropdown-menu li').each (i, li) =>
@@ -88,7 +90,6 @@ define [
                     $newTitle = jQuery("<#{dropType.titleTagName or 'span'} class='title'></#{dropType.titleTagName or 'span'}")
                     $element.append($newTitle)
                     $newTitle.aloha()
-
                 else
                   $element.children('.title').remove()
 
@@ -97,6 +98,8 @@ define [
                   $element.attr('data-label', dropType.dataClass)
                 else
                   $element.removeAttr('data-label')
+
+                typeContainer.find('.type').text(dropType.label)
 
                 # Remove all notish class names and then add this one in
                 for key of notishClasses

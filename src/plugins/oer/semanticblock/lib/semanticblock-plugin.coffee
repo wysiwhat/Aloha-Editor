@@ -8,6 +8,8 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
   BlockManager.registerBlockType 'semanticBlock', semanticBlock
 
+  settings = {}
+
   DIALOG_HTML = '''
     <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
       <div class="modal-header">
@@ -210,6 +212,10 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
         $element.wrap(blockTemplate).parent().append(controls).prepend(top).alohaBlock({'aloha-block-type': 'semanticBlock'})
 
         type.activate $element
+
+        if not settings.showLabels
+          $element.find('.type-container .type').remove()
+
         return
 
       # if we make it this far none of the activators have run
@@ -293,6 +299,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   Plugin.create 'semanticblock',
 
     defaults: {
+      showLabels: true,
       defaultSelector: 'div:not(.title,.aloha-oer-block,.aloha-editable,.aloha-block,.aloha-ephemera-wrapper,.aloha-ephemera)'
     }
     makeClean: (content) ->
@@ -346,6 +353,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
         classes = []
         classes.push type.selector for type in registeredTypes
 
+        settings = @settings
         selector = @settings.defaultSelector + ',' + classes.join()
 
         # theres no really good way to do this. editables get made into sortables
