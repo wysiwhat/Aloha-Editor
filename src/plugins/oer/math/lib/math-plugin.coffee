@@ -46,7 +46,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
             <textarea type="text" class="formula" rows="1"
                       placeholder="Insert your math notation here"></textarea>
         </div>
-        <div class="footer">
+        <div class="footer controls form-inline">
           <span>This is:</span>
           <label class="radio inline">
               <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath
@@ -61,7 +61,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
               <input type="radio" name="mime-type" value="text/plain"> Plain text
           </label>
           <button class="btn btn-primary done">Done</button>
-          <button class="btn copy">Copy</button>
+          <button class="btn btn-default copy">Copy</button>
         </div>
     </div>
   '''

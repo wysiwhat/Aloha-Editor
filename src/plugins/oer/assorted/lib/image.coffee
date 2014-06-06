@@ -48,7 +48,7 @@ define [
                 <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
               </div>
             </div>
-            <div class="placeholder preview hide">
+            <div class="placeholder preview" style="display: none;">
               <img class="preview-image"/>
             </div>
         </div>

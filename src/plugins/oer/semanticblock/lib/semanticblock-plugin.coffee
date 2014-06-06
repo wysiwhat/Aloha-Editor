@@ -13,25 +13,23 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   DIALOG_HTML = '''
     <div class="semantic-settings modal fade" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
       <div class="modal-dialog">
-      <div class="modal-content">
-
-      <div class="modal-header">
-        <h3></h3>
-      </div>
-      <div class="modal-body">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title"></h3>
+          </div>
+          <div class="modal-body">
             <strong>Custom class</strong>
             <p>
                 Give this element a custom "class". Nothing obvious will change in your document.
                 This is for advanced book styling and requires support from the publishing system.
             </p>
             <input type="text" placeholder="custom element class" name="custom_class">
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary action submit">Save changes</button>
-        <button class="btn action cancel">Cancel</button>
-      </div>
-
-      </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary action submit">Save changes</button>
+            <button class="btn action cancel">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>'''
 
