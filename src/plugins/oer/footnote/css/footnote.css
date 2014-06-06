@@ -1,0 +1,11 @@
+span.footnote-data {
+    display:none;
+}
+
+span.footnote-marker:hover > span.footnote-data {
+    display:inline;
+    border: 1px solid red;
+}
+
+span.footnote-marker { counter-increment: footnote; }
+span.footnote-marker::before { content: '[' counter(footnote) ']'; }
