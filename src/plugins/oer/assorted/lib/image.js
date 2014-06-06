@@ -281,10 +281,14 @@
       });
       return deferred.promise();
     };
-    insertImage = function() {
-      var marker;
-      marker = Figure.insertPlaceholder();
+    insertImage = function(marker) {
+      if (!marker) {
+        marker = Figure.insertPlaceholder();
+      }
       return showCreateDialog().then(function(image) {
+        if (marker.parent().is('figure')) {
+          marker.parent().children('div').wrap('<figure>');
+        }
         Figure.insertOverPlaceholder(image, marker);
         return showModalDialog2(image);
       }).fail(function() {
@@ -332,10 +336,16 @@
       }
     };
     initialize = function($img) {
-      var edit, wrapper;
+      var edit, figure, remove, wrapper;
       wrapper = $('<div class="image-wrapper aloha-ephemera-wrapper">');
       edit = $('<div class="image-edit aloha-ephemera">');
-      $img.wrap(wrapper).parent().prepend(edit);
+      remove = $('<div class="image-remove aloha-ephemera"><i class="fa fa-times icon-remove"></i></div>');
+      $img.wrap(wrapper).parent().prepend(edit).append(remove);
+      figure = $img.parents('figure').last();
+      if (!figure.children('.add-figure-left').length) {
+        $('<span class="add-figure-left">+</span>').prependTo(figure);
+        $('<span class="add-figure-right">+</span>').appendTo(figure);
+      }
       return setEditText($img);
     };
     return AlohaPlugin.create('oer-image', {
@@ -346,6 +356,20 @@
           click: function(e) {
             return insertImage.bind(plugin)(e);
           }
+        });
+        $(document).on('click', '.add-figure-left', function() {
+          return insertImage(Figure.placeholder.clone().insertAfter($(this)));
+        });
+        $(document).on('click', '.add-figure-right', function() {
+          return insertImage(Figure.placeholder.clone().insertBefore($(this)));
+        });
+        $(document).on('click', '.image-remove', function() {
+          var thisFigure;
+          thisFigure = $(this).parents('figure').first();
+          if ($(this).parents('figure').last().children('figure').length === 2) {
+            $(this).parents('figure').last().children('figure').not(thisFigure).contents().unwrap();
+          }
+          return thisFigure.remove();
         });
         $(document).on('mouseover', 'img', function() {
           if (!$(this).parent().is('.image-wrapper') && $(this).parents('.aloha-root-editable').length) {

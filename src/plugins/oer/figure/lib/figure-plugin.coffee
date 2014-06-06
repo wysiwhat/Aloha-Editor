@@ -25,16 +25,21 @@ define [
     getLabel: -> 'Figure'
     activate: activate
     deactivate: deactivate
-    selector: 'figure'
+    selector: 'figure:not(figure figure)'
+    placeholder: semanticBlock.placeholder
     insertPlaceholder: ->
       semanticBlock.insertPlaceholder()
     insertOverPlaceholder: ($content, $placeholder) ->
       $figure = $('<figure>')
-        .append('<div class="title">')
         .append($content)
-        .append('<figcaption>')
+
+      if not $placeholder.parents('figure').length
+        $figure.prepend('<div class="title">')
+        $figure.append('<figcaption>')
         
-      semanticBlock.insertOverPlaceholder($figure, $placeholder)
+        semanticBlock.insertOverPlaceholder($figure, $placeholder)
+      else
+        $placeholder.replaceWith($figure)
     init: () ->
       plugin = @
       semanticBlock.register(plugin)

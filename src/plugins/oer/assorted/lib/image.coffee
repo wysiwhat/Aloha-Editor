@@ -400,10 +400,14 @@ define [
 
     return deferred.promise()
 
-  insertImage = () ->
-    marker = Figure.insertPlaceholder()
+  insertImage = (marker) ->
+    marker = Figure.insertPlaceholder() if not marker
 
     showCreateDialog().then (image) ->
+
+      if marker.parent().is('figure')
+        marker.parent().children('div').wrap('<figure>')
+
       Figure.insertOverPlaceholder(image, marker)
       showModalDialog2(image)
     .fail () ->
@@ -438,7 +442,14 @@ define [
   initialize = ($img) ->
     wrapper = $('<div class="image-wrapper aloha-ephemera-wrapper">')
     edit = $('<div class="image-edit aloha-ephemera">')
-    $img.wrap(wrapper).parent().prepend(edit)
+    remove = $('<div class="image-remove aloha-ephemera"><i class="fa fa-times icon-remove"></i></div>')
+    $img.wrap(wrapper).parent().prepend(edit).append(remove)
+
+    figure = $img.parents('figure').last()
+    if not figure.children('.add-figure-left').length
+      $('<span class="add-figure-left">+</span>').prependTo(figure)
+      $('<span class="add-figure-right">+</span>').appendTo(figure)
+    
     setEditText $img
 
   # Return config
@@ -448,6 +459,19 @@ define [
       UI.adopt 'insertImage-oer', null,
         click: (e) -> insertImage.bind(plugin)(e)
 
+      $(document).on 'click', '.add-figure-left', ->
+        insertImage(Figure.placeholder.clone().insertAfter($(this)))
+      $(document).on 'click', '.add-figure-right', ->
+        insertImage(Figure.placeholder.clone().insertBefore($(this)))
+
+      $(document).on 'click', '.image-remove', ->
+        thisFigure = $(this).parents('figure').first()
+
+        if $(this).parents('figure').last().children('figure').length == 2
+          $(this).parents('figure').last().children('figure').not(thisFigure).contents().unwrap()
+
+        thisFigure.remove()
+  
       $(document).on 'mouseover', 'img', ->
         if !$(this).parent().is('.image-wrapper') && $(this).parents('.aloha-root-editable').length
           initialize($(this))
