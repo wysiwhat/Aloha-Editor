@@ -403,6 +403,7 @@ define [
   insertImage = (marker) ->
     marker = Figure.insertPlaceholder() if not marker
 
+    console.log(marker)
     showCreateDialog().then (image) ->
 
       if marker.parent().is('figure')
@@ -457,7 +458,7 @@ define [
     init: () ->
       plugin = @
       UI.adopt 'insertImage-oer', null,
-        click: (e) -> insertImage.bind(plugin)(e)
+        click: (e) -> insertImage.bind(plugin)()
 
       $(document).on 'click', '.add-figure-left', ->
         insertImage(Figure.placeholder.clone().insertAfter($(this)))

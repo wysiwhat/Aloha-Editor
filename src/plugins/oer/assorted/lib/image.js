@@ -285,6 +285,7 @@
       if (!marker) {
         marker = Figure.insertPlaceholder();
       }
+      console.log(marker);
       return showCreateDialog().then(function(image) {
         if (marker.parent().is('figure')) {
           marker.parent().children('div').wrap('<figure>');
@@ -354,7 +355,7 @@
         plugin = this;
         UI.adopt('insertImage-oer', null, {
           click: function(e) {
-            return insertImage.bind(plugin)(e);
+            return insertImage.bind(plugin)();
           }
         });
         $(document).on('click', '.add-figure-left', function() {
