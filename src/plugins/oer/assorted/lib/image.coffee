@@ -403,11 +403,10 @@ define [
   insertImage = (marker) ->
     marker = Figure.insertPlaceholder() if not marker
 
-    console.log(marker)
     showCreateDialog().then (image) ->
 
       if marker.parent().is('figure')
-        marker.parent().children('div').wrap('<figure>')
+        marker.parent().children('div.image-wrapper').wrap('<figure>')
 
       Figure.insertOverPlaceholder(image, marker)
       showModalDialog2(image)
@@ -461,9 +460,15 @@ define [
         click: (e) -> insertImage.bind(plugin)()
 
       $(document).on 'click', '.add-figure-left', ->
-        insertImage(Figure.placeholder.clone().insertAfter($(this)))
+        other = $(this).siblings('figure').first()
+        if not other.length
+          other = $(this).siblings('div.image-wrapper')
+        insertImage(Figure.placeholder.clone().insertBefore(other))
       $(document).on 'click', '.add-figure-right', ->
-        insertImage(Figure.placeholder.clone().insertBefore($(this)))
+        other = $(this).siblings('figure').last()
+        if not other.length
+          other = $(this).siblings('div.image-wrapper')
+        insertImage(Figure.placeholder.clone().insertAfter(other))
 
       $(document).on 'click', '.image-remove', ->
         thisFigure = $(this).parents('figure').first()

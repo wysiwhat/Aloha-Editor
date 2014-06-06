@@ -285,10 +285,9 @@
       if (!marker) {
         marker = Figure.insertPlaceholder();
       }
-      console.log(marker);
       return showCreateDialog().then(function(image) {
         if (marker.parent().is('figure')) {
-          marker.parent().children('div').wrap('<figure>');
+          marker.parent().children('div.image-wrapper').wrap('<figure>');
         }
         Figure.insertOverPlaceholder(image, marker);
         return showModalDialog2(image);
@@ -359,10 +358,20 @@
           }
         });
         $(document).on('click', '.add-figure-left', function() {
-          return insertImage(Figure.placeholder.clone().insertAfter($(this)));
+          var other;
+          other = $(this).siblings('figure').first();
+          if (!other.length) {
+            other = $(this).siblings('div.image-wrapper');
+          }
+          return insertImage(Figure.placeholder.clone().insertBefore(other));
         });
         $(document).on('click', '.add-figure-right', function() {
-          return insertImage(Figure.placeholder.clone().insertBefore($(this)));
+          var other;
+          other = $(this).siblings('figure').last();
+          if (!other.length) {
+            other = $(this).siblings('div.image-wrapper');
+          }
+          return insertImage(Figure.placeholder.clone().insertAfter(other));
         });
         $(document).on('click', '.image-remove', function() {
           var thisFigure;
