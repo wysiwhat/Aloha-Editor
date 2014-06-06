@@ -19,7 +19,7 @@ define [
 	'''
     TYPE_CONTAINER = '''
         <div class="type-container dropdown aloha-ephemera">
-            <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span></span>
+            <span class="type-dropdown btn-link" data-toggle="dropdown"><span class="caret"></span><span class="type"></span></span>
             <ul class="dropdown-menu">
                 <li><span class="btn-link" data-label="">Exercise</span></li>
                 <li><span class="btn-link" data-label="homework">Homework</span></li>
@@ -50,6 +50,7 @@ define [
       $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>').parent()
 
       $typeContainer = jQuery(TYPE_CONTAINER)
+      $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1) )
 
       $typeContainer.find('.dropdown-menu li').each (i, li) =>
         if jQuery(li).children('span').data('type') == type
@@ -189,7 +190,7 @@ define [
         semanticBlock.registerEvent('click', '.aloha-oer-block.solution > .type-container > ul > li > *,
                                               .aloha-oer-block.exercise > .type-container > ul > li > *', (e) ->
           $el = jQuery(@)
-          $el.parents('.type-container').first().children('.type').text $el.text()
+          $el.parents('.type-container').first().find('.type').text $el.text()
           $el.parents('.aloha-oer-block').first().attr 'data-label', $el.data('type')
 
           $el.parents('.type-container').find('.dropdown-menu li').each (i, li) =>
