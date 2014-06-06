@@ -14,10 +14,10 @@
     });
     BlockManager.registerBlockType('semanticBlock', semanticBlock);
     settings = {};
-    DIALOG_HTML = '<div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">\n  <div class="modal-header">\n    <h3></h3>\n  </div>\n  <div class="modal-body">\n        <strong>Custom class</strong>\n        <p>\n            Give this element a custom "class". Nothing obvious will change in your document.\n            This is for advanced book styling and requires support from the publishing system.\n        </p>\n        <input type="text" placeholder="custom element class" name="custom_class">\n  </div>\n  <div class="modal-footer">\n    <button class="btn btn-primary action submit">Save changes</button>\n    <button class="btn action cancel">Cancel</button>\n  </div>\n</div>';
+    DIALOG_HTML = '<div class="semantic-settings modal fade" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <div class="modal-header">\n        <h3 class="modal-title"></h3>\n      </div>\n      <div class="modal-body">\n        <strong>Custom class</strong>\n        <p>\n            Give this element a custom "class". Nothing obvious will change in your document.\n            This is for advanced book styling and requires support from the publishing system.\n        </p>\n        <input type="text" placeholder="custom element class" name="custom_class">\n      </div>\n      <div class="modal-footer">\n        <button class="btn btn-primary action submit">Save changes</button>\n        <button class="btn action cancel">Cancel</button>\n      </div>\n    </div>\n  </div>\n</div>';
     blockTemplate = jQuery('<div class="semantic-container aloha-ephemera-wrapper"></div>');
-    topControls = jQuery('<div class="semantic-controls-top aloha-ephemera">\n  <a class="copy" title="Copy this element"><i class="icon-copy"></i> Copy element</button>\n</div>');
-    blockControls = jQuery('<div class="semantic-controls aloha-ephemera">\n  <button class="semantic-delete" title="Remove this element"><i class="icon-remove"></i></button>\n  <button class="semantic-settings" title="Advanced options for this element"><i class="icon-cog"></i></button>\n</div>');
+    topControls = jQuery('<div class="semantic-controls-top aloha-ephemera">\n  <a class="copy" title="Copy this element"><i class="fa fa-copy icon-copy"></i> Copy element</button>\n</div>');
+    blockControls = jQuery('<div class="semantic-controls aloha-ephemera">\n  <button class="semantic-delete" title="Remove this element"><i class="fa fa-times icon-remove"></i></button>\n  <button class="semantic-settings" title="Advanced options for this element"><i class="fa fa-cog icon-cog"></i></button>\n</div>');
     blockDragHelper = jQuery('<div class="semantic-drag-helper aloha-ephemera">\n    <div class="title"></div>\n    <div class="body">Drag me to the desired location in the document</div>\n</div>');
     registeredTypes = [];
     copyBuffer = null;
@@ -362,10 +362,9 @@
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, selector, sortableInterval, type, _i, _len;
           $root = params.obj;
+          settings = _this.settings;
           selector = _this.settings.defaultSelector;
           classes = [];
-          settings = _this.settings;
-          selector = _this.settings.defaultSelector + ',' + classes.join();
           for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
             type = registeredTypes[_i];
             if (type.selector) {
@@ -387,7 +386,7 @@
                 return ui.item.data("disableDrop", ui.placeholder.parent().data('disableDropTarget'));
               });
               $root.sortable('option', 'stop', function(e, ui) {
-                var $element, _ref;
+                var $element, _ref, _ref1;
                 if (ui.item.data('disableDrop')) {
                   jQuery(this).sortable("cancel");
                   return;
@@ -401,9 +400,11 @@
                     _ref.onDrop($element);
                   }
                 }
-                Aloha.activeEditable.smartContentChange({
-                  type: 'block-change'
-                });
+                if ((_ref1 = Aloha.activeEditable) != null) {
+                  _ref1.smartContentChange({
+                    type: 'block-change'
+                  });
+                }
                 return $element.removeClass('drag-active');
               });
               $root.sortable('option', 'placeholder', 'aloha-oer-block-placeholder aloha-ephemera');

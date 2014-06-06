@@ -1,5 +1,5 @@
 define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './path', 'css!copy/css/copy.css'], (Aloha, Plugin, jQuery, UI, Button, PubSub, Path) ->
-   
+
   buffer = ''
   srcpath = null
   content_type = null
@@ -99,7 +99,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
           @copybutton.enable()
         else
           @copybutton.disable()
-    
+
       # Register with ui
       @pastebutton = UI.adopt 'paste', Button,
         tooltip: 'Paste',
@@ -119,7 +119,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
 
           # Default paste behaviour follows
           $elements = jQuery plugin.getBuffer()
-          
+
           # Remove any classes associated with previewing what element you were copying
           $elements.removeClass('copy-preview focused')
 
@@ -155,7 +155,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'ui/ui', 'ui/button', 'PubSub', './pa
         $ob.prepend('''
           <div class="aloha-ephemera copy-section-controls"
                contenteditable="false">
-            <span href="#" title="Copy section" class="copy-section"><i class="icon-copy"></i> Copy section</span>
+            <span href="#" title="Copy section" class="copy-section"><i class="fa fa-copy icon-copy"></i> Copy section</span>
           </div>
         ''')
 

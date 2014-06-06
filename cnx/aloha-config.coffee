@@ -8,7 +8,7 @@
 @Aloha.settings =
   jQuery: @jQuery # Use the same version of jQuery
   logLevels:
-    error: false
+    error: true
     warn: true
     info: false
     debug: false
@@ -20,43 +20,51 @@
       # tooltip) our copy has those removed.
       jqueryui: '../../oerpub/js/jquery-ui-1.9.0.custom-aloha'
 
+    # This allows the UI.adopt (which all plugins use to register) to call the toolbar plugin
+    map:
+      '*':
+        'ui/ui': 'toolbar/toolbar-plugin'
+
+
   errorhandling: true
   plugins:
     # All the plugins we use in Aloha
     load: [
       'common/ui'
       'oer/toolbar'
-      'oer/overlay'
-      'oer/format'
-      'common/contenthandler'
-      'common/paste'
+      'common/format'
       'common/block'
       'common/list'
+      'common/contenthandler'
+      'oer/paste'
       'oer/table'
+      'extra/draganddropfiles'
+      'oer/image'
       'oer/overlay'
       'oer/math'
-      'extra/draganddropfiles'
-      'common/image'
       'oer/assorted'
-      'oer/title'
-      'common/undo'
-      'oer/undobutton'
-      'oer/genericbutton'
       'oer/semanticblock'
-      'oer/exercise'
       'oer/note'
+      'oer/example'
+      'oer/exercise'
+      'oer/quotation'
+      'oer/equation'
+      'oer/definition'
+      'oer/multipart'
+      'oer/copy'
+      'oer/cleanup'
       # **NOTE:** Update `build/aloha/build-profile-with-oer.js` when adding a new plugin
     ]
 
     note: [
-      { label: 'Note',      cls: 'note', hasTitle: true }
-      { label: 'Aside',     cls: 'note', hasTitle: true, type: 'aside' }
-      { label: 'Warning',   cls: 'note', hasTitle: true, type: 'warning' }
-      { label: 'Tip',       cls: 'note', hasTitle: true, type: 'tip' }
-      { label: 'Important', cls: 'note', hasTitle: true, type: 'important' }
+      { label: 'Note',      typeClass: 'note', hasTitle: true }
+      { label: 'Aside',     typeClass: 'note', hasTitle: true, type: 'aside' }
+      { label: 'Warning',   typeClass: 'note', hasTitle: true, type: 'warning' }
+      { label: 'Tip',       typeClass: 'note', hasTitle: true, type: 'tip' }
+      { label: 'Important', typeClass: 'note', hasTitle: true, type: 'important' }
 
-      { label: 'Noteish',   cls: 'noteish', hasTitle: true }
-      { label: 'Noteish (no Title)', cls: 'noteish-notitle', hasTitle: false }
+      { label: 'Noteish',   typeClass: 'noteish', hasTitle: true }
+      { label: 'Noteish (no Title)', typeClass: 'noteish-notitle', hasTitle: false }
     ]
 
     # This whole thing is what's needed to:

@@ -10,7 +10,7 @@ define ['aloha', 'aloha/plugin', 'jquery', 'css!mathcheatsheet/css/mathcheatshee
             <div class="math-help-link">
                 <span class="btn-link" title="Help using the math editor">See help</a>
             </div>'''
-        MathPlugin.editor.find('.plaintext-label').after '''
+        MathPlugin.editor.find('.footer').after '''
             <label class="cheatsheet-label checkbox inline">
                 <input id="cheatsheet-activator" type="checkbox" name="cheatsheet-activator"> Show cheat sheet
             </label>'''

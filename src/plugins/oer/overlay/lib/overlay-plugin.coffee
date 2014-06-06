@@ -211,8 +211,11 @@ define [ 'aloha', 'jquery', 'css!overlay/css/popover.css' ], (Aloha, jQuery) ->
   # defining feature that is bound to be available. I use here the fact that
   # in 2.3 bootstrap added the 'container' option to tooltips/popovers, so
   # not having that is a sign that patching is needed.
-  if typeof($.fn.tooltip.defaults.container) == 'undefined'
-    monkeyPatch()
+  #
+  # Bootstrap 3 does this properly (defined by `$.fn.tooltip.DEFAULTS`)
+  if typeof($.fn.tooltip.defaults?.container) == 'undefined'
+    if not $.fn.tooltip.Constructor?.DEFAULTS
+      monkeyPatch()
 
   Popover =
     MILLISECS: 2000
@@ -250,6 +253,9 @@ define [ 'aloha', 'jquery', 'css!overlay/css/popover.css' ], (Aloha, jQuery) ->
               $node.on 'hide.bubble', =>
                 @blur.bind($node[0])($node.data('popover').$tip)
 
+            # Clear the content since HTML is appended (to preserve events)
+            $node.data('bs.popover')?.tip()?.find('.popover-content')?.empty()
+
             # Specifying 'container: body' has no effect on bootstrap<2.3,
             # but on the newer versions it places the popover outside
             # the editor area, which avoids selecttion-changed events
@@ -273,10 +279,11 @@ define [ 'aloha', 'jquery', 'css!overlay/css/popover.css' ], (Aloha, jQuery) ->
           makePopovers($node)
           $node.popover 'show'
           if @markerclass
-            $node.data('popover').$tip.addClass(@markerclass)
+            popoverData = $node.data('bs.popover') or $node.data('popover')
+            popoverData.$tip.addClass(@markerclass)
           $node.data('aloha-bubble-visible', true)
         # As long as the popover is open  move it around if the document changes ($el updates)
-        that = $node.data('popover')
+        that = $node.data('bs.popover') or $node.data('popover')
         if that and that.$tip
           Bootstrap_Popover__position.bind(that)(that.$tip, hint)
       $el.on 'hide-popover.bubble', @selector, (evt) =>

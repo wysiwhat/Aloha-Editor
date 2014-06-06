@@ -1,10 +1,10 @@
 /*global window:true, define:true, document:true */
 /* blockmanager.js is part of Aloha Editor project http://aloha-editor.org
  *
- * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor. 
+ * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor.
  * Copyright (c) 2010-2012 Gentics Software GmbH, Vienna, Austria.
- * Contributors http://aloha-editor.org/contribution.php 
- * 
+ * Contributors http://aloha-editor.org/contribution.php
+ *
  * Aloha Editor is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
+ *
  * As an additional permission to the GNU GPL version 2, you may distribute
  * non-source (e.g., minimized or compacted) forms of the Aloha-Editor
  * source code without the copy of the GNU GPL normally required,
@@ -105,7 +105,7 @@ define([
 
 		/**
 		 * Flag that stores the drag & drop state
-		 * @type boolean 
+		 * @type boolean
 		 */
 		_dragdropEnabled: true,
 
@@ -323,7 +323,7 @@ define([
 
 		/**
 		 * When editables are activated (e.g. by moving the focus with Tab or Shift-Tab or programmatically),
-		 * we need to activate the enclosing blocks. 
+		 * we need to activate the enclosing blocks.
 		 */
 		_registerEventHandlersForEditableActivated: function () {
 			var that = this;
@@ -375,6 +375,8 @@ define([
 				// aloha blocks draggable.
 				$editableOrBlockCollection.addClass("aloha-block-blocklevel-sortable").sortable({
 					revert: 100,
+// HACK to make all blocks sortable but not sections (dragging a block in a section used to drag the whole section)
+items: "> :not(section), .aloha-block",
 					handle: ".aloha-block-draghandle-blocklevel",
 					connectWith: ".aloha-block-blocklevel-sortable.aloha-block-dropzone", // we want to be able to drag an element to other editables
 					disabled: !that._dragdropEnabled, // if drag & drop is disabled, sortable should also be disabled
@@ -385,10 +387,10 @@ define([
 					change: function (event, ui) {
 						ui.item.data("block-sort-allowed", (ui.placeholder.parents(".aloha-block-dropzone").length > 0));
 					},
-					stop: function (event, ui) { 
+					stop: function (event, ui) {
 						if (!ui.item.data("block-sort-allowed")) {
 							jQuery(this).sortable("cancel");
-						} 
+						}
 						ui.item.removeData("block-sort-allowed");
 					}
 				});
@@ -488,7 +490,7 @@ define([
 
 		/**
 		 * Unblockify the given element
-		 * 
+		 *
 		 * @private
 		 */
 		_unblockify: function (element) {

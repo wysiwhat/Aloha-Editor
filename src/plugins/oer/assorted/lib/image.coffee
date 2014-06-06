@@ -23,12 +23,15 @@ define [
   WARNING_IMAGE_PATH = '/../plugins/oer/assorted/img/warning.png'
 
   DIALOG_HTML_CONTAINER = '''
-      <form class="plugin image modal hide fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
+      <form class="plugin image modal fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
 
   DIALOG_HTML = '''
+    <div class="modal-dialog">
+    <div class="modal-content">
+
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Insert image</h3>
+        <h3 class="modal-title">Insert image</h3>
       </div>
       <div class="modal-body">
         <div class="image-options">
@@ -45,13 +48,13 @@ define [
                 <input type="url" class="upload-url-input" placeholder="Enter URL of image ...">
               </div>
             </div>
-            <div class="placeholder preview hide">
+            <div class="placeholder preview" style="display: none;">
               <img class="preview-image"/>
             </div>
         </div>
         <div class="image-alt">
           <div class="forminfo">
-            <i class="icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
+            <i class="fa fa-warning icon-warning"></i><strong>Describe the image for someone who cannot see it.</strong> This description can be read aloud, making it possible for visually impaired learners to understand the content.</strong>
           </div>
           <div>
             <textarea name="alt" placeholder="Enter description ..." rows="3"></textarea>
@@ -61,9 +64,14 @@ define [
       <div class="modal-footer">
         <button class="btn action cancel">Cancel</button>
         <button type="submit" disabled="true" class="btn btn-primary action insert">Next</button>
-      </div>'''
+      </div>
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  '''
 
   DIALOG_HTML2 = '''
+    <div class="modal-dialog">
+    <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Insert image</h3>
@@ -76,12 +84,12 @@ define [
           <ul style="list-style-type: none; padding: 0; margin: 0;">
             <li id="listitem-i-own-this">
               <label class="radio">
-                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed) 
+                <input type="radio" name="image-source-selection" value="i-own-this">I own it (no citation needed)
               </label>
             </li>
             <li id="listitem-i-got-permission">
               <label class="radio">
-                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it: 
+                <input type="radio" name="image-source-selection" value="i-got-permission">I am allowed to reuse it:
               </label>
               <div class="source-selection-allowed">
                 <fieldset>
@@ -127,7 +135,9 @@ define [
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary action insert">Save</button>
         <button class="btn action cancel">Cancel</button>
-      </div>'''
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  '''
 
   showEditDialog = ($el) ->
     dialog = jQuery(DIALOG_HTML_CONTAINER)
@@ -158,7 +168,7 @@ define [
       dialog.modal('hide')
       deferred.resolve($el)
 
-    dialog.on 'shown', () =>
+    dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
       
     dialog.on 'click', '.btn.action.cancel', (evt) =>
@@ -260,7 +270,7 @@ define [
       dialog.modal('hide')
       deferred.resolve($el)
 
-    dialog.on 'shown', () =>
+    dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
       
     dialog.on 'click', '.btn.action.cancel', (evt) =>
@@ -268,7 +278,7 @@ define [
       deferred.reject()
       dialog.modal('hide')
 
-    dialog.on 'hidden', () ->
+    dialog.on 'hidden hidden.bs.modal', () ->
       deferred.reject()
 
     dialog.modal {show: true}
@@ -406,7 +416,7 @@ define [
     wrapper = $img.parents('.image-wrapper').first()
     return if not wrapper.length
     editDiv = wrapper.children('.image-edit')
-    editDiv.html('<i class="icon-edit"></i> Thank You!').removeClass('passive')
+    editDiv.html('<i class="fa fa-edit icon-edit"></i> Thank You!').removeClass('passive')
     editDiv.addClass('thank-you')
     editDiv.animate({opacity: 0}, 2000, 'swing', -> setEditText $img)
 
@@ -417,9 +427,9 @@ define [
     editDiv = wrapper.children('.image-edit').removeClass('thank-you').css('opacity', 1)
 
     if alt
-        editDiv.html('<i class="icon-edit"></i>').addClass('passive')
+        editDiv.html('<i class="fa fa-edit icon-edit"></i>').addClass('passive')
     else
-        editDiv.html('<i class="icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
+        editDiv.html('<i class="fa fa-warning icon-warning"></i><span class="warning-text">Description missing</span>').removeClass('passive')
         editDiv.off('mouseenter').on 'mouseenter', (e) ->
           editDiv.find('.warning-text').text('Image is missing a description for the visually impaired. Click to provide one.')
         editDiv.off('mouseleave').on 'mouseleave', (e) ->
@@ -454,10 +464,10 @@ define [
 
         xhr.onload = () ->
           if settings.image.parseresponse
-            url = parseresponse(xhr)
+            {status, url} = settings.image.parseresponse(xhr)
           else
             url = JSON.parse(xhr.response).url
-          callback(url)
+          callback(status, url)
 
         xhr.open("POST", settings.image.uploadurl, true)
         xhr.setRequestHeader("Cache-Control", "no-cache")

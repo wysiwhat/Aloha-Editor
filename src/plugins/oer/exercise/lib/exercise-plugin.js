@@ -14,7 +14,7 @@
       $problem = $element.children('.problem');
       $solutions = $element.children('.solution');
       $element.children().not($problem).not($solutions).remove();
-      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>');
+      $problemContainer = $problem.add($solutions).wrapAll('<section class="js-problem-container aloha-ephemera-wrapper"></section>').parent();
       $typeContainer = jQuery(TYPE_CONTAINER);
       $typeContainer.find('.type').text(type.charAt(0).toUpperCase() + type.slice(1));
       $typeContainer.find('.dropdown-menu li').each(function(i, li) {
@@ -51,7 +51,7 @@
         }
       });
       $typeContainer.prependTo($element);
-      return jQuery('<div>').addClass('body').addClass('aloha-block-dropzone').appendTo($element).aloha().append($body);
+      return jQuery('<div>').addClass('body').addClass('aloha-ephemera-wrapper').addClass('aloha-block-dropzone').appendTo($element).aloha().append($body);
     };
     deactivateSolution = function($element) {
       if ($element.children('.body').children().length) {
@@ -112,7 +112,7 @@
           exercise = jQuery(this).parents('.exercise').first();
           controls = exercise.children('.solution-controls');
           controls.children('.solution-toggle').text('hide solution').show();
-          return semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.children('.solutions'));
+          return semanticBlock.appendElement(jQuery(SOLUTION_TEMPLATE), exercise.find('.solutions'));
         });
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', function() {
           var controls, exercise, solutions;

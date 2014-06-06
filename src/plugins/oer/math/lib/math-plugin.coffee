@@ -46,7 +46,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
             <textarea type="text" class="formula" rows="1"
                       placeholder="Insert your math notation here"></textarea>
         </div>
-        <div class="footer">
+        <div class="footer controls form-inline">
           <span>This is:</span>
           <label class="radio inline">
               <input type="radio" name="mime-type" value="math/asciimath"> ASCIIMath
@@ -60,9 +60,8 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
           <label class="plaintext-label radio inline">
               <input type="radio" name="mime-type" value="text/plain"> Plain text
           </label>
-
-          <button class="btn clear">Clear</button>
-          <button class="btn copy">Copy</button>
+          <button class="btn btn-default clear">Clear</button>
+          <button class="btn btn-default copy">Copy</button>
           <button class="btn btn-primary done">Done</button>
         </div>
     </div>
@@ -248,7 +247,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       # Though the tooltip was bound to the editor and delegates
       # to these items, you still have to clean it up youself
       $el.siblings('.math-element-spaceafter').remove()
-      $el.trigger('hide-popover').tooltip('destroy').remove()
+      $el.popover('hide').tooltip('destroy').remove()
       Aloha.activeEditable.smartContentChange {type: 'block-change'}
     )
 
@@ -327,10 +326,10 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
 
     # Bind some actions for the buttons
     $editor.find('.done').on 'click', =>
-      $span.trigger 'hide-popover'
+      $span.popover('hide')
       placeCursorAfter($span)
     $editor.find('.remove').on 'click', =>
-      $span.trigger 'hide-popover'
+      $span.popover('hide')
       cleanupFormula($editor, $span, true)
     $editor.find('.copy').on 'click', =>
       Copy.buffer $span.outerHtml(), 'text/oerpub-content'
@@ -349,7 +348,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     formula = $span.find('script[type]').html()
 
     # Set the language and fill in the formula
-    $editor.find("input[name=mime-type][value='#{mimeType}']").attr('checked', true)
+    $editor.find("input[name=mime-type][value='#{mimeType}']").prop('checked', true)
     $formula.val(formula)
 
     # Set the hidden pre that causes auto-sizing to the same value
@@ -406,13 +405,14 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
         $editor.find('.math-container pre span').text(
             $editor.find('.formula').val())
 
-    # Grr, Bootstrap doesn't set the cheked value properly on radios
     radios = $editor.find('input[name=mime-type]')
     radios.on 'click', () ->
-        radios.attr('checked', false)
-        jQuery(@).attr('checked', true)
-        clearTimeout(keyTimeout)
-        setTimeout(keyDelay.bind($formula), 500)
+      # The following lines are for bootstrap 2
+      # radios.prop('checked', false)
+      # jQuery(@).prop('checked', true)
+
+      clearTimeout(keyTimeout)
+      setTimeout(keyDelay.bind($formula), 500)
 
     $span.off('shown.math').on 'shown.math', () ->
       $span.css 'background-color', '#E5EEF5'

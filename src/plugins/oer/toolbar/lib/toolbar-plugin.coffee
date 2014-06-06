@@ -2,21 +2,21 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
     jQuery, Aloha, Plugin, PubSub, Button) ->
 
   squirreledEditable = null
-  $ROOT = jQuery('body') # Could also be configured to some other div
+  ROOT_SELECTOR = 'body' # Could also be configured to some other div
 
   makeItemRelay = (slot) ->
     # This class adapts button functions Aloha expects to functions the toolbar
     # uses
     class ItemRelay
       constructor: () ->
-      show: () -> $ROOT.find(".action.#{slot}").removeClass('hidden')
-      hide: () -> #$ROOT.find(".action.#{slot}").addClass('hidden')
+      show: () -> jQuery(ROOT_SELECTOR).find(".action.#{slot}").removeClass('hidden')
+      hide: () -> #jQuery(ROOT_SELECTOR).find(".action.#{slot}").addClass('hidden')
       setActive: (bool) ->
-        $ROOT.find(".action.#{slot}").removeClass('active') if not bool
-        $ROOT.find(".action.#{slot}").addClass('active') if bool
+        jQuery(ROOT_SELECTOR).find(".action.#{slot}").removeClass('active') if not bool
+        jQuery(ROOT_SELECTOR).find(".action.#{slot}").addClass('active') if bool
       setState: (bool) -> @setActive bool
       enable: (bool=true) ->
-        btn = $ROOT.find(".action.#{slot}")
+        btn = jQuery(ROOT_SELECTOR).find(".action.#{slot}")
 
         # Fire an enable event on btn, allow enable/disable to be customised
         evt = $.Event(bool and 'enable-action' or 'disable-action')
@@ -45,10 +45,10 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
         # activating such a button, we will do the same thing we do for
         # setActive, which is to look for a matching subaction.
         if subslot
-          $ROOT.find(".action.#{slot} .subaction.#{subslot}").addClass(
+          jQuery(ROOT_SELECTOR).find(".action.#{slot} .subaction.#{subslot}").addClass(
             'active')
         else
-          $ROOT.find(".action.#{slot} .subaction.#{subslot}").removeClass(
+          jQuery(ROOT_SELECTOR).find(".action.#{slot} .subaction.#{subslot}").removeClass(
             'active')
       focus: () ->
         # When a UI component receives focus, this method is called to activate
@@ -59,7 +59,7 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
       flash: () ->
         # Allows a plugin to flash a button, thereby grabbing the user's
         # attention.
-        el = $ROOT.find(".action.#{slot}")
+        el = jQuery(ROOT_SELECTOR).find(".action.#{slot}")
 
         # Fire a flash event on el, allow flashing to be customised
         evt = $.Event('flash-action')
@@ -80,7 +80,7 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
     jQuery.each adoptedActions, (slot, settings) ->
 
       selector = ".action.#{slot}"
-      $ROOT.on 'click', selector, (evt) ->
+      jQuery(ROOT_SELECTOR).on 'click', selector, (evt) ->
         evt.preventDefault()
         Aloha.activeEditable = Aloha.activeEditable or squirreledEditable
         # The Table plugin requires this.element to work so it can pop open a
@@ -91,12 +91,12 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
           @element = @
           settings.click.bind(@)(evt)
       if settings.preview
-        $ROOT.on 'mouseenter', selector, (evt) ->
+        jQuery(ROOT_SELECTOR).on 'mouseenter', selector, (evt) ->
           $target = jQuery(evt.target)
           if not ($target.is(':disabled') or $target.parent().is('.disabled'))
             settings.preview.bind(@)(evt)
       if settings.unpreview
-        $ROOT.on 'mouseleave', selector, (evt) ->
+        jQuery(ROOT_SELECTOR).on 'mouseleave', selector, (evt) ->
           $target = jQuery(evt.target)
           if not ($target.is(':disabled') or $target.parent().is('.disabled'))
             settings.unpreview.bind(@)(evt)
@@ -104,11 +104,11 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
   formats = {}
 
   buildMenu = (options, selected) ->
-    $container = $ROOT.find('.headings ul')
+    $container = jQuery(ROOT_SELECTOR).find('.headings ul')
     $container.empty()
     for tag, label of options
       $container.append("<li><a href=\"#\" class=\"action changeHeading\" data-tagname=\"#{tag}\">#{label}</a></li>")
-    $ROOT.find('.headings .currentHeading').text(formats[selected])
+    jQuery(ROOT_SELECTOR).find('.headings .currentHeading').text(formats[selected])
 
   ###
    register the plugin with unique name
@@ -156,15 +156,15 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
 
         # Tell Aloha we changed things
         squirreledEditable.smartContentChange type: 'block-change'
-        
+
         # $newEl.attr('id', $oldEl.attr('id))
         # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
 
-      $ROOT.on 'click', '.action.changeHeading', changeHeading
+      jQuery(ROOT_SELECTOR).on 'click', '.action.changeHeading', changeHeading
 
       # Stop mousedown events from propagating to aloha's handler, which will
       # cause the editor to deactivate.
-      $ROOT.on 'mousedown', ".action", (evt) ->
+      jQuery(ROOT_SELECTOR).on 'mousedown', ".action", (evt) ->
         evt.stopPropagation()
 
       Aloha.bind 'aloha-editable-activated', (event, data) ->
@@ -176,7 +176,7 @@ define [ 'jquery', 'aloha', 'aloha/plugin', 'PubSub', 'ui/button' ], (
         # Figure out if we are in any particular heading
         parents = $(el).parents().andSelf()
         currentHeading = parents.filter(Object.keys(formats).join(',')).first()
-      
+
         blacklist = []
         parents.filter('[data-format-blacklist]').each ->
           blacklist += jQuery(@).data('formatBlacklist')

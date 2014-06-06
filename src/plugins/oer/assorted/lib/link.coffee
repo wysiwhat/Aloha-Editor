@@ -21,6 +21,8 @@ define [
 
   DIALOG_HTML = '''
     <form class="modal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+      <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="linkModalLabel">Edit link</h3>
@@ -29,17 +31,41 @@ define [
         <div id="link-text">
           <span>Text to display</span>
           <div>
-            <input id="link-contents" class="input-xlarge" type="text" placeholder="Enter a phrase here" required />
+            <input id="link-contents" class="input-xlarge form-control" type="text" placeholder="Enter a phrase here" required />
           </div>
         </div>
-        <div id="link-url">
-          <span for="link-external">Link to webpage</span>
-          <input class="link-input link-external" id="link-external" type="url" pattern="https?://.+"/>
-        </div>
+
+        <hr/>
+
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-internal"/>Link to a part of this page
+            </label>
+          </div>
+          <select class="link-internal link-input form-control collapse" name="linkinternal" id="link-internal">
+            <option value="">None</option>
+          </select>
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-external"/>Link to webpage
+            </label>
+          </div>
+          <input class="link-input link-external form-control collapse" id="link-external" placeholder="http://"/>
+          <div class="radio">
+            <label>
+              <input type="radio" name="link-type" value="link-resource"/>Upload a Document and link to it
+            </label>
+          </div>
+          <div class="link-resource collapse">
+            <input id="link-resource-input" class="form-control" type="file" placeholder="path/to/file"/>
+            <input id="link-resource-url" class="link-input form-control hidden" placeholder="Upload a file first"/>
+          </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary link-save">Submit</button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+      </div>
       </div>
     </form>'''
 
@@ -47,22 +73,50 @@ define [
   DETAILS_HTML = '''
       <span class="link-popover-details">
         <button class="btn-link edit-link" title="Change the link's text, location, or other properties">
-          <i class="icon-edit-link"></i>
+          <!-- <i class="fa fa-edit icon-edit"></i> -->
           <span>Edit link...</span>
         </button>
         <button class="btn-link delete-link">
-          <i class="icon-delete-link"></i>
+          <!-- <i class="icon-delete"></i> -->
           <span title="Remove the link, leaving just the text">Unlink</span>
         </button>
         <a class="visit-link" target="_blank" title="Visit the link in a new window or tab">
-          <i class="icon-external-link"></i>
-          <span class="title"></span></a>
+          <i class=""></i>
+          <span class="title"></span>
+        </a>
       </span>
       <br/>
   '''
 
   # have ephemera remove the attribute that bootstrap inserts for tooltips
   Ephemera.attributes('data-original-title')
+
+
+  getTitle = ($el, href) ->
+    if $el.is('h1,h2,h3,h4,h5,h6')
+      $clone = $el.clone()
+      $clone.find('.aloha-ephemera').remove()
+      $clone.text()
+    else if $el.is('figure')
+      caption = $el.find('figcaption')
+      caption.text() or 'Figure'
+    else if $el.is('table')
+      caption = $el.find('caption')
+      caption.text() or 'Table'
+    else
+      console.error('BUG! Trying to find title of unknown DOM element')
+      href
+
+
+  getIcon = (href) ->
+    if /^#/.test(href)
+      $el = jQuery(href)
+      return 'fa fa-paragraph icon-paragraph' if $el.is('h1,h2,h3,h4,h5,h6')
+      return 'fa fa-file-image-o icon-image' if $el.is('figure')
+      return 'fa fa-table' if $el.is('table')
+      return ''
+    else
+      return 'fa fa-external-link icon-external-link'
 
   showModalDialog = ($el) ->
       root = Aloha.activeEditable.obj
@@ -79,88 +133,175 @@ define [
       # Build the link options and then populate one of them.
       linkExternal = dialog.find('.link-external')
       linkInternal = dialog.find('.link-internal')
+      linkResource = dialog.find('.link-resource')
+      linkResourceInput = dialog.find('#link-resource-input')
+      linkResourceUrl = dialog.find('#link-resource-url')
       linkSave     = dialog.find('.link-save')
+      radios       = dialog.find('[name="link-type"]')
 
       # Combination of linkExternal and linkInternal
       linkInput    = dialog.find('.link-input')
 
-      appendOption = (id, contentsToClone) ->
-        clone = contentsToClone[0].cloneNode(true)
-        contents = jQuery(clone).contents()
+      appendOption = ($el, $optGroup, text) ->
         option = jQuery('<option></option>')
-        option.attr 'value', '#' + id
-        option.append contents
-        option.appendTo linkInternal
+        unless $el.attr('id')
+          $el.attr('id', GENTICS.Utils.guid())
+        href = "##{$el.attr('id')}"
+        text = getTitle($el, href)
+        option.attr('value', href)
+        option.append(text)
+        option.appendTo($optGroup)
 
       orgElements = root.find('h1,h2,h3,h4,h5,h6')
       figuresAndTables = root.find('figure,table')
       orgElements.filter(':not([id])').each ->
         jQuery(@).attr 'id', GENTICS.Utils.guid()
 
-      orgElements.each ->
-        item = jQuery(@)
-        id = item.attr('id')
-        appendOption id, item
 
-      figuresAndTables.each ->
-        item = jQuery(@)
-        id = item.attr('id')
-        caption = item.find('caption,figcaption')
-        appendOption id, caption if caption[0]
+      if orgElements[0]
+        $optGroup = jQuery('<optgroup label="Headings"></optgroup>')
+        $optGroup.appendTo(linkInternal)
 
-      dialog.find('a[data-toggle=tab]').on 'shown', (evt) ->
-        prevTab = jQuery(jQuery(evt.relatedTarget).attr('href'))
-        newTab  = jQuery(jQuery(evt.target).attr('href'))
-        prevTab.find('.link-input').removeAttr('required')
-        newTab.find('.link-input').attr('required', true)
+        orgElements.each ->
+          item = jQuery(@)
+          appendOption item, $optGroup
+
+      if figuresAndTables[0]
+        $optGroup = jQuery('<optgroup label="Figures and Tables"></optgroup>')
+        $optGroup.appendTo(linkInternal)
+
+        figuresAndTables.each ->
+          item = jQuery(@)
+          appendOption item, $optGroup
+
+      linkInternal.on 'change', () ->
+        linkExternal.val('')
+        linkResourceUrl.val('')
+        linkSave.toggleClass('disabled', !linkInternal.val())
+
+      linkExternal.on 'change keyup', () ->
+        linkInternal.val('')
+        linkResourceUrl.val('')
+        linkSave.toggleClass('disabled', !linkExternal.val())
+
+
+      linkResourceUrl.on 'change keyup', () ->
+        linkInternal.val('')
+        linkExternal.val('')
+        linkSave.toggleClass('disabled', !linkResourceUrl.val())
+
+
+      uploadFile = (file, callback) ->
+        settings = Aloha.require('assorted/assorted-plugin').settings
+        xhr = new XMLHttpRequest()
+        # For testing without a backend to upload to
+        # unless settings.image.uploadurl
+        #   return callback('/resources/1234567')
+        if xhr.upload and settings.image.uploadurl
+
+          xhr.onload = () ->
+            if settings.image.parseresponse
+              {status, url} = settings.image.parseresponse(xhr)
+            else
+              url = JSON.parse(xhr.response).url
+            callback(status, url)
+
+          xhr.open("POST", settings.image.uploadurl, true)
+          xhr.setRequestHeader("Cache-Control", "no-cache")
+          if settings.image.uploadSinglepart
+            xhr.setRequestHeader "Content-Type", ""
+            xhr.setRequestHeader "X-File-Name", file.name
+            xhr.send file
+          else
+            f = new FormData()
+            f.append settings.image.uploadfield or 'upload', file, file.name
+            xhr.send f
+
+      linkResourceInput.on 'change', () ->
+        files = linkResourceInput[0].files
+        # Parse the file and if it's an image set the imageSource
+        if files.length > 0
+          uploadFile files[0], (status, url) ->
+            if status is 413
+              alert('The file is too large. Please upload a smaller one')
+            else
+              if url
+                linkResourceInput.addClass('hidden')
+                linkResourceUrl.val(url)
+                linkResourceUrl.removeClass('hidden')
+                linkResourceUrl.trigger('change')
+
 
       # Activate the current tab
       href = $el.attr('href')
 
-      # Clear up the active tabs
-      dialog.find('.active').removeClass('active')
+      if not href or /^#/.test(href) and linkInternal.find("option[value='#{href}']").length
+        linkInternal.val(href)
+        radios.val(['link-internal'])
+        linkInternal.addClass('in')
+      else if /^\/?resources\/.+/.test(href)
+        linkResourceInput.addClass('hidden')
+        linkResourceUrl.removeClass('hidden')
+        linkResourceUrl.val(href)
+        radios.val(['link-resource'])
+        linkResource.addClass('in')
+      else
+        linkExternal.val(href)
+        radios.val(['link-external'])
+        linkExternal.addClass('in')
 
-      linkInputId = '#link-tab-external'
-      linkInputId = '#link-tab-internal' if $el.attr('href').match(/^#/)
 
-      #dialog.find('#link-tab-internal').tab('show')
-      dialog.find(linkInputId)
-      .addClass('active')
-      .find('.link-input')
-      .attr('required', true)
-      .val(href)
-      dialog.find("a[href=#{linkInputId}]").parent().addClass('active')
+      linkSave.toggleClass('disabled', !href)
 
       massageUrlInput = ($input) ->
         url = $input.val()
-        if /^http/.test(url) or /^htp/.test(url) or /^htt/.test(url)
+        if /^[^\/]*#[^\/]+/.test(url)
+          # Inter-Module (page) links are OK (UUID followed by # followed by XML id)
+        else if /^\/resources\/[^\/]{32}/.test(url)
+          # Links to resources are OK
+        else if /^http/.test(url) or /^htp/.test(url) or /^htt/.test(url)
           # not missing.  if not valid, form validation will notify
           # and do not want to add http below in this case
         else
-          if not /^https?:\/\//.test(url)
-            $input.val 'http://' + url
+          unless /^https?:\/\//.test(url)
+            $input.val("http://#{url}")
+
+      dialog.on 'change', '[name="link-type"]', (evt) ->
+        if evt.target.value
+          linkExternal.removeClass('in').val('')
+          linkInternal.removeClass('in').val('')
+          linkResource.removeClass('in')
+          linkSave.addClass('disabled')
+          switch evt.target.value
+            when 'link-external' then linkExternal.addClass('in')
+            when 'link-internal' then linkInternal.addClass('in')
+            when 'link-resource' then linkResource.addClass('in')
 
       linkExternal.on 'blur', (evt) ->
-        massageUrlInput linkExternal
+        massageUrlInput(linkExternal)
 
       linkExternal.bind 'keydown', 'return', (evt) ->
-        massageUrlInput linkExternal
+        massageUrlInput(linkExternal)
 
       dialog.on 'submit', (evt) =>
         evt.preventDefault()
 
         if linkContents.val() and linkContents.val().trim()
           $el.contents().remove()
-          $el.append linkContents.val()
+          $el.append(linkContents.val())
 
         # Set the href based on the active tab
-        active = dialog.find('.link-input[required]')
-        href = active.val()
-        $el.attr 'href', href
-        dialog.modal('hide')
+        href = null
+        dialog.find('.link-input').each (i, input) ->
+          $input = jQuery(input)
+          href = $input.val() if $input.val()
+
+        if href
+          $el.attr('href', href)
+          dialog.modal('hide')
 
       dialog.modal('show')
-      dialog.on 'hidden', () ->
+      dialog.on 'hidden.bs.modal', () ->
         dialog.remove()
       dialog
 
@@ -248,8 +389,18 @@ define [
           Aloha.activeEditable = editable
           unlink($el)
 
-      details.find('.visit-link').attr 'href', href
-      details.find('.visit-link .title').text shortUrl(href,30)
+      # Fill in the link "Tooltip".
+      # For external links make them open in a new window and
+      # for internal links hide the "external link" icon.
+      $linkTooltip = details.find('.visit-link')
+      $linkTooltip.attr 'href', href
+
+      $linkTooltip.find('i').addClass(getIcon(href))
+      if /^#/.test(href)
+        $linkTooltip.removeAttr('target')
+        $linkTooltip.find('.title').text(getTitle(jQuery(href), href))
+      else
+        $linkTooltip.find('.title').text shortUrl(href,30)
 
 
       $bubble.contents()
@@ -302,7 +453,7 @@ define [
 
       # Wait until the dialog is closed before inserting it into the DOM
       # That way if it is cancelled nothing is inserted
-      dialog.on 'hidden', =>
+      dialog.on 'hidden.bs.modal', =>
 
         Aloha.activeEditable = editable
 

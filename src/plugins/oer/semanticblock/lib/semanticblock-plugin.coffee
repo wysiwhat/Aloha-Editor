@@ -11,34 +11,38 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   settings = {}
 
   DIALOG_HTML = '''
-    <div class="semantic-settings modal hide" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
-      <div class="modal-header">
-        <h3></h3>
-      </div>
-      <div class="modal-body">
+    <div class="semantic-settings modal fade" id="linkModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title"></h3>
+          </div>
+          <div class="modal-body">
             <strong>Custom class</strong>
             <p>
                 Give this element a custom "class". Nothing obvious will change in your document.
                 This is for advanced book styling and requires support from the publishing system.
             </p>
             <input type="text" placeholder="custom element class" name="custom_class">
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary action submit">Save changes</button>
-        <button class="btn action cancel">Cancel</button>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary action submit">Save changes</button>
+            <button class="btn action cancel">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>'''
 
   blockTemplate = jQuery('<div class="semantic-container aloha-ephemera-wrapper"></div>')
   topControls = jQuery('''
     <div class="semantic-controls-top aloha-ephemera">
-      <a class="copy" title="Copy this element"><i class="icon-copy"></i> Copy element</button>
+      <a class="copy" title="Copy this element"><i class="fa fa-copy icon-copy"></i> Copy element</button>
     </div>
   ''')
   blockControls = jQuery('''
     <div class="semantic-controls aloha-ephemera">
-      <button class="semantic-delete" title="Remove this element"><i class="icon-remove"></i></button>
-      <button class="semantic-settings" title="Advanced options for this element"><i class="icon-cog"></i></button>
+      <button class="semantic-delete" title="Remove this element"><i class="fa fa-times icon-remove"></i></button>
+      <button class="semantic-settings" title="Advanced options for this element"><i class="fa fa-cog icon-cog"></i></button>
     </div>''')
   blockDragHelper = jQuery('''
     <div class="semantic-drag-helper aloha-ephemera">
@@ -348,15 +352,11 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
-        $root = params.obj
-        
-        selector = @settings.defaultSelector
-
-        classes = []
-
+        $root    = params.obj
         settings = @settings
+        selector = @settings.defaultSelector
+        classes  = []
 
-        selector = @settings.defaultSelector + ',' + classes.join()
         for type in registeredTypes
           if type.selector
             classes.push type.selector
@@ -389,7 +389,7 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
               $element = jQuery(ui.item)
               activate $element if $element.is(selector)
               getType($element)?.onDrop?($element)
-              Aloha.activeEditable.smartContentChange({type: 'block-change'})
+              Aloha.activeEditable?.smartContentChange({type: 'block-change'})
 
               $element.removeClass('drag-active')
 
