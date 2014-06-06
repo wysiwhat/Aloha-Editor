@@ -362,10 +362,9 @@
         return Aloha.bind('aloha-editable-created', function(e, params) {
           var $root, classes, selector, sortableInterval, type, _i, _len;
           $root = params.obj;
+          settings = _this.settings;
           selector = _this.settings.defaultSelector;
           classes = [];
-          settings = _this.settings;
-          selector = _this.settings.defaultSelector + ',' + classes.join();
           for (_i = 0, _len = registeredTypes.length; _i < _len; _i++) {
             type = registeredTypes[_i];
             if (type.selector) {

@@ -352,15 +352,11 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
 
 
       Aloha.bind 'aloha-editable-created', (e, params) =>
-        $root = params.obj
-        
-        selector = @settings.defaultSelector
-
-        classes = []
-
+        $root    = params.obj
         settings = @settings
+        selector = @settings.defaultSelector
+        classes  = []
 
-        selector = @settings.defaultSelector + ',' + classes.join()
         for type in registeredTypes
           if type.selector
             classes.push type.selector
