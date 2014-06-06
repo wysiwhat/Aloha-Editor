@@ -87,19 +87,12 @@ math,
     width: 16px;
     top: -1px;
     height: 16px;
-    background-image: url(../img/remove-01.png);
-    background-repeat: no-repeat;
-    background-position: right top;
     cursor: pointer;
 }
 
 .math-element:hover .math-element-destroy {
     display: inline-block;
     text-decoration: none;
-}
-
-.math-element .math-element-destroy:hover {
-    background-image: url(../img/remove-02.png);
 }
 
 button.done,

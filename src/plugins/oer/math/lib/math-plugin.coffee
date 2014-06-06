@@ -441,7 +441,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     # $el is <span class="math-element">
     $closer = $el.find '.math-element-destroy'
     if not $closer[0]?
-      $closer = jQuery('<span class="math-element-destroy aloha-ephemera" title="Delete\u00A0math">&nbsp;</span>')
+      $closer = jQuery('<span class="math-element-destroy aloha-ephemera fa fa-times" title="Delete\u00A0math"></span>')
       # The hidden event on the closeIcon should not propagate, otherwise it
       # triggers cleanupFormula repeatedly on an empty math element, causing
       # infinite recursion.
