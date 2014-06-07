@@ -311,6 +311,7 @@
       return bindEvents(jQuery(document));
     });
     return Plugin.create('semanticblock', {
+      placeholder: $('<span class="aloha-ephemera oer-placeholder"></span>'),
       defaults: {
         showLabels: true,
         defaultSelector: 'div:not(.title,.aloha-oer-block,.aloha-editable,.aloha-block,.aloha-ephemera-wrapper,.aloha-ephemera)'

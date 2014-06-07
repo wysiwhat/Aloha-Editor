@@ -2,6 +2,11 @@
 figure {
   text-align: center;
   overflow: auto;
+  display: inline-block;
+}
+
+figure.aloha-oer-block {
+  counter-increment: figure;
 }
 
 .semantic-container:hover figure div.title:not(:focus):empty:before {
@@ -29,4 +34,7 @@ figure.aloha-oer-block > figcaption {
     display: block;
     text-align: center
 }
-
+figure figcaption::before {
+  content: "Figure " counter(figure) " ";
+  font-weight: bold;
+}

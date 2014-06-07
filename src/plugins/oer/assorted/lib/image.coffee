@@ -170,7 +170,7 @@ define [
 
     dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
-      
+
     dialog.on 'click', '.btn.action.cancel', (evt) =>
       evt.preventDefault() # Don't submit the form
       deferred.reject()
@@ -272,7 +272,7 @@ define [
 
     dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
-      
+
     dialog.on 'click', '.btn.action.cancel', (evt) =>
       evt.preventDefault() # Don't submit the form
       deferred.reject()
@@ -400,10 +400,14 @@ define [
 
     return deferred.promise()
 
-  insertImage = () ->
-    marker = Figure.insertPlaceholder()
+  insertImage = (marker) ->
+    marker = Figure.insertPlaceholder() if not marker
 
     showCreateDialog().then (image) ->
+
+      if marker.parent().is('figure')
+        marker.parent().children('div.image-wrapper').wrap('<figure>')
+
       Figure.insertOverPlaceholder(image, marker)
       showModalDialog2(image)
     .fail () ->
@@ -438,7 +442,14 @@ define [
   initialize = ($img) ->
     wrapper = $('<div class="image-wrapper aloha-ephemera-wrapper">')
     edit = $('<div class="image-edit aloha-ephemera">')
-    $img.wrap(wrapper).parent().prepend(edit)
+    remove = $('<div class="image-remove aloha-ephemera"><i class="fa fa-times icon-remove"></i></div>')
+    $img.wrap(wrapper).parent().prepend(edit).append(remove)
+
+    figure = $img.parents('figure').last()
+    if not figure.children('.add-figure-left').length
+      $('<span class="add-figure-left">+</span>').prependTo(figure)
+      $('<span class="add-figure-right">+</span>').appendTo(figure)
+
     setEditText $img
 
   # Return config
@@ -446,12 +457,32 @@ define [
     init: () ->
       plugin = @
       UI.adopt 'insertImage-oer', null,
-        click: (e) -> insertImage.bind(plugin)(e)
+        click: (e) -> insertImage.bind(plugin)()
+
+      $(document).on 'click', '.add-figure-left', ->
+        other = $(this).siblings('figure').first()
+        if not other.length
+          other = $(this).siblings('div.image-wrapper')
+        insertImage(Figure.placeholder.clone().insertBefore(other))
+      $(document).on 'click', '.add-figure-right', ->
+        other = $(this).siblings('figure').last()
+        if not other.length
+          other = $(this).siblings('div.image-wrapper')
+        insertImage(Figure.placeholder.clone().insertAfter(other))
+
+      $(document).on 'click', '.image-remove', ->
+        thisFigure = $(this).parents('figure').first()
+
+        if $(this).parents('figure').last().children('figure').length == 2
+          $(this).parents('figure').last().children('figure').not(thisFigure).contents().unwrap()
+
+        thisFigure.remove()
 
       $(document).on 'mouseover', 'img', ->
-        if !$(this).parent().is('.image-wrapper') && $(this).parents('.aloha-root-editable').length
-          initialize($(this))
-      
+        $el = $(this)
+        if $el.parent().is('figure.aloha-oer-block') and $el.parents('figure').length is 1
+          initialize($el)
+
       $(document).on 'click', 'figure.aloha-oer-block .image-edit', ->
         $img = $(this).siblings('img')
         showEditDialog($img)

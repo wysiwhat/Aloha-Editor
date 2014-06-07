@@ -19,16 +19,6 @@
 .popover .popover-title {
   display: none;
 }
-figure {
-  counter-increment: figure;
-  /* Set inline-block so the figure popover shows up directly under instead of 1/2-way in the page */
-
-  display: inline-block;
-}
-figure figcaption::before {
-  content: "Figure " counter(figure) " ";
-  font-weight: bold;
-}
 .aloha-image-upload-drop-box {
   text-align: center;
   border: 1px dashed #ccc;

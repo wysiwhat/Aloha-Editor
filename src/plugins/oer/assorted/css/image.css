@@ -12,7 +12,29 @@
 }
 
 figure.aloha-oer-block img {
-    max-width: none;
+  max-width: none;
+  position: relative;
+}
+
+figure .add-figure-left,
+figure .add-figure-right {
+  top: 45%;
+  float: left;
+  position: absolute;
+  font-size: 40px;
+  color: #428bca;
+  display: none;
+  cursor: pointer;
+} 
+figure .add-figure-left {
+  left: 20px;
+} 
+figure .add-figure-right {
+  right: 20px;
+} 
+figure:hover .add-figure-left,
+figure:hover .add-figure-right {
+  display: inline;
 }
 
 .image-options .placeholder.preview img {
@@ -46,6 +68,23 @@ figure.aloha-oer-block .image-wrapper {
     display: inline-block;
     margin: 0 auto;
     overflow-x: auto;
+}
+
+figure.aloha-oer-block figure .image-wrapper:hover img {
+  opacity: 0.3; 
+}
+
+figure.aloha-oer-block .image-remove {
+  position: absolute;
+  cursor: pointer;
+  top: calc(50% - 25px);
+  left: calc(50% - 25px);
+  font-size: 50px;
+  display: none;
+}
+
+figure.aloha-oer-block figure .image-wrapper:hover .image-remove {
+  display: block;
 }
 
 figure.aloha-oer-block .image-wrapper .image-edit {

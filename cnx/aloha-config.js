@@ -22,7 +22,7 @@
     },
     errorhandling: true,
     plugins: {
-      load: ['common/ui', 'oer/toolbar', 'common/format', 'common/block', 'common/list', 'common/contenthandler', 'oer/paste', 'oer/table', 'extra/draganddropfiles', 'oer/image', 'oer/overlay', 'oer/math', 'oer/assorted', 'oer/semanticblock', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/definition', 'oer/multipart', 'oer/copy', 'oer/cleanup'],
+      load: ['common/ui', 'oer/toolbar', 'common/format', 'common/block', 'common/list', 'common/contenthandler', 'oer/paste', 'oer/table', 'extra/draganddropfiles', 'oer/image', 'oer/figure', 'oer/overlay', 'oer/math', 'oer/assorted', 'oer/semanticblock', 'oer/note', 'oer/example', 'oer/exercise', 'oer/quotation', 'oer/equation', 'oer/definition', 'oer/multipart', 'oer/copy', 'oer/cleanup'],
       note: [
         {
           label: 'Note',
