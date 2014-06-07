@@ -170,7 +170,7 @@ define [
 
     dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
-      
+
     dialog.on 'click', '.btn.action.cancel', (evt) =>
       evt.preventDefault() # Don't submit the form
       deferred.reject()
@@ -272,7 +272,7 @@ define [
 
     dialog.on 'shown shown.bs.modal', () =>
       dialog.find('input,textarea,select').filter(':visible').first().focus()
-      
+
     dialog.on 'click', '.btn.action.cancel', (evt) =>
       evt.preventDefault() # Don't submit the form
       deferred.reject()
@@ -449,7 +449,7 @@ define [
     if not figure.children('.add-figure-left').length
       $('<span class="add-figure-left">+</span>').prependTo(figure)
       $('<span class="add-figure-right">+</span>').appendTo(figure)
-    
+
     setEditText $img
 
   # Return config
@@ -477,11 +477,12 @@ define [
           $(this).parents('figure').last().children('figure').not(thisFigure).contents().unwrap()
 
         thisFigure.remove()
-  
+
       $(document).on 'mouseover', 'img', ->
-        if !$(this).parent().is('.image-wrapper') && $(this).parents('.aloha-root-editable').length
-          initialize($(this))
-      
+        $el = $(this)
+        if $el.parent().is('figure.aloha-oer-block') and $el.parents('figure').length is 1
+          initialize($el)
+
       $(document).on 'click', 'figure.aloha-oer-block .image-edit', ->
         $img = $(this).siblings('img')
         showEditDialog($img)
