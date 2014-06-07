@@ -245,6 +245,8 @@
         'quotation/css': '../plugins/oer/quotation/css',
         'table': '../plugins/oer/table/lib',
         'table/css': '../plugins/oer/table/css',
+        'media-embed': '../plugins/oer/media-embed/lib',
+        'media-embed/css': '../plugins/oer/media-embed/css',
 
 
         //Do not forget to add these to aloha.coffee
@@ -445,6 +447,7 @@
                 'quotation/quotation-plugin',
                 'table/table-plugin',
                 'toolbar/toolbar-plugin',
+                'media-embed/media-embed-plugin'
             ],
         },
     ],
