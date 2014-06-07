@@ -19,9 +19,6 @@ define [
   Figure
 ) ->
 
-  # This will be prefixed with Aloha.settings.baseUrl
-  WARNING_IMAGE_PATH = '/../plugins/oer/assorted/img/warning.png'
-
   DIALOG_HTML_CONTAINER = '''
       <form class="plugin image modal fade form-horizontal" id="linkModal" tabindex="-1" role="dialog" aria-labelledby="linkModalLabel" aria-hidden="true" data-backdrop="false" />'''
 
@@ -197,11 +194,10 @@ define [
     imageSource = null
 
     # Set onerror of preview image
-    ((img, baseurl) ->
-      img.onerror = ->
-        errimg = baseurl + WARNING_IMAGE_PATH
-        img.src = errimg unless img.src is errimg
-    ) dialog.find('.placeholder.preview img')[0], Aloha.settings.baseUrl
+    (($img) ->
+      $img[0].onerror = ->
+        $img.replaceWith('<span class="selected-invalid-image-type"><i class="fa fa-warning"></i> The file you selected is not a valid image. Please close and try again.</span>')
+    ) dialog.find('.placeholder.preview img')
 
     setImageSource = (href) ->
       imageSource = href
@@ -234,7 +230,7 @@ define [
       # Parse the file and if it's an image set the imageSource
       if files.length > 0
         if settings.image.preview
-          $previewImg = $placeholder.find('img')
+          $previewImg = $placeholder.find('img') or jQuery('<img class="placeholder-image">').appendTo($placeholder)
           loadLocalFile files[0], $previewImg
           $placeholder.show()
           $imageselect.hide()
