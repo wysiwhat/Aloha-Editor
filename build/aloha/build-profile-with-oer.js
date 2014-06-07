@@ -72,11 +72,11 @@
         "link/css": "../plugins/common/link/css",
         "link/nls": "../plugins/common/link/nls",
         "link/res": "../plugins/common/link/res",
-        "table": "../plugins/common/table/lib",
-        "table/vendor": "../plugins/common/table/vendor",
-        "table/css": "../plugins/common/table/css",
-        "table/nls": "../plugins/common/table/nls",
-        "table/res": "../plugins/common/table/res",
+        // "table": "../plugins/common/table/lib",
+        // "table/vendor": "../plugins/common/table/vendor",
+        // "table/css": "../plugins/common/table/css",
+        // "table/nls": "../plugins/common/table/nls",
+        // "table/res": "../plugins/common/table/res",
         "list": "../plugins/common/list/lib",
         "list/vendor": "../plugins/common/list/vendor",
         "list/css": "../plugins/common/list/css",
@@ -243,6 +243,9 @@
         'multipart/css': '../plugins/oer/multipart/css',
         'quotation': '../plugins/oer/quotation/lib',
         'quotation/css': '../plugins/oer/quotation/css',
+        'table': '../plugins/oer/table/lib',
+        'table/css': '../plugins/oer/table/css',
+
 
         //Do not forget to add these to aloha.coffee
 
