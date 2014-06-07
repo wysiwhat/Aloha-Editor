@@ -43,7 +43,7 @@
 .semantic-container.copy-preview, .semantic-container.copy-preview > .semantic-controls-top {
     background-color: #F2F2F2;
 }
-.semantic-container.copy-preview .exercise-controls, 
+.semantic-container.copy-preview .exercise-controls,
 .semantic-container.copy-preview .solution-controls {
     display: none !important;
 }
@@ -51,8 +51,8 @@
 .semantic-container.drag-active {
     background: #F0F0F0;
 }
-.semantic-container.drag-active .semantic-controls-top, 
-.semantic-container.drag-active .exercise-controls, 
+.semantic-container.drag-active .semantic-controls-top,
+.semantic-container.drag-active .exercise-controls,
 .semantic-container.drag-active .solution-controls {
     display: none !important;
 }
@@ -63,8 +63,8 @@
 .semantic-container.delete-hover .aloha-oer-block{
     opacity: 0.3;
 }
-.semantic-container.delete-hover .semantic-controls-top, 
-.semantic-container.delete-hover .exercise-controls, 
+.semantic-container.delete-hover .semantic-controls-top,
+.semantic-container.delete-hover .exercise-controls,
 .semantic-container.delete-hover .solution-controls {
     display: none !important;
 }
@@ -97,14 +97,14 @@
     left: 50%;
     top: -8px;
     display: none !important; /* override the default aloha display logic for handles */
-    cursor: -moz-grab !important;
-    cursor: -webkit-grab !important;
-    cursor: url('openhand.cur'), default;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab, move;
 }
 .semantic-container.aloha-oer-dragging .aloha-block-handle {
-    cursor: -moz-grabbing !important;
-    cursor: -webkit-grabbing !important;
-    cursor: url('closedhand.cur'), default;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+    cursor: grabbing, move;
 }
 .semantic-container.drag-active .aloha-block-handle {
     background-color: #F0F0F0;
