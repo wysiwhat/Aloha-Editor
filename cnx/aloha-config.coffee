@@ -40,6 +40,7 @@
       'oer/table'
       'extra/draganddropfiles'
       'oer/image'
+      'oer/figure'
       'oer/overlay'
       'oer/math'
       'oer/assorted'
