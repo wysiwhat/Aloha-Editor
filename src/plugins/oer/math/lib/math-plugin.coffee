@@ -43,7 +43,7 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
     <div class="math-editor-dialog">
         <div class="math-container">
             <pre><span></span><br></pre>
-            <textarea type="text" class="formula" rows="1"
+            <textarea type="text" class="formula" rows="1" autofocus="autofocus"
                       placeholder="Insert your math notation here"></textarea>
         </div>
         <div class="footer controls form-inline">
