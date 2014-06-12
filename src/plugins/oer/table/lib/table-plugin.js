@@ -149,7 +149,7 @@ function(Aloha, Plugin, $, Ui, Button, PubSub, Dialog, Ephemera, semanticBlock, 
 
             semanticBlock.register(plugin);
 
-            semanticBlock.registerEvent('click', 'table', this.clickTable.bind(this));
+            semanticBlock.registerEvent('click', '.aloha-editable table', this.clickTable.bind(this));
 
             // Mark some classes as ephemeral
             Ephemera.classes('aloha-current-cell', 'aloha-current-row', 'add-column-before', 'add-column-after');
