@@ -319,24 +319,24 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
   # $span contains the span with LaTeX/ASCIIMath
   buildEditor = ($span) ->
     $editor = $_editor.clone(true)
+    $formula = $editor.find('.formula')
 
     # If this is new math, drop the plain text option.
-    if $span.find('.mathjax-wrapper > *').length == 0
+    if $span.find('.mathjax-wrapper > *').length is 0
       $editor.find('.plaintext-label').remove()
 
     # Bind some actions for the buttons
-    $editor.find('.done').on 'click', =>
+    $editor.find('.done').on 'click', ->
       $span.popover('hide')
       placeCursorAfter($span)
-    $editor.find('.remove').on 'click', =>
+    $editor.find('.remove').on 'click', ->
       $span.popover('hide')
       cleanupFormula($editor, $span, true)
-    $editor.find('.copy').on 'click', =>
+    $editor.find('.copy').on 'click', ->
       Copy.buffer $span.outerHtml(), 'text/oerpub-content'
-    $editor.find('.clear').on 'click', =>
-      $editor.find('.formula').val('')
-
-    $formula = $editor.find('.formula')
+    $editor.find('.clear').on 'click', ->
+      $formula.val('')
+      $formula.trigger('input')
 
     # Set the formula in jQuery data if it hasn't been set before
     #$span.data('math-formula', $span.data('math-formula') or $span.attr('data-math-formula') or $span.text())
@@ -400,10 +400,9 @@ define [ 'aloha', 'aloha/plugin', 'jquery', 'overlay/overlay-plugin', 'ui/ui', '
       $formula.trigger('focus')
 
     $formula.on 'input', () ->
-        clearTimeout(keyTimeout)
-        setTimeout(keyDelay.bind(@), 500)
-        $editor.find('.math-container pre span').text(
-            $editor.find('.formula').val())
+      clearTimeout(keyTimeout)
+      setTimeout(keyDelay.bind(@), 500)
+      $editor.find('.math-container pre span').text($formula.val())
 
     radios = $editor.find('input[name=mime-type]')
     radios.on 'click', () ->

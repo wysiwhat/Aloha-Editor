@@ -235,32 +235,25 @@
     buildEditor = function($span) {
       var $editor, $formula, formula, keyDelay, keyTimeout, mimeType, radios;
       $editor = $_editor.clone(true);
+      $formula = $editor.find('.formula');
       if ($span.find('.mathjax-wrapper > *').length === 0) {
         $editor.find('.plaintext-label').remove();
       }
-      $editor.find('.done').on('click', (function(_this) {
-        return function() {
-          $span.popover('hide');
-          return placeCursorAfter($span);
-        };
-      })(this));
-      $editor.find('.remove').on('click', (function(_this) {
-        return function() {
-          $span.popover('hide');
-          return cleanupFormula($editor, $span, true);
-        };
-      })(this));
-      $editor.find('.copy').on('click', (function(_this) {
-        return function() {
-          return Copy.buffer($span.outerHtml(), 'text/oerpub-content');
-        };
-      })(this));
-      $editor.find('.clear').on('click', (function(_this) {
-        return function() {
-          return $editor.find('.formula').val('');
-        };
-      })(this));
-      $formula = $editor.find('.formula');
+      $editor.find('.done').on('click', function() {
+        $span.popover('hide');
+        return placeCursorAfter($span);
+      });
+      $editor.find('.remove').on('click', function() {
+        $span.popover('hide');
+        return cleanupFormula($editor, $span, true);
+      });
+      $editor.find('.copy').on('click', function() {
+        return Copy.buffer($span.outerHtml(), 'text/oerpub-content');
+      });
+      $editor.find('.clear').on('click', function() {
+        $formula.val('');
+        return $formula.trigger('input');
+      });
       mimeType = $span.find('script[type]').attr('type') || 'math/tex';
       mimeType = mimeType.split(';')[0];
       formula = $span.find('script[type]').html();
@@ -312,7 +305,7 @@
       $formula.on('input', function() {
         clearTimeout(keyTimeout);
         setTimeout(keyDelay.bind(this), 500);
-        return $editor.find('.math-container pre span').text($editor.find('.formula').val());
+        return $editor.find('.math-container pre span').text($formula.val());
       });
       radios = $editor.find('input[name=mime-type]');
       radios.on('click', function() {
