@@ -172,13 +172,14 @@ define [
         semanticBlock.registerEvent('click', '.exercise .solution-controls .solution-toggle', () ->
           exercise = jQuery(this).parents('.exercise').first()
           controls = exercise.children('.solution-controls')
-          solutions = exercise.children('.solutions')
+          solutions = exercise.find('.solutions')
 
-          solutions.slideToggle ->
-            if solutions.is(':visible')
-              controls.children('.solution-toggle').text('hide solution')
-            else
-              controls.children('.solution-toggle').text('show solution')
+          solutions.toggle(!solutions.is(':visible'))
+
+          if solutions.is(':visible')
+            controls.children('.solution-toggle').text('hide solution')
+          else
+            controls.children('.solution-toggle').text('show solution')
 
         )
         semanticBlock.registerEvent('click', '.exercise .semantic-delete', () ->
