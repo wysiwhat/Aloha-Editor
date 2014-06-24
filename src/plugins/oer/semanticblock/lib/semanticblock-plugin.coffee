@@ -303,10 +303,11 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
   Plugin.create 'semanticblock',
 
     placeholder: $('<span class="aloha-ephemera oer-placeholder"></span>')
-    defaults: {
-      showLabels: true,
+    defaults:
+      semanticDragSelector: '.semantic-drag-source'
+      showLabels: true
       defaultSelector: 'div:not(.title,.aloha-oer-block,.aloha-editable,.aloha-block,.aloha-ephemera-wrapper,.aloha-ephemera)'
-    }
+
     makeClean: (content) ->
 
       content.find('.semantic-container').each ->
@@ -330,10 +331,10 @@ define ['aloha', 'block/block', 'block/blockmanager', 'aloha/plugin', 'aloha/plu
       Aloha.bind 'aloha-editable-activated', (e, params) =>
         $root = params.editable.obj
 
-        if $root.is('.aloha-root-editable')
+        if @settings.semanticDragSelector and $root.is('.aloha-root-editable')
 
           # setting up these drag sources may break if there is more than one top level editable on the page
-          jQuery('.semantic-drag-source').children().each ->
+          jQuery(@settings.semanticDragSelector).children().each ->
             element = jQuery(this)
             elementLabel = (element.data('type') or element.attr('class')).split(' ')[0]
             element.draggable
